@@ -187,7 +187,6 @@ function Editor() {
     }
 
     // 送信用オブジェクトの作成
-
     // if (newIndex) {
     //   switch (overItem.type) {
     //     case 'page-list':
