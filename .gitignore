@@ -15,6 +15,7 @@
 *.vcxproj.filters
 *.vcxproj.user
 *.xcodeproj
+*.db
 /.idea/
 /dist/
 node_modules/
@@ -55,4 +56,3 @@ patches/mtime-cache.json
 
 spec/fixtures/logo.png
 
-.db
