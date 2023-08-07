@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+}
+
+.editorPage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-gap: 16px;
+  min-height: 100vh;
+}
+
+.editorJS {
+  background-color: #f8f8f8;
+}
+
+#sideBar {
+  padding: 16px;
+  border-right: 0.5px solid grey;
+  min-height: 100%;
+}
+
+.editorTabList {
+  padding: 16px 0;
+  display: flex;
+  li {
+    list-style: none;
+    padding: 0 16px;
+    cursor: pointer;
+  }
+  li.selected {
+    font-weight: bold;
+  }
+}
