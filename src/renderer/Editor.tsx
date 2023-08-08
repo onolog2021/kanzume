@@ -9,6 +9,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { loadavg } from 'os';
+import { act } from 'react-test-renderer';
 import WorkSpace from './components/workspace/WorkSpace';
 import SideBar from './components/sidebar/Sidebar';
 import { ProjectContext, TabListContext } from './components/Context';
@@ -23,6 +24,7 @@ interface itemData {
   id: string;
   itemId: number;
   type: string;
+  area: string;
   index: any;
   parentId: number | null;
 }
@@ -39,7 +41,8 @@ function Editor() {
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
   const [tabIndex, setTabIndex] = useState([]);
-  const [paperIndex, setPaperIndex] = useState([]);
+  const folderType = ['folder', 'board'];
+  const pageType = ['page', 'paper'];
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 20,
@@ -119,7 +122,7 @@ function Editor() {
           boardList={boardList}
           pageList={pageList}
         />
-        <WorkSpace tabs={tabs} paperIndex={paperIndex} />
+        <WorkSpace tabs={tabs} />
       </div>
       <DragOverlay>
         <p>現在、越境中</p>
@@ -127,11 +130,18 @@ function Editor() {
     </DndContext>
   );
 
+  // 与えられた配列のなかの反対を返す
+  function returnOpposite(keys: [string, string], paramWord: string) {
+    const word = keys[0] === paramWord ? keys[1] : keys[0];
+    return word;
+  }
+
   function handleDragStart({ active }) {
     setActiveItem({
       id: active.id,
-      itemId: active.data.current.itemId,
       type: active.data.current.type,
+      itemId: active.data.current.itemId,
+      area: active.data.current.area,
       index: active.data.current.index,
       parentId: active.data.current.parentId,
     });
@@ -141,19 +151,19 @@ function Editor() {
     if (over) {
       setOverItem({
         id: over.id,
-        itemId: over.data.current.itemId,
         type: over.data.current.type,
+        itemId: over.data.current.itemId,
+        area: over.data.current.area,
         index: over.data.current.index,
         parentId: over.data.current.parentId,
       });
     }
   }
 
-  function handleDragEnd({ active, over }) {
-    // 新しいIndexを作成
+  function createNewIndex() {
     let newIndex: string[];
-    // typeが同じ場合
-    if (activeItem.type === overItem.type) {
+    // areaが同じ場合
+    if (activeItem.area === overItem.area) {
       if (activeItem && overItem && activeItem.id !== overItem.id) {
         const oldIndex = activeItem.index.findIndex(
           (page) => page === activeItem.id
@@ -165,94 +175,130 @@ function Editor() {
           newIndex = arrayMove(activeItem.index, oldIndex, newPosition);
         }
       }
-    }
-
-    // typeが違う場合
-    if (activeItem.type !== overItem.type) {
+    } else {
+      // areaがちがう場合
       const oldIndex = overItem?.index;
-      const newPosition = overItem?.index.findIndex(
-        (item) => item === overItem.id
-      );
+      const newPosition = oldIndex.findIndex((item) => item === overItem.id);
       if (newPosition !== -1) {
         const newOverIndex = [...overItem.index];
         newOverIndex.splice(newPosition, 0, activeItem.id);
         newIndex = newOverIndex;
       }
     }
-
-    if (overItem.type === 'page-list') {
-      const valuesArray = updatePageIndex(newIndex);
-      console.log(valuesArray);
-      window.electron.ipcRenderer.sendMessage('updatePosition', valuesArray);
-    }
-
-    // 送信用オブジェクトの作成
-    // if (newIndex) {
-    //   switch (overItem.type) {
-    //     case 'page-list':
-    //       updatePageIndex(newIndex);
-    //       break;
-    //     default:
-    //   }
-    // }
-    // if (activeItem.type !== overItem?.type) {
-    //   convertItem(activeItem, overItem);
-    // }
-    // switch (overItem?.type) {
-    //   case 'page':
-    //   case 'folder':
-    //     updatePageIndex(active, over);
-    //     break;
-    //   case 'board':
-    //     updateBoardIndex(active, over);
-    //     break;
-    //   case 'tab':
-    //     updateTabIndex(active, over);
-    //     break;
-    //   case 'paper':
-    //     updatePaperIndex(activeItem, overItem);
-    //     break;
-    //   default:
-    //   // console.log('test');
-    // }
+    return newIndex;
   }
 
-  function convertItem(active: itemData, over: itemData) {
-    if (active.type === 'folder') {
-      if (over.type === 'board') {
-        // const values = {id: active.itemId, type: 'board', position: -1}
-        // window.electron.ipcRenderer.sendMessage('updateFolder', values);
-        const newActiveIndex = active.index.filter(
-          (item) => item === active.id
-        );
-        const newPosition = over.index.findIndex((item) => item === over.id);
+  // 引数にあわせて更新する
+  function updateList(area) {
+    // boardの場合、どれを更新するか。
+    const ids = [];
+    if (activeItem.type === 'paper') {
+      ids.push(activeItem?.parentId);
+    }
+    if (overItem.type === 'paper') {
+      ids.push(overItem?.parentId);
+    }
+    switch (area) {
+      case 'page-list':
+        getTree(project);
+        break;
+      case 'board-list':
+        getBoards(project);
+        break;
+      case 'paper':
+        window.electron.ipcRenderer.sendMessage('updateBoardPapers', ids);
+        break;
+      default:
+    }
+  }
+
+  // ドロップ後の処理分け
+  function caseUpdate() {
+    updateList(activeItem.area);
+    if (activeItem.area !== overItem.area) {
+      updateList(overItem.area);
+    }
+  }
+
+  // ドロップ後にドラッグしたものとドロップした場所の更新
+  function handleDragEnd({ active, over }) {
+    if (active && over) {
+      // 新しいIndexを作成
+      const newIndex = createNewIndex();
+
+      // newindex.length>0のときに実施するコード
+
+      if (overItem.area === 'page-list') {
+        const valuesArray = translateForSidebar(newIndex);
+        window.electron.ipcRenderer.sendMessage('updatePosition', valuesArray);
       }
+
+      // 発火の条件分けでfolderとboardのときのみにするのを忘れずにね。
+      if (overItem.area === 'board-list' && activeItem.type !== 'page') {
+        const valuesArray = translateForSidebar(newIndex);
+        window.electron.ipcRenderer.sendMessage('updatePosition', valuesArray);
+      }
+
+      if (overItem.area === 'board-body') {
+        const valuesArray = updatePaperIndex(newIndex);
+        window.electron.ipcRenderer.sendMessage('droppedBoardBody', valuesArray);
+      }
+
+      setTimeout(() => caseUpdate(), 300);
     }
   }
 
-  function updatePaperIndex(activeItem, overItem) {
-    const originalindex = activeItem.index;
-    const oldIndex = originalindex.findIndex((item) => item === activeItem.id);
-    const newIndex = originalindex.findIndex((item) => item === overItem.id);
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const newPaperIndex = arrayMove(originalindex, oldIndex, newIndex);
-      const ary = [];
-      // storeIdだから注意
-      newPaperIndex.forEach((item, position) =>
-        ary.push({
-          table: 'store',
-          id: parseInt(item.replace('paper-', '')),
-          position,
-        })
-      );
-      const submitIndex = async () =>
-        await window.electron.ipcRenderer.sendMessage('updatePosition', ary);
-      submitIndex();
-      setPaperIndex(newPaperIndex);
+  function updatePaperIndex(index) {
+    const ary = [];
+    index.forEach((item, index) => {
+      const element = item.split('-');
+      if (element[0] === 'page') {
+        const arg = {
+          folder_id: overItem?.parentId,
+          page_id: parseInt(element[1]),
+          position: index,
+        };
+        ary.push(arg);
+      }
+      if (element[0] === 'paper') {
+        const arg = {
+          folder_id: overItem?.parentId,
+          page_id: parseInt(element[1]),
+          position: index,
+        };
+        ary.push(arg);
+      }
+    });
+    const values = [overItem?.parentId, ary]
+    return values;
+  }
+
+  function adjustTableName(name: string) {
+    switch (name) {
+      case 'board':
+        return 'folder';
+      case 'paper':
+        return 'page';
+      default:
+        return name;
     }
   }
 
-  function updatePageIndex(pageIndex) {
+  function translateItem(params: [string, string], index: number) {
+    const table = adjustTableName(params[0]);
+    const arg = {
+      table,
+      id: parseInt(params[1]),
+      position: index,
+    };
+    // ページリスト→ボードリストの場合
+    if (table === 'folder' && activeItem.area !== overItem.area) {
+      arg.type = overItem.area === 'board-list' ? 'board' : 'folder';
+    }
+    return arg;
+  }
+
+  function translateForSidebar(pageIndex) {
     const ary = [];
     pageIndex.forEach((item, index) => {
       const element = item.split('-');
@@ -264,102 +310,10 @@ function Editor() {
         };
         window.electron.ipcRenderer.sendMessage('destroyStore', value);
       }
-      switch (element[0]) {
-        case 'page':
-        case 'paper':
-          {
-            const arg = {
-              table: 'page',
-              id: parseInt(element[1]),
-              position: index,
-            };
-            ary.push(arg);
-          }
-          break;
-        case 'folder':
-          {
-            const arg = {
-              table: 'folder',
-              id: parseInt(element[1]),
-              position: index,
-            };
-            ary.push(arg);
-          }
-          break;
-        case 'board':
-          {
-            const arg = {
-              table: 'folder',
-              id: parseInt(element[1]),
-              position: index,
-              type: 'folder',
-            };
-            ary.push(arg);
-          }
-          break;
-        default:
-      }
+      const arg = translateItem(element, index);
+      ary.push(arg);
     });
     return ary;
-
-    // if (activeItem && overItem && activeItem.id !== overItem.id) {
-    //   const oldIndex = ary.findIndex((page) => page === activeItem.id);
-    //   const newIndex = ary.findIndex((page) => page === overItem.id);
-    //   const newAry: string[] = [];
-    //   if (oldIndex !== -1 && newIndex !== -1) {
-    //     const newPageList = arrayMove(newAry, oldIndex, newIndex);
-    //     newPageList.forEach((item, index) => {
-    //       if (!item.startsWith('project')) {
-    //         const paramId = item.startsWith('folder')
-    //           ? item.replace('folder-', '')
-    //           : item.replace('page-', '');
-    //         const paramType = item.startsWith('folder') ? 'folder' : 'page';
-    //         const type = item.startsWith('folder') ? 'folder' : null;
-    //         newAry.push({
-    //           table: paramType,
-    //           id: paramId,
-    //           position: index,
-    //           type,
-    //         });
-    //       }
-    //     });
-    //     const submitIndex = async () => {
-    //       const arg = [newAry, 'pageList'];
-    //       await window.electron.ipcRenderer.sendMessage('updatePosition', arg);
-    //       await getTree(project);
-    //     };
-    //   console.log(newAry)
-    //   submitIndex();
-    //   }
-    // }
-  }
-
-  function updateBoardIndex(activeItem, overItem) {
-    if (activeItem && overItem && activeItem.id !== overItem.id) {
-      const oldIndex = boardIndex.findIndex((page) => page === activeItem.id);
-      const newIndex = boardIndex.findIndex((page) => page === overItem.id);
-      const ary = [];
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newBoardIndex = arrayMove(boardIndex, oldIndex, newIndex);
-        newBoardIndex.forEach((item, index) => {
-          if (!item.startsWith('project')) {
-            const paramId = item.replace('board-', '');
-            ary.push({
-              table: 'folder',
-              id: paramId,
-              position: index,
-              type: 'board',
-            });
-          }
-        });
-        const submitIndex = async () => {
-          await window.electron.ipcRenderer.sendMessage('updatePosition', ary);
-          await getBoards(project);
-        };
-        submitIndex();
-        setBoardIndex(newBoardIndex);
-      }
-    }
   }
 
   function updateTabIndex(activeItem, overItem) {

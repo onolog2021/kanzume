@@ -18,12 +18,6 @@ function PageList({ root }) {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
 
-  useEffect(() => {
-    window.electron.ipcRenderer.on('updatePageList', (event) => {
-      console.log(event);
-    });
-  },[])
-
   async function createNewPage() {
     const newTitle = '無題';
     const getNewId = await window.electron.ipcRenderer.invoke('createNewPage', [

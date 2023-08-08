@@ -4,7 +4,7 @@ import { Box, Paper } from '@mui/material';
 import { SortableContext } from '@dnd-kit/sortable';
 import Boardpage from './BoardPage';
 
-export default function BoardBody({ boardData, paperIndex }) {
+export default function BoardBody({ boardData }) {
   const [board, setBoard] = useState();
   const [pages, setPages] = useState();
   const [index, setIndex] = useState([]);
@@ -19,7 +19,20 @@ export default function BoardBody({ boardData, paperIndex }) {
       setIndex(newAry);
     };
     getPages();
-  }, [paperIndex]);
+  }, []);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('updatePapers', (event, ...args) => {
+      setTimeout(() => {
+        console.log(event);
+      },500)
+      if (args[0] === boardData.id) {
+        setTimeout(() => {
+          setPages(args[1]);
+        }, 500);
+      }
+    });
+  }, []);
 
   return (
     <>

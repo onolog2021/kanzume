@@ -3,7 +3,6 @@ import { ListItemText, IconButton, ListItemButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { updatePageList } from 'renderer/components/GlobalMethods';
 import Page from 'renderer/Classes/Page';
 import {
   CurrentPageContext,
@@ -19,7 +18,7 @@ function ListItemPage({ pageData, index }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: `page-${page.id}`,
-      data: { type: 'page-list', itemId: page.id, index },
+      data: { area: 'page-list', type: 'page', itemId: page.id, index },
     });
 
   const style = {

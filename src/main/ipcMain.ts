@@ -13,6 +13,23 @@ function executeTransaction(sql: string, value: Array<T>) {
   });
 }
 
+function createPlaceholder(length: number) {
+  const placeholders = Array(length).fill('?').join(', ');
+  return `(${placeholders})`;
+}
+
+function formatObjectKeyValuePairs(obj) {
+  const keyValuePairs = [];
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      keyValuePairs.push(`${key} = ${obj[key]}`);
+    }
+  }
+
+  return keyValuePairs.join(', ');
+}
+
 ipcMain.handle('createProject', (_e, title) => {
   return new Promise((resolve, reject) => {
     const sql = 'INSERT INTO project(title) VALUES (?)';
@@ -258,7 +275,7 @@ ipcMain.on('bookmarking', (_e, ary) => {
   });
 });
 
-ipcMain.handle('getPages', (_e, projectId) => {
+async function getPages(projectId) {
   const sql =
     'SELECT id, title, position, folder_id from page WHERE project_id = ? ORDER BY position ASC';
   return new Promise((resolve, reject) => {
@@ -270,6 +287,17 @@ ipcMain.handle('getPages', (_e, projectId) => {
       }
     });
   });
+}
+
+ipcMain.handle('getPages', async (_e, projectId) => {
+  try {
+    // getPageDataをawaitキーワードを使って非同期に待つ
+    const rows = await getPages(projectId);
+    return rows;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 });
 
 ipcMain.handle('getFolders', (_e, projectId) => {
@@ -328,18 +356,15 @@ ipcMain.handle('boardChildren', (_e, folderId) => {
   });
 });
 
-// test
 // table,position,id,type
 ipcMain.on('updatePosition', (event, values) => {
   db.serialize(() => {
     db.run('BEGIN TRANSACTION;');
     values?.forEach((element) => {
-      const columns =
-        element.table === 'folder'
-          ? `position = ${element.position}, type = 'folder'`
-          : `position = ${element.position}`;
+      const columns = element.type
+        ? `position = ${element.position}, type = '${element.type}'`
+        : `position = ${element.position}`;
       const sqlLine = `UPDATE ${element.table} SET ${columns} WHERE id = ${element.id};`;
-      console.log(sqlLine);
       db.run(sqlLine, (error) => {
         if (error) {
           console.error(error);
@@ -364,12 +389,65 @@ ipcMain.on('updateFolder', (_e, arg) => {
 });
 
 ipcMain.on('destroyStore', (event, arg) => {
-  console.log(arg);
   const sql = 'DELETE FROM store WHERE page_id = ? AND folder_id = ?';
   const value = [arg.page_id, arg.folder_id];
   db.run(sql, value, (error) => {
     if (error) {
       console.log(error);
+    }
+  });
+});
+
+ipcMain.on('updateBoardPapers', (event, array) => {
+  // それぞれに更新した内容を送信する。
+  array.forEach((boardId) => {
+    const sql =
+      'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
+    db.all(sql, boardId, (error, rows) => {
+      if (error) {
+        console.log(error);
+      } else {
+        event.reply('updatePapers', [boardId, rows]);
+      }
+    });
+  });
+});
+
+ipcMain.on('droppedBoardBody', (event, values) => {
+  const array = values[1];
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION;');
+    array?.forEach((element) => {
+      if (element.id) {
+        const valuesSet = formatObjectKeyValuePairs(element);
+        const sqlLine = `UPDATE store SET ${valuesSet} WHERE id = ${element.id}`;
+        db.run(sqlLine, (error) => {
+          if (error) {
+            console.error(error);
+          }
+        });
+        console.log(sqlLine);
+      } else {
+        const columns = Object.keys(element);
+        const values = Object.values(element);
+        const placeholder = createPlaceholder(values.length);
+        const sqlLine = `INSERT OR REPLACE INTO store(${columns}) VALUES ${placeholder};`;
+        db.run(sqlLine, values, (error) => {
+          if (error) {
+            console.error(error);
+          }
+        });
+      }
+    });
+    db.run('COMMIT;');
+  });
+  const sql =
+    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
+  db.all(sql, values[0], (error, rows) => {
+    if (error) {
+      console.log(error);
+    } else {
+      event.reply('updatePapers', [values[0], rows]);
     }
   });
 });

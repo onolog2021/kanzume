@@ -13,7 +13,7 @@ function BoadItem({ board, index }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: `board-${board.id}`,
-      data: { type: 'board', itemId: board.id, index },
+      data: { type: 'board', area: 'board-list', itemId: board.id, index },
     });
 
   const style = {
@@ -24,8 +24,9 @@ function BoadItem({ board, index }) {
     const value = {
       id: board.id,
       title: board.title,
-      type: 'board',
+      type: 'board-list',
       tabId: `tab-board-${board.id}`,
+      parentId: board.id,
     };
     if (
       !tabList.some((item) => item.id === value.id && item.type === 'board')

@@ -25,7 +25,7 @@ function WorkSpace({ tabs, paperIndex }) {
             </div>
           ) : (
             <div style={isCurrent(tab)} key={`board-${tab.id}`}>
-              <BoardBody boardData={tab} paperIndex={paperIndex} />
+              <BoardBody boardData={tab} />
             </div>
           )
         )}

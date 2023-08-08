@@ -7,7 +7,6 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, TextField } from '@mui/material';
-import { updatePageList } from '../GlobalMethods';
 
 function TabItem({ tab, index }) {
   const [project] = useContext(ProjectContext);
@@ -46,8 +45,6 @@ function TabItem({ tab, index }) {
       newTitle,
     ]);
     setInput(false);
-    const newList = await updatePageList(project.id);
-    setPageList(newList);
   }
 
   const Tab = (

@@ -10,7 +10,13 @@ function Boardpage({ pageData, index, boardId }) {
 
   const { attributes, listeners, setNodeRef, transform } = useSortable({
     id: `paper-${pageData.id}`,
-    data: { type: 'paper', itemId: pageData.id, parentId: boardId,index },
+    data: {
+      area: 'board-body',
+      type: 'paper',
+      itemId: pageData.id,
+      parentId: boardId,
+      index,
+    },
   });
   const style = {
     transform: CSS.Translate.toString(transform),
