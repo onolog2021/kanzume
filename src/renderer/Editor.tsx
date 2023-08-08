@@ -225,7 +225,6 @@ function Editor() {
     if (active && over) {
       // 新しいIndexを作成
       const newIndex = createNewIndex();
-
       // newindex.length>0のときに実施するコード
 
       if (overItem.area === 'page-list') {
@@ -241,7 +240,10 @@ function Editor() {
 
       if (overItem.area === 'board-body') {
         const valuesArray = updatePaperIndex(newIndex);
-        window.electron.ipcRenderer.sendMessage('droppedBoardBody', valuesArray);
+        window.electron.ipcRenderer.sendMessage(
+          'droppedBoardBody',
+          valuesArray
+        );
       }
 
       setTimeout(() => caseUpdate(), 300);
@@ -269,7 +271,7 @@ function Editor() {
         ary.push(arg);
       }
     });
-    const values = [overItem?.parentId, ary]
+    const values = [overItem?.parentId, ary];
     return values;
   }
 

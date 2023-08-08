@@ -401,22 +401,13 @@ ipcMain.on('destroyStore', (event, arg) => {
 ipcMain.on('updateBoardPapers', (event, array) => {
   // それぞれに更新した内容を送信する。
   array.forEach((boardId) => {
-    const sql =
-      'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
-    db.all(sql, boardId, (error, rows) => {
-      if (error) {
-        console.log(error);
-      } else {
-        event.reply('updatePapers', [boardId, rows]);
-      }
-    });
+    getBoardBody(event, boardId);
   });
 });
 
 ipcMain.on('droppedBoardBody', (event, values) => {
   const array = values[1];
-  db.serialize(() => {
-    db.run('BEGIN TRANSACTION;');
+  const childrenFunc = () => {
     array?.forEach((element) => {
       if (element.id) {
         const valuesSet = formatObjectKeyValuePairs(element);
@@ -439,15 +430,45 @@ ipcMain.on('droppedBoardBody', (event, values) => {
         });
       }
     });
-    db.run('COMMIT;');
+  };
+
+  const dropped = () => {
+    transactionSql(childrenFunc)
+      .then(() => {
+        getBoardBody(event, values[0]);
+      })
+      .catch((error) => {
+        console.error('Transaction failed:', error);
+      });
+  };
+
+  dropped();
+});
+
+function transactionSql(children) {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION;');
+      children();
+      db.run('COMMIT;', (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
   });
+}
+
+function getBoardBody(event, boardId) {
   const sql =
     'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
-  db.all(sql, values[0], (error, rows) => {
+  db.all(sql, boardId, (error, rows) => {
     if (error) {
       console.log(error);
     } else {
-      event.reply('updatePapers', [values[0], rows]);
+      event.reply('updatePapers', [boardId, rows]);
     }
   });
-});
+}

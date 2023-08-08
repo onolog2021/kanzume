@@ -22,14 +22,10 @@ export default function BoardBody({ boardData }) {
   }, []);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('updatePapers', (event, ...args) => {
-      setTimeout(() => {
-        console.log(event);
-      },500)
+    window.electron.ipcRenderer.on('updatePapers', (args) => {
+      console.log(args[1]);
       if (args[0] === boardData.id) {
-        setTimeout(() => {
-          setPages(args[1]);
-        }, 500);
+        setPages(args[1]);
       }
     });
   }, []);
