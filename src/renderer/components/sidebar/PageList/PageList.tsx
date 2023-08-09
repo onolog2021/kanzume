@@ -1,11 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { List, Button } from '@mui/material';
-import { SortableContext, arrayMove } from '@dnd-kit/sortable';
-import { MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
-import Project from 'renderer/Classes/Project';
+import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
-import Node from 'renderer/Classes/Node';
-import { collectNames } from 'renderer/components/GlobalMethods';
 import {
   ProjectContext,
   CurrentPageContext,
@@ -18,23 +14,28 @@ function PageList({ root }) {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
 
+  const { setNodeRef } = useDroppable({
+    id: 'page-list',
+  });
+
   async function createNewPage() {
     const newTitle = '無題';
-    const getNewId = await window.electron.ipcRenderer.invoke('createNewPage', [
+    const newId = await window.electron.ipcRenderer.invoke('createNewPage', [
       project.id,
       newTitle,
     ]);
-    const value = {
-      id: getNewId,
-      title: newTitle,
+    await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
+    const newTab = {
+      id: newId,
+      title: '無題',
       type: 'editor',
+      tabId: `tab-editor-${newId}`,
     };
-    if (
-      !tabList.some((item) => item.id === value.id && item.type === 'editor')
-    ) {
-      setTabList((prevTabs) => [...prevTabs, value]);
-    }
-    setCurrentPage(getNewId);
+    setTabList((prevList) => {
+      prevList.push(newTab);
+      return prevList;
+    });
+    setCurrentPage({ id: newId, type: 'editor' });
   }
 
   async function createNewFolder() {
@@ -42,8 +43,8 @@ function PageList({ root }) {
       title: '無題のフォルダ',
       project_id: project.id,
     });
-    newFolder.create();
-    getTree(project);
+    await newFolder.create();
+    await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
   }
 
   if (!root) {
@@ -55,8 +56,10 @@ function PageList({ root }) {
       <h1>{project.title}</h1>
       <h2>テキスト</h2>
       <Button onClick={() => createNewPage()}>新規ページ</Button>
-      <Button onClick={() => createNewFolder()}>新規ページ</Button>
-      <List>{root ? <TreeBranch parentNode={root} /> : null}</List>
+      <Button onClick={() => createNewFolder()}>新規フォルダ</Button>
+      <List ref={setNodeRef}>
+        {root ? <TreeBranch parentNode={root} /> : null}
+      </List>
     </>
   );
 }

@@ -25,7 +25,7 @@ function ListItemFolder({ folderData, index }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: `folder-${folder.id}`,
-      data: { area: 'page-list', type:'folder' ,itemId: folder.id, index },
+      data: { area: 'page-list', type: 'folder', itemId: folder.id, index },
     });
 
   const style = {
@@ -34,11 +34,10 @@ function ListItemFolder({ folderData, index }) {
   };
 
   const deleteFolder = () => {
-    window.electron.ipcRenderer
-      .invoke('deleteById', ['folder', folder.id])
-      .then((result) => {
-        onDelete(project.id);
-      });
+    window.electron.ipcRenderer.sendMessage('deleteById', [
+      'folder',
+      folder.id,
+    ]);
   };
 
   const handleClick = () => {

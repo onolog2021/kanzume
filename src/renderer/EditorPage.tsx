@@ -11,9 +11,7 @@ function EditorPage() {
     <ProjectProvider>
       <TabListProvider>
         <CurrentPageProvider>
-          <PageListProvider>
-            <Editor />
-          </PageListProvider>
+          <Editor />
         </CurrentPageProvider>
       </TabListProvider>
     </ProjectProvider>

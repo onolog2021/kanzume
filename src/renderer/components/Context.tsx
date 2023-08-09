@@ -1,6 +1,6 @@
 // src/contexts/CountContexts.jsx
 
-import { useState, createContext } from 'react';
+import { useState, createContext, useCallback } from 'react';
 
 export const ProjectContext = createContext([]);
 
@@ -30,27 +30,26 @@ export function CurrentPageProvider({ children }) {
   );
 }
 
-export const PageListContext = createContext([]);
-
-export function PageListProvider({ children }) {
-  const [pageList, setPageList] = useState(null);
-
-  return (
-    <PageListContext.Provider value={[pageList, setPageList]}>
-      {children}
-    </PageListContext.Provider>
-  );
-}
-
 export const TabListContext = createContext([]);
 
 export function TabListProvider({ children }) {
   interface tabData {
     id: number;
     title: string;
-    type: string;
+    type: 'editor' | 'board';
+    tabId: string;
   }
   const [tabList, setTabList] = useState<tabData[]>([]);
+
+  const addTab = useCallback(
+    (newTab: tabData) => {
+      // Check for duplication based on tabId
+      if (!tabList.some((tab) => tab.tabId === newTab.tabId)) {
+        setTabList((prevTabs) => [...prevTabs, newTab]);
+      }
+    },
+    [tabList]
+  );
 
   return (
     <TabListContext.Provider value={[tabList, setTabList]}>

@@ -1,10 +1,5 @@
 import { useContext, useState, useRef, useEffect } from 'react';
-import {
-  CurrentPageContext,
-  ProjectContext,
-  PageListContext,
-  TabListContext,
-} from 'renderer/components/Context';
+import { TabListContext } from 'renderer/components/Context';
 import {
   SortableContext,
   horizontalListSortingStrategy,
@@ -12,19 +7,14 @@ import {
 import TabItem from './TabItem';
 
 function TabList({ tabIndex }) {
-  const [project] = useContext(ProjectContext);
-  const [pageList, setPageList] = useContext(PageListContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const [index, setIndex] = useState(tabIndex);
   const [tabList, setTabList] = useContext(TabListContext);
 
   return (
     <ul className="editorTabList">
-      <SortableContext
-        items={tabIndex}
-        strategy={horizontalListSortingStrategy}
-      >
+      <SortableContext items={index} strategy={horizontalListSortingStrategy}>
         {tabList.map((tab) => (
-          <TabItem key={`tab-${tab.type}-${tab.id}`} tab={tab} index={tabIndex} />
+          <TabItem key={`tab-${tab.type}-${tab.id}`} tab={tab} index={index} />
         ))}
       </SortableContext>
     </ul>

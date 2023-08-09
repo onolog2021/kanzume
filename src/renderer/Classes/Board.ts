@@ -13,8 +13,7 @@ export default class Board {
     this.title = data.title;
   }
 
-  // 出てくるのはstoreIDなことに注意！
   async pages() {
-    return await window.electron.ipcRenderer.invoke('boardChildren', this.id);
+    return await window.electron.ipcRenderer.invoke('boardChildren', [this.id]);
   }
 }

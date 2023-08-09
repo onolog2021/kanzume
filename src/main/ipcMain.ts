@@ -1,17 +1,14 @@
 import { ipcMain } from 'electron';
-import path from 'path';
+import path, { resolve } from 'path';
 import fs from 'fs';
 import { error } from 'console';
+import { rejects } from 'assert';
+import { IpcMainEvent } from 'electron/main';
+import Project from 'renderer/Classes/Project';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
 const db = new sqlite3.Database(dbPath);
-
-function executeTransaction(sql: string, value: Array<T>) {
-  db.run(sql, value, (error) => {
-    console.log(error);
-  });
-}
 
 function createPlaceholder(length: number) {
   const placeholders = Array(length).fill('?').join(', ');
@@ -112,19 +109,6 @@ ipcMain.handle('savePage', (_e, map) => {
   });
 });
 
-ipcMain.handle('getProjectItems', (_e, ary) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM ${ary[0]} WHERE project_id = (?) ORDER BY position ASC`;
-    db.all(sql, [ary[1]], (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
-
 ipcMain.handle('createFolder', (_e, object) => {
   return new Promise((resolve, reject) => {
     const sql =
@@ -140,44 +124,6 @@ ipcMain.handle('createFolder', (_e, object) => {
         reject(error);
       } else {
         resolve(this.lastID);
-      }
-    });
-  });
-});
-
-ipcMain.handle('getFolderChild', (_e, ary) => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      'SELECT p.id, p.title FROM page p JOIN store s ON p.id = s.page_id WHERE s.folder_id = (?);';
-    db.all(sql, [ary[0]], (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
-
-ipcMain.on('updatePageListPosition', (_e, object) => {
-  object.forEach((element) => {
-    const ary = [element.position, element.id];
-    const sql = 'UPDATE page SET position = ? WHERE id = ?';
-    db.run(sql, ary, (error) => {
-      if (error) {
-        console.error(error);
-      }
-    });
-  });
-});
-
-ipcMain.on('updateBoardPosition', (_e, object) => {
-  object.forEach((element) => {
-    const ary = [element.position, element.id];
-    const sql = 'UPDATE folder SET position = ? WHERE id = ?';
-    db.run(sql, ary, (error) => {
-      if (error) {
-        console.error(error);
       }
     });
   });
@@ -218,51 +164,11 @@ ipcMain.on('changePageTitle', (_e, ary) => {
   });
 });
 
-ipcMain.handle('getAllItems', async (_e, projectId) => {
-  try {
-    const projectPromise = db.get(
-      `SELECT * FROM project WHERE id = ?`,
-      projectId
-    );
-    const pagesPromise = db.all(
-      `SELECT * FROM page WHERE project_id = ?`,
-      projectId
-    );
-    const foldersPromise = db.all(
-      `SELECT * FROM folder WHERE project_id = ?`,
-      projectId
-    );
-    const storesPromise = db.all(
-      `SELECT store.* FROM store JOIN folder ON store.folder_id = folder.id WHERE folder.project_id = ?`,
-      projectId
-    );
-
-    const [project, pages, folders, stores] = await Promise.all([
-      projectPromise,
-      pagesPromise,
-      foldersPromise,
-      storesPromise,
-    ]);
-
-    return { project, pages, folders, stores };
-  } catch (error) {
-    console.error('Database operation failed:', error);
-    throw error; // or handle error as you prefer
-  }
-});
-
 ipcMain.handle('findChildPage', (_e, folderId) => {
   const sql =
     'SELECT p.title, p.id FROM page p INNER JOIN folder f ON f.id = p.folder_id WHERE f.id = ?';
-  return new Promise((resolve, reject) => {
-    db.all(sql, folderId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  const value = [folderId];
+  return executeDbAll(sql, value);
 });
 
 ipcMain.on('bookmarking', (_e, ary) => {
@@ -270,97 +176,48 @@ ipcMain.on('bookmarking', (_e, ary) => {
     ? 'INSERT OR REPLACE INTO bookmark(target, target_id) VALUES (?, ?)'
     : 'DELETE bookmark WHERE target = ? AND target_id = ?';
   const value = [ary[0], ary[1]];
-  db.run(sql, value, (error) => {
-    console.log(error);
-  });
+  executeDbRun(sql, value);
 });
 
-async function getPages(projectId) {
+ipcMain.handle('getPages', async (_e, projectId) => {
   const sql =
     'SELECT id, title, position, folder_id from page WHERE project_id = ? ORDER BY position ASC';
-  return new Promise((resolve, reject) => {
-    db.all(sql, projectId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-}
-
-ipcMain.handle('getPages', async (_e, projectId) => {
-  try {
-    // getPageDataをawaitキーワードを使って非同期に待つ
-    const rows = await getPages(projectId);
-    return rows;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  return executeDbAll(sql, projectId);
 });
 
 ipcMain.handle('getFolders', (_e, projectId) => {
   const sql =
     "SELECT id, title, position, parent_id from folder WHERE project_id = ? AND type = 'folder' ORDER BY position ASC";
-  return new Promise((resolve, reject) => {
-    db.all(sql, projectId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  return executeDbAll(sql, projectId);
 });
 
 ipcMain.handle('getStores', (_e, projectId) => {
   const sql =
     'SELECT s.folder_id, s.page_id, s.position from store s JOIN page p ON p.id = s.page_id WHERE p.project_id = ? ORDER BY s.position ASC';
-  return new Promise((resolve, reject) => {
-    db.all(sql, projectId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  return executeDbAll(sql, projectId);
 });
 
 ipcMain.handle('getBoards', (_e, projectId) => {
   const sql =
     "SELECT id, title, position, parent_id from folder WHERE project_id = ? AND type = 'board' ORDER BY position ASC";
-  return new Promise((resolve, reject) => {
-    db.all(sql, projectId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  return executeDbAll(sql, projectId);
 });
 
 ipcMain.handle('boardChildren', (_e, folderId) => {
   const sql =
     'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
-  return new Promise((resolve, reject) => {
-    db.all(sql, folderId, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  return executeDbAll(sql, folderId);
+});
+
+ipcMain.on('updatePageList', (event, projectId) => {
+  updatePageList(projectId, event);
 });
 
 // table,position,id,type
-ipcMain.on('updatePosition', (event, values) => {
+ipcMain.on('updatePosition', (event, args) => {
   db.serialize(() => {
     db.run('BEGIN TRANSACTION;');
-    values?.forEach((element) => {
+    args.values?.forEach((element) => {
       const columns = element.type
         ? `position = ${element.position}, type = '${element.type}'`
         : `position = ${element.position}`;
@@ -373,29 +230,14 @@ ipcMain.on('updatePosition', (event, values) => {
     });
     db.run('COMMIT;');
   });
-  event.reply('updatePageList', values);
-});
-
-ipcMain.on('updateFolder', (_e, arg) => {
-  let columns = '';
-  for (const key in arg) {
-    if (key != 'id') {
-      const value = obj[key];
-      columns += `${key} = ${value}`;
-    }
-  }
-  const sql = `UPDATE folder SET ${columns} WHERE id = ${arg.id}`;
-  console.log(sql);
+  // ここあとで調節
+  updatePageList(args.projectId, event);
 });
 
 ipcMain.on('destroyStore', (event, arg) => {
   const sql = 'DELETE FROM store WHERE page_id = ? AND folder_id = ?';
   const value = [arg.page_id, arg.folder_id];
-  db.run(sql, value, (error) => {
-    if (error) {
-      console.log(error);
-    }
-  });
+  executeDbRun(sql, value);
 });
 
 ipcMain.on('updateBoardPapers', (event, array) => {
@@ -403,6 +245,10 @@ ipcMain.on('updateBoardPapers', (event, array) => {
   array.forEach((boardId) => {
     getBoardBody(event, boardId);
   });
+});
+
+ipcMain.on('updateBoardList', (event, projectId) => {
+  event.reply('updateBoardList', projectId);
 });
 
 ipcMain.on('droppedBoardBody', (event, values) => {
@@ -445,6 +291,24 @@ ipcMain.on('droppedBoardBody', (event, values) => {
   dropped();
 });
 
+async function executeDbAll<T>(sql: string, values: unknown[]): Promise<T> {
+  return new Promise((resolve, reject) => {
+    db.all(sql, values, (error, rows) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
+function executeDbRun(sql: string, values: unknown[]): void {
+  db.run(sql, values, (error) => {
+    console.log(error);
+  });
+}
+
 function transactionSql(children) {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
@@ -471,4 +335,14 @@ function getBoardBody(event, boardId) {
       event.reply('updatePapers', [boardId, rows]);
     }
   });
+}
+
+async function updatePageList(projectId: number, event: IpcMainEvent) {
+  const sql =
+    'SELECT id, title, position, folder_id from page WHERE project_id = ? ORDER BY position ASC';
+  const rows = await executeDbAll(sql, [projectId]);
+  event.reply('updatePageList', rows);
+}
+
+async function updateBoardList(projectId: number, event: IpcMainEvent) {
 }

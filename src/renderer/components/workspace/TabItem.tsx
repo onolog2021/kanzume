@@ -2,7 +2,6 @@ import { useContext, useState, useRef, useEffect } from 'react';
 import {
   CurrentPageContext,
   ProjectContext,
-  PageListContext,
 } from 'renderer/components/Context';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -10,7 +9,6 @@ import { Button, TextField } from '@mui/material';
 
 function TabItem({ tab, index }) {
   const [project] = useContext(ProjectContext);
-  const [pageList, setPageList] = useContext(PageListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const titleRef = useRef();
   const [title, setTitle] = useState<string>(tab.title);
@@ -44,12 +42,13 @@ function TabItem({ tab, index }) {
       id,
       newTitle,
     ]);
+    await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
     setInput(false);
   }
 
   const Tab = (
     <li
-      className={currentPage === id ? 'selected' : null}
+      className={currentPage.id === id ? 'selected' : null}
       onClick={() => handleActiveTab(id)}
       ref={setNodeRef}
       style={style}

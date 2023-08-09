@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   DndContext,
   useSensors,
@@ -8,17 +8,14 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { loadavg } from 'os';
-import { act } from 'react-test-renderer';
 import WorkSpace from './components/workspace/WorkSpace';
 import SideBar from './components/sidebar/Sidebar';
 import { ProjectContext, TabListContext } from './components/Context';
 import Board from './components/sidebar/Board/Board';
 import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
-import { collectNames, updatePosition } from './components/GlobalMethods';
+import { collectNames } from './components/GlobalMethods';
 import TabList from './components/workspace/TabList';
-import Folder from './Classes/Folder';
 
 interface itemData {
   id: string;
@@ -41,8 +38,6 @@ function Editor() {
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
   const [tabIndex, setTabIndex] = useState([]);
-  const folderType = ['folder', 'board'];
-  const pageType = ['page', 'paper'];
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 20,
@@ -52,6 +47,20 @@ function Editor() {
   const boardList = <Board boardIndex={boardIndex} boards={boards} />;
   const pageList = <PageList root={pageRoot} />;
   const tabs = <TabList tabIndex={tabIndex} />;
+  const listArea = ['page-list', 'board-list', 'paper-list'];
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('updatePageList', () => {
+      if (project) {
+        getTree(project);
+      }
+    });
+    window.electron.ipcRenderer.on('updateBoardList', () => {
+      if (project) {
+        getBoards(project);
+      }
+    });
+  }, [project]);
 
   async function getProject() {
     try {
@@ -82,10 +91,14 @@ function Editor() {
   }
 
   async function getBoards(params: Project) {
-    const result = await params.boards();
-    setBoards(result);
-    const newAry = result.map((element) => `board-${element.id}`);
-    setBoardIndex(newAry);
+    try {
+      const result = await params.boards();
+      setBoards(result);
+      const newAry = result.map((element) => `board-${element.id}`);
+      setBoardIndex(newAry);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function createTabIndex() {
@@ -125,16 +138,10 @@ function Editor() {
         <WorkSpace tabs={tabs} />
       </div>
       <DragOverlay>
-        <p>現在、越境中</p>
+        <p>・・・</p>
       </DragOverlay>
     </DndContext>
   );
-
-  // 与えられた配列のなかの反対を返す
-  function returnOpposite(keys: [string, string], paramWord: string) {
-    const word = keys[0] === paramWord ? keys[1] : keys[0];
-    return word;
-  }
 
   function handleDragStart({ active }) {
     setActiveItem({
@@ -147,8 +154,8 @@ function Editor() {
     });
   }
 
-  function handleDragOver({ active, over }) {
-    if (over) {
+  function handleDragOver({ over }) {
+    if (over && !listArea.includes(over.id)) {
       setOverItem({
         id: over.id,
         type: over.data.current.type,
@@ -158,8 +165,15 @@ function Editor() {
         parentId: over.data.current.parentId,
       });
     }
+    if (over && listArea.includes(over.id)) {
+      setOverItem({
+        id: over.id,
+        type: 'new',
+      });
+    }
   }
 
+  // 要調査・先頭ドラッグの挙動がおかしいかも
   function createNewIndex() {
     let newIndex: string[];
     // areaが同じ場合
@@ -221,21 +235,45 @@ function Editor() {
   }
 
   // ドロップ後にドラッグしたものとドロップした場所の更新
-  function handleDragEnd({ active, over }) {
+  async function handleDragEnd({ active, over }) {
     if (active && over) {
+      if (overItem.type === 'new') {
+        // 落とした場所とアイテムに合わせて処理
+        if (overItem.id === 'board-list' && activeItem.type === 'folder') {
+          const arg = createNewArg();
+          const query = { projectId: project.id, values: [arg] };
+          await window.electron.ipcRenderer.sendMessage(
+            'updatePosition',
+            query
+          );
+          await getBoards(project);
+        }
+        if (
+          overItem.id === 'page-list' &&
+          (activeItem.type === 'paper' || activeItem.type === 'board')
+        ) {
+          const item = createNewArg();
+          const args = { projectId: project.id, values: [item] };
+          await window.electron.ipcRenderer.sendMessage('updatePosition', args);
+          await getTree(project)
+        }
+        return;
+      }
       // 新しいIndexを作成
       const newIndex = createNewIndex();
       // newindex.length>0のときに実施するコード
 
       if (overItem.area === 'page-list') {
         const valuesArray = translateForSidebar(newIndex);
-        window.electron.ipcRenderer.sendMessage('updatePosition', valuesArray);
+        const args = { projectId: project.id, values: valuesArray };
+        window.electron.ipcRenderer.sendMessage('updatePosition', args);
       }
 
       // 発火の条件分けでfolderとboardのときのみにするのを忘れずにね。
       if (overItem.area === 'board-list' && activeItem.type !== 'page') {
         const valuesArray = translateForSidebar(newIndex);
-        window.electron.ipcRenderer.sendMessage('updatePosition', valuesArray);
+        const args = { projectId: project.id, values: valuesArray };
+        window.electron.ipcRenderer.sendMessage('updatePosition', args);
       }
 
       if (overItem.area === 'board-body') {
@@ -246,7 +284,32 @@ function Editor() {
         );
       }
 
-      setTimeout(() => caseUpdate(), 300);
+      caseUpdate();
+    }
+  }
+
+  // 新規に登録する場合
+  function createNewArg() {
+    // ボードリストにフォルダを移動した場合
+    if (overItem.id === 'board-list') {
+      const arg = {
+        table: 'folder',
+        id: activeItem?.itemId,
+        position: -1,
+        type: 'board',
+      };
+      return arg;
+    }
+    if(overItem.id === 'page-list'){
+      const arg = {
+        table: adjustTableName(activeItem.type),
+        id: activeItem?.itemId,
+        position: -1,
+      }
+      if(activeItem.type === 'board'){
+        arg.type = 'folder';
+      }
+      return arg;
     }
   }
 
@@ -316,23 +379,6 @@ function Editor() {
       ary.push(arg);
     });
     return ary;
-  }
-
-  function updateTabIndex(activeItem, overItem) {
-    if (activeItem && overItem && activeItem.id !== overItem.id) {
-      const oldIndex = tabIndex.findIndex((page) => page === activeItem.id);
-      const newIndex = tabIndex.findIndex((page) => page === overItem.id);
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newTabIndex = arrayMove(tabIndex, oldIndex, newIndex);
-        setTabIndex(newTabIndex);
-        const ary = [];
-        newTabIndex.forEach((tabId) => {
-          const target = tabList.find((item) => item.tabId === tabId);
-          ary.push(target);
-        });
-        setTabList(ary);
-      }
-    }
   }
 }
 

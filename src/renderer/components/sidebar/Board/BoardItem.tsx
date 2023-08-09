@@ -20,6 +20,7 @@ function BoadItem({ board, index }) {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
   function handleClick(board: Object) {
     const value = {
       id: board.id,
@@ -29,9 +30,13 @@ function BoadItem({ board, index }) {
       parentId: board.id,
     };
     if (
-      !tabList.some((item) => item.id === value.id && item.type === 'board')
+      tabList.length === 0 ||
+      !tabList.some((item) => item.tabId === value.tabId)
     ) {
-      setTabList((prevTabs) => [...prevTabs, value]);
+      setTabList((prevTabs) => {
+        prevTabs.push(value);
+        return prevTabs;
+      });
     }
     setCurrentPage({ id: board.id, type: 'board' });
   }
