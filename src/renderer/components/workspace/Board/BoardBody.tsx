@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Board from 'renderer/Classes/Board';
 import { Box, Paper } from '@mui/material';
+import { useDroppable } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
 import Boardpage from './BoardPage';
 
@@ -8,6 +9,10 @@ export default function BoardBody({ boardData }) {
   const [board, setBoard] = useState();
   const [pages, setPages] = useState();
   const [index, setIndex] = useState([]);
+  const { setNodeRef } = useDroppable({
+    id: 'paper-list',
+    data: { parentId: boardData.id },
+  });
 
   useEffect(() => {
     const newBoard = new Board({ id: boardData.id, title: boardData.title });
@@ -23,7 +28,6 @@ export default function BoardBody({ boardData }) {
 
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePapers', (args) => {
-      console.log(args[1]);
       if (args[0] === boardData.id) {
         setPages(args[1]);
       }
@@ -37,6 +41,7 @@ export default function BoardBody({ boardData }) {
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
+          minHeight: '200px',
           '& > :not(style)': {
             m: 1,
             p: 3,
@@ -44,6 +49,7 @@ export default function BoardBody({ boardData }) {
             height: 128,
           },
         }}
+        ref={setNodeRef}
       >
         <SortableContext items={index}>
           {pages &&

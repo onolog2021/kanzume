@@ -5,6 +5,7 @@ import { error } from 'console';
 import { rejects } from 'assert';
 import { IpcMainEvent } from 'electron/main';
 import Project from 'renderer/Classes/Project';
+import { eventNames } from 'process';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -263,7 +264,6 @@ ipcMain.on('droppedBoardBody', (event, values) => {
             console.error(error);
           }
         });
-        console.log(sqlLine);
       } else {
         const columns = Object.keys(element);
         const values = Object.values(element);
@@ -303,9 +303,15 @@ async function executeDbAll<T>(sql: string, values: unknown[]): Promise<T> {
   });
 }
 
-function executeDbRun(sql: string, values: unknown[]): void {
-  db.run(sql, values, (error) => {
-    console.log(error);
+function executeDbRun<T>(sql: string, values: unknown[]): Promise<T> {
+  return new Promise((resolve, reject) => {
+    db.run(sql, values, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve('success');
+      }
+    });
   });
 }
 
@@ -325,7 +331,7 @@ function transactionSql(children) {
   });
 }
 
-function getBoardBody(event, boardId) {
+function getBoardBody(event: IpcMainEvent, boardId: number) {
   const sql =
     'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
   db.all(sql, boardId, (error, rows) => {
@@ -344,5 +350,14 @@ async function updatePageList(projectId: number, event: IpcMainEvent) {
   event.reply('updatePageList', rows);
 }
 
-async function updateBoardList(projectId: number, event: IpcMainEvent) {
-}
+async function updateBoardList(projectId: number, event: IpcMainEvent) {}
+
+ipcMain.on('createNewStore', (event, args) => {
+  const columns = Object.keys(args);
+  const values = Object.values(args);
+  const placeholder = createPlaceholder(values.length);
+  const sql = `INSERT OR REPLACE INTO store(${columns}) VALUES ${placeholder};`;
+  executeDbRun(sql, values).then(() => {
+    getBoardBody(event, args.folder_id);
+  });
+});

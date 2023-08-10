@@ -21,11 +21,12 @@ function BoadItem({ board, index }) {
     transition,
   };
 
-  function handleClick(board: Object) {
+  async function handleClick(board: Object) {
+    await setCurrentPage({ id: board.id, type: 'board' });
     const value = {
       id: board.id,
       title: board.title,
-      type: 'board-list',
+      type: 'board',
       tabId: `tab-board-${board.id}`,
       parentId: board.id,
     };
@@ -33,12 +34,8 @@ function BoadItem({ board, index }) {
       tabList.length === 0 ||
       !tabList.some((item) => item.tabId === value.tabId)
     ) {
-      setTabList((prevTabs) => {
-        prevTabs.push(value);
-        return prevTabs;
-      });
+      await setTabList((prevTabs) => [...prevTabs, value]);
     }
-    setCurrentPage({ id: board.id, type: 'board' });
   }
 
   return (

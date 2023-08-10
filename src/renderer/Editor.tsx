@@ -27,9 +27,8 @@ interface itemData {
 }
 
 function Editor() {
-  const location = useLocation();
-  const projectId = location.state?.project_id;
-  const [project, setProject] = useContext(ProjectContext);
+  const projectId = useLocation().state?.project_id;
+  const [project, setProject] = useContext<Project>(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [activeItem, setActiveItem] = useState<itemData>();
   const [overItem, setOverItem] = useState<itemData>();
@@ -49,29 +48,36 @@ function Editor() {
   const tabs = <TabList tabIndex={tabIndex} />;
   const listArea = ['page-list', 'board-list', 'paper-list'];
 
+  // プロジェクトの初期設定
+  useEffect(() => {
+    async function fetchData() {
+      const thisProjectData = await fetchProjectData();
+      await updatePageList(thisProjectData);
+      await updateBoardList(thisProjectData);
+    }
+    fetchData();
+  }, []);
+
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePageList', () => {
       if (project) {
-        getTree(project);
+        updatePageList(project);
       }
     });
     window.electron.ipcRenderer.on('updateBoardList', () => {
       if (project) {
-        getBoards(project);
+        updateBoardList(project);
       }
     });
   }, [project]);
 
-  async function getProject() {
+  async function fetchProjectData() {
     try {
       const projectData = await window.electron.ipcRenderer.invoke('findById', [
         'project',
         projectId,
       ]);
-      const currentProject = new Project({
-        id: projectData.id,
-        title: projectData.title,
-      });
+      const currentProject = new Project(projectData);
       setProject(currentProject);
       return currentProject;
     } catch (error) {
@@ -79,7 +85,7 @@ function Editor() {
     }
   }
 
-  async function getTree(thisProject: Project) {
+  async function updatePageList(thisProject: Project) {
     const tree: Node = await thisProject.createTree();
     setPageRoot(tree);
     const itemsData = collectNames(tree);
@@ -90,7 +96,7 @@ function Editor() {
     setPageIndex(newIndex);
   }
 
-  async function getBoards(params: Project) {
+  async function updateBoardList(params: Project) {
     try {
       const result = await params.boards();
       setBoards(result);
@@ -100,27 +106,6 @@ function Editor() {
       console.log(error);
     }
   }
-
-  async function createTabIndex() {
-    if (tabList.length !== 0) {
-      const newAry = tabList.map((tab) => tab.tabId);
-      setTabIndex(newAry);
-    }
-  }
-
-  useEffect(() => {
-    async function fetchData() {
-      const currentProject = await getProject();
-      await getTree(currentProject);
-      await getBoards(currentProject);
-      await createTabIndex();
-    }
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    createTabIndex();
-  }, [tabList]);
 
   return (
     <DndContext
@@ -169,6 +154,7 @@ function Editor() {
       setOverItem({
         id: over.id,
         type: 'new',
+        parentId: over.data.current?.parentId,
       });
     }
   }
@@ -214,10 +200,10 @@ function Editor() {
     }
     switch (area) {
       case 'page-list':
-        getTree(project);
+        updatePageList(project);
         break;
       case 'board-list':
-        getBoards(project);
+        updateBoardList(project);
         break;
       case 'paper':
         window.electron.ipcRenderer.sendMessage('updateBoardPapers', ids);
@@ -236,9 +222,10 @@ function Editor() {
 
   // ドロップ後にドラッグしたものとドロップした場所の更新
   async function handleDragEnd({ active, over }) {
-    if (active && over) {
+    if (active && over && active.id !== over.id) {
       if (overItem.type === 'new') {
         // 落とした場所とアイテムに合わせて処理
+        // フォルダ→ボード
         if (overItem.id === 'board-list' && activeItem.type === 'folder') {
           const arg = createNewArg();
           const query = { projectId: project.id, values: [arg] };
@@ -246,8 +233,9 @@ function Editor() {
             'updatePosition',
             query
           );
-          await getBoards(project);
+          await updateBoardList(project);
         }
+        // ボード→フォルダ
         if (
           overItem.id === 'page-list' &&
           (activeItem.type === 'paper' || activeItem.type === 'board')
@@ -255,7 +243,13 @@ function Editor() {
           const item = createNewArg();
           const args = { projectId: project.id, values: [item] };
           await window.electron.ipcRenderer.sendMessage('updatePosition', args);
-          await getTree(project)
+          await updatePageList(project);
+        }
+        // ページ→ボード内
+        if (overItem.id === 'paper-list' && activeItem.type === 'page') {
+          const args = createNewArg();
+          await window.electron.ipcRenderer.sendMessage('createNewStore', args);
+          await updatePageList(project);
         }
         return;
       }
@@ -300,15 +294,23 @@ function Editor() {
       };
       return arg;
     }
-    if(overItem.id === 'page-list'){
+    if (overItem.id === 'page-list') {
       const arg = {
         table: adjustTableName(activeItem.type),
         id: activeItem?.itemId,
         position: -1,
-      }
-      if(activeItem.type === 'board'){
+      };
+      if (activeItem.type === 'board') {
         arg.type = 'folder';
       }
+      return arg;
+    }
+    if (overItem.id === 'paper-list') {
+      const arg = {
+        position: -1,
+        page_id: activeItem?.itemId,
+        folder_id: overItem?.parentId,
+      };
       return arg;
     }
   }

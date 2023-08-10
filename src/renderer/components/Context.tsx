@@ -2,7 +2,7 @@
 
 import { useState, createContext, useCallback } from 'react';
 
-export const ProjectContext = createContext([]);
+export const ProjectContext = createContext(null);
 
 export function ProjectProvider({ children }) {
   const [project, setProject] = useState(null);

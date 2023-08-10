@@ -1,14 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
 import { ListItemText, IconButton, ListItemButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Page from 'renderer/Classes/Page';
 import {
   CurrentPageContext,
-  WorkSpaceContext,
   TabListContext,
-  PageListContext,
 } from '../../Context';
 
 function ListItemPage({ pageData, index }) {

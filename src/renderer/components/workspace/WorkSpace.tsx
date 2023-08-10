@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { TabListContext, CurrentPageContext } from '../Context';
+import { useDroppable } from '@dnd-kit/core';
 import TabList from './TabList';
 import EditorBody from './Editor/EditorBody';
 import BoardBody from './Board/BoardBody';
