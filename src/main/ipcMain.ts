@@ -1,11 +1,7 @@
 import { ipcMain } from 'electron';
 import path, { resolve } from 'path';
-import fs from 'fs';
-import { error } from 'console';
-import { rejects } from 'assert';
 import { IpcMainEvent } from 'electron/main';
-import Project from 'renderer/Classes/Project';
-import { eventNames } from 'process';
+import { table } from 'console';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -139,21 +135,25 @@ ipcMain.on('saveTextData', (_e, ary) => {
   });
 });
 
-ipcMain.handle('createNewPage', (_e, ary) => {
+// レコードの作成
+ipcMain.handle('createRecord', (_e, param: { table: string; json: JSON }) => {
   return new Promise((resolve, reject) => {
-    const sql =
-      'INSERT INTO page(project_id, title, content, position) VALUES (?, ?, ?, ?)';
-    const values = [ary[0], ary[1], '{}', -1];
+    const columns = Object.keys(param.json).join(', ');
+    const placeholders = Object.keys(param.json)
+      .map(() => '?')
+      .join(', ');
+    const sql = `INSERT INTO ${param.table} (${columns}) VALUES (${placeholders})`;
+    const values = Object.values(param.json);
     db.run(sql, values, function (error) {
       if (error) {
         reject(error);
       } else {
-        console.log('success!');
         resolve(this.lastID);
       }
     });
   });
 });
+
 
 ipcMain.on('changePageTitle', (_e, ary) => {
   const sql = 'UPDATE page SET title = ? WHERE id = ?';

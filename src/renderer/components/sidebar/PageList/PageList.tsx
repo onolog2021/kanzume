@@ -19,11 +19,18 @@ function PageList({ root }) {
   });
 
   async function createNewPage() {
-    const newTitle = '無題';
-    const newId = await window.electron.ipcRenderer.invoke('createNewPage', [
-      project.id,
-      newTitle,
-    ]);
+    const sendedObj = { table: 'page' };
+    const pageJson = {
+      title: '無題1',
+      project_id: project.id,
+      content: '{}',
+      position: -1,
+    };
+    sendedObj.json = pageJson;
+    const newId = await window.electron.ipcRenderer.invoke(
+      'createRecord',
+      sendedObj
+    );
     await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
     const newTab = {
       id: newId,
