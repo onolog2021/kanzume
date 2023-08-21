@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 
-function Start() {
+function StartMenu() {
   const projectTitleRef = useRef();
   const [projectlist, setProjectList] = useState<unknown[]>([]);
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ function Start() {
 
   return (
     <>
-      <h1>Start!</h1>
+      <h1>StartMenu!</h1>
       <TextField fullWidth label="プロジェクト名" inputRef={projectTitleRef} />
       <Button size="large" variant="contained" onClick={createNewPage}>
         新規作成
@@ -52,4 +52,4 @@ function Start() {
   );
 }
 
-export default Start;
+export default StartMenu;
