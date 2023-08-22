@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
 import { table } from 'console';
+import { type } from 'os';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -154,6 +155,43 @@ ipcMain.handle('createRecord', (_e, param: { table: string; json: JSON }) => {
   });
 });
 
+ipcMain.handle('fetchRecords', (event, args) => {
+  const { columns, table, conditions, order, limit } = args;
+  return new Promise((resolve, reject) => {
+    let query;
+    if (columns) {
+      query = `SELECT ${columns.join(', ')} FROM ${table}`;
+    } else {
+      query = `SELECT * FROM ${table}`;
+    }
+
+    if (conditions && Object.keys(conditions).length > 0) {
+      const conditionArray = [];
+      for (const key in conditions) {
+        conditionArray.push(`${key} = ?`);
+      }
+      query += ` WHERE ${conditionArray.join(' AND ')}`;
+    }
+
+    if (order) {
+      query += ` ORDER BY ${order[0]} ${order[1]}`;
+    }
+
+    if (limit) {
+      query += ` LIMIT ${limit}`;
+    }
+
+    console.log(query);
+
+    db.all(query, Object.values(conditions || {}), (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows);
+    });
+  });
+});
 
 ipcMain.on('changePageTitle', (_e, ary) => {
   const sql = 'UPDATE page SET title = ? WHERE id = ?';

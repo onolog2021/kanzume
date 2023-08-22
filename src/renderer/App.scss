@@ -32,3 +32,20 @@
     font-weight: bold;
   }
 }
+
+// StartMenu
+.startMenuWrapper{
+  padding: 24px;
+  .logo{
+    display: block;
+    margin:  0 auto 32px;
+  }
+}
+
+.startMenu{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  width: 80vw;
+  height: 80vh;
+  margin: auto;
+}

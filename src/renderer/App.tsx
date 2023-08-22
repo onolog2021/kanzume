@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import StartMenu from './StartMenu';
+import StartMenu from './components/StartMenu/StartMenu';
 import Editor from './Editor';
 import './App.scss';
 
