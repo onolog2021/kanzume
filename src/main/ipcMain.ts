@@ -25,22 +25,6 @@ function formatObjectKeyValuePairs(obj) {
   return keyValuePairs.join(', ');
 }
 
-ipcMain.handle('createProject', (_e, title) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO project(title) VALUES (?)';
-    if (!title) {
-      title = '無題';
-    }
-    db.run(sql, [title], function (error: string) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(this.lastID);
-      }
-    });
-  });
-});
-
 ipcMain.handle('getTableData', (_e, table_name) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM ${table_name}`;
@@ -107,51 +91,12 @@ ipcMain.handle('savePage', (_e, map) => {
   });
 });
 
-ipcMain.handle('createFolder', (_e, object) => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      'INSERT INTO folder(title, position, project_id, type) VALUES (?, ?, ?, ?)';
-    const value = [
-      object.title,
-      object.position,
-      object.project_id,
-      object.type,
-    ];
-    db.run(sql, value, function (error) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(this.lastID);
-      }
-    });
-  });
-});
-
 ipcMain.on('saveTextData', (_e, ary) => {
   const sql = 'UPDATE page SET content = ? WHERE id = ?';
   db.run(sql, ary, (error) => {
     if (error) {
       console.error(error);
     }
-  });
-});
-
-// レコードの作成
-ipcMain.handle('createRecord', (_e, param: { table: string; json: JSON }) => {
-  return new Promise((resolve, reject) => {
-    const columns = Object.keys(param.json).join(', ');
-    const placeholders = Object.keys(param.json)
-      .map(() => '?')
-      .join(', ');
-    const sql = `INSERT INTO ${param.table} (${columns}) VALUES (${placeholders})`;
-    const values = Object.values(param.json);
-    db.run(sql, values, function (error) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(this.lastID);
-      }
-    });
   });
 });
 
@@ -388,8 +333,6 @@ async function updatePageList(projectId: number, event: IpcMainEvent) {
   event.reply('updatePageList', rows);
 }
 
-async function updateBoardList(projectId: number, event: IpcMainEvent) {}
-
 ipcMain.on('createNewStore', (event, args) => {
   const columns = Object.keys(args);
   const values = Object.values(args);
@@ -399,3 +342,31 @@ ipcMain.on('createNewStore', (event, args) => {
     getBoardBody(event, args.folder_id);
   });
 });
+
+function createRecord(args) {
+  return new Promise((resolve, reject) => {
+    let sql = `INSERT INTO ${args.table}`;
+    if (args.columns) {
+      const keys = Object.keys(args.columns);
+      const columns = keys.join(',');
+      sql += `(${columns}) `;
+      const placeholder = keys.map((key) => '?').join(',');
+      sql += `VALUES (${placeholder})`;
+    }
+    const values = Object.values(args.columns)
+    console.log(sql);
+    console.log(values);
+    db.run(sql, values, function (error) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(this.lastID);
+      }
+    });
+  });
+}
+
+ipcMain.handle('insertRecord', async (event, args) => {
+  const result = await createRecord(args);
+  return result;
+})

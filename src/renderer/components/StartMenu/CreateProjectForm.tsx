@@ -5,12 +5,17 @@ export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
 
   function createNewPage() {
-    const projectTitle = projectTitleRef.current.value;
-    window.electron.ipcRenderer
-      .invoke('createProject', projectTitle)
-      .then((result) => {
-        handleClick(result);
-      });
+    const titleValue = projectTitleRef.current.value;
+    const title = titleValue || '無題';
+    const json = {
+      table: 'project',
+      columns: {
+        title,
+      },
+    };
+    window.electron.ipcRenderer.invoke('insertRecord', json).then((result) => {
+      handleClick(result);
+    });
   }
 
   return (

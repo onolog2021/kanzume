@@ -34,16 +34,20 @@ export default class Folder {
   }
 
   async create() {
-    const value = {
+    const columns = {
       id: this.id,
       title: this.title,
       project_id: this.project_id,
       position: this.position,
       type: this.type,
     };
+    const folderArgs = {
+      table: 'folder',
+      columns,
+    };
     const result = await window.electron.ipcRenderer.invoke(
-      'createFolder',
-      value
+      'insertRecord',
+      folderArgs
     );
     return result;
   }
