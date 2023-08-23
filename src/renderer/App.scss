@@ -44,6 +44,7 @@
 
 .startMenu{
   display: grid;
+  grid-gap: 16px;
   grid-template-columns: repeat(2,1fr);
   width: 80vw;
   height: 80vh;

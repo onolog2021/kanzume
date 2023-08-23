@@ -6,9 +6,9 @@ import {
   ListItemButton,
   ListItemText,
 } from '@mui/material';
+import ProjectItem from './ProjectItem';
 
-function CurrentProjects(props) {
-  const { handleClick } = props;
+function CurrentProjects({ handleClick }) {
   const [projectlist, setProjectList] = useState<unknown[]>([]);
 
   useEffect(() => {
@@ -26,19 +26,16 @@ function CurrentProjects(props) {
       .catch((error) => console.warn(error));
   }, []);
 
-  const openProject = (id: number) => {};
-
   return (
     <div>
-      <h2>最近開いたプロジェクト</h2>
+      <h2>最近のプロジェクト</h2>
       <List>
         {projectlist.map((project) => (
-          <ListItemButton
+          <ProjectItem
             key={project.id}
-            onClick={() => handleClick(project.id)}
-          >
-            <ListItemText primary={project.title} secondary={project.created_at}/>
-          </ListItemButton>
+            project={project}
+            handleClick={handleClick}
+          />
         ))}
       </List>
     </div>
