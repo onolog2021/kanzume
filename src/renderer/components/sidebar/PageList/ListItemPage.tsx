@@ -48,9 +48,6 @@ function ListItemPage({ pageData, index }) {
       {...attributes}
     >
       <ListItemText primary={page.title} />
-      {/* <IconButton edge="end" aria-label="delete" onClick={deletePage}>
-        <DeleteIcon />
-      </IconButton> */}
     </ListItemButton>
   );
 }

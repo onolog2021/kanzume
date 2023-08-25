@@ -12,8 +12,7 @@ function SideBar({ project_id, pageList, boardList }) {
   }
 
   return (
-    <div id="sideBar">
-      <a href="/">start</a>
+    <div className="sideBar">
       {pageList}
       {boardList}
     </div>

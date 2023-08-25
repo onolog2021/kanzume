@@ -7,6 +7,8 @@ import {
   ListItemText,
 } from '@mui/material';
 import ProjectItem from './ProjectItem';
+import TextWithSvg from './TextWithSVG';
+import { ReactComponent as DocumentsSvg } from '../../../../assets/documents.svg';
 
 function CurrentProjects({ handleClick }) {
   const [projectlist, setProjectList] = useState<unknown[]>([]);
@@ -28,7 +30,7 @@ function CurrentProjects({ handleClick }) {
 
   return (
     <div>
-      <h2>最近のプロジェクト</h2>
+      <TextWithSvg SvgComponent={DocumentsSvg} text="最近のプロジェクト" />
       <List>
         {projectlist.map((project) => (
           <ProjectItem

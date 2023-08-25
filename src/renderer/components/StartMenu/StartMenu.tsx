@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { ReactComponent as Logo } from '../../../../assets/logo.svg';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
+import LogoImage from '../../../../assets/logo.png';
+
+import SearchProjectForm from './SearchProjectForm';
 
 function StartMenu() {
   const navigate = useNavigate();
@@ -12,12 +14,12 @@ function StartMenu() {
 
   return (
     <div className="startMenuWrapper">
-      <Logo className="logo" />
+      <img src={LogoImage} alt="logo" className="logo" />
       <div className="startMenu">
         <CurrentProjects handleClick={openProject} />
         <div>
           <CreateProjectForm handleClick={openProject} />
-          <h2>既存プロジェクト</h2>
+          <SearchProjectForm handleClick={openProject} />
         </div>
       </div>
     </div>

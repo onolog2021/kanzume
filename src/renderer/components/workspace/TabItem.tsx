@@ -65,7 +65,7 @@ function TabItem({ tab, index }) {
       inputRef={titleRef}
       size="small"
       value={title}
-      onBlur={saveTitle}
+      onBlur={() => saveTitle}
       onChange={(e) => {
         setTitle(e.target.value);
       }}

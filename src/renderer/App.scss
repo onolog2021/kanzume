@@ -1,6 +1,65 @@
+$main-color:#6B9EBB;
+
 * {
-  margin: 0;
+  margin: 0px;
+  box-sizing: inherit;
+  position: inherit;
 }
+
+html{
+  font-size: 62.5%;
+}
+
+body{
+  box-sizing: border-box;
+  position: relative;
+  margin: 0px;
+}
+
+// StartMenu
+.startMenuWrapper{
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 24px;
+  .logo{
+    display: block;
+    width: 120px;
+    margin: 0 auto 12vh;
+  }
+  &::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: rotate(180deg);
+    width: 12vw;
+    height: 12vw;
+    background-image: url('../../assets/edge.png');
+    background-size: cover;
+    z-index: -1;
+  }
+  &:after{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12vw;
+    height: 12vw;
+    background-image: url('../../assets/edge.png');
+    background-size: cover;
+    z-index: -1;
+  }
+}
+
+.startMenu{
+  display: flex;
+  gap: 12vw;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+
+// Editor
 
 .editorPage {
   width: 100%;
@@ -14,11 +73,7 @@
   background-color: #f8f8f8;
 }
 
-#sideBar {
-  padding: 16px;
-  border-right: 0.5px solid grey;
-  min-height: 100%;
-}
+
 
 .editorTabList {
   padding: 16px 0;
@@ -33,20 +88,18 @@
   }
 }
 
-// StartMenu
-.startMenuWrapper{
-  padding: 24px;
-  .logo{
-    display: block;
-    margin:  0 auto 32px;
-  }
-}
 
-.startMenu{
-  display: grid;
-  grid-gap: 16px;
-  grid-template-columns: repeat(2,1fr);
-  width: 80vw;
-  height: 80vh;
-  margin: auto;
+// sideBar
+.sideBar {
+  padding: 16px;
+  border-right: 0.5px solid grey;
+  min-height: 100%;
+  h1{
+    font-size: 1.2rem;
+    font-weight: normal;
+    margin-bottom: 16px;
+  }
+  h2{
+    font-size: 1.8rem;
+  }
 }

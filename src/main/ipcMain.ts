@@ -354,8 +354,6 @@ function createRecord(args) {
       sql += `VALUES (${placeholder})`;
     }
     const values = Object.values(args.columns)
-    console.log(sql);
-    console.log(values);
     db.run(sql, values, function (error) {
       if (error) {
         reject(error);

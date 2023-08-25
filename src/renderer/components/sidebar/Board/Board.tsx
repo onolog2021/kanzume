@@ -9,19 +9,25 @@ import {
   TabListContext,
 } from '../../Context';
 import BoardItem from './BoardItem';
+import CreateForm from '../PageList/CreateForm';
 
 function Board({ boards, boardIndex }) {
   const [project] = useContext(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const [formDisplay, setFormDisplay] = useState(null);
+
+  const switchFormDisplay = (status: string) => {
+    setFormDisplay(status);
+  };
 
   const { setNodeRef } = useDroppable({
     id: 'board-list',
   });
 
-  async function createNewBoard() {
+  const createNewBoard = async (title: string) => {
     const newBoard = new Folder({
-      title: '新しいボード',
+      title,
       project_id: project.id,
       type: 'board',
     });
@@ -33,7 +39,7 @@ function Board({ boards, boardIndex }) {
     const value = {
       id: newId,
       tabId: `tab-board-${newId}`,
-      title: '新しいボード',
+      title,
       type: 'board',
     };
     setTabList((prevTab) => {
@@ -42,7 +48,7 @@ function Board({ boards, boardIndex }) {
     });
     const current = { id: newId, type: 'board' };
     setCurrentPage(current);
-  }
+  };
 
   if (!boards) {
     <h3>Now Loading...</h3>;
@@ -51,7 +57,10 @@ function Board({ boards, boardIndex }) {
   return (
     <>
       <h2>ボード</h2>
-      <Button onClick={() => createNewBoard()}>新しいボード</Button>
+      <Button onClick={() => switchFormDisplay('board')}>新しいボード</Button>
+      {formDisplay && (
+        <CreateForm createFunc={createNewBoard} setStatus={switchFormDisplay} />
+      )}
       <SortableContext items={boardIndex}>
         <List ref={setNodeRef}>
           {boards &&

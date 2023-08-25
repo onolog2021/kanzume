@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
+import TextWithSvg from './TextWithSVG';
+import { ReactComponent as PlusSvg } from '../../../../assets/new.svg';
 
 export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
@@ -20,17 +22,19 @@ export default function CreateProjectForm({ handleClick }) {
 
   return (
     <>
-      <h2>新規作成</h2>
-      <TextField
-        fullWidth
-        size="small"
-        label="プロジェクト名"
-        inputRef={projectTitleRef}
-        sx={{ mb: 2 }}
-      />
-      <Button size="small" variant="contained" onClick={createNewPage}>
-        新規作成
-      </Button>
+      <TextWithSvg SvgComponent={PlusSvg} text="新規作成" />
+      <Box display="flex" alignItems="center">
+        <TextField
+          fullWidth
+          size="small"
+          label="プロジェクト名"
+          inputRef={projectTitleRef}
+          sx={{ mr: 2 }}
+        />
+        <Button size="small" variant="contained" onClick={createNewPage}>
+          新規作成
+        </Button>
+      </Box>
     </>
   );
 }

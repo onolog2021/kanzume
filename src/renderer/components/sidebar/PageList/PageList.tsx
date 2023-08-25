@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { List, Button } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
@@ -8,21 +8,27 @@ import {
   TabListContext,
 } from '../../Context';
 import TreeBranch from './TreeBranch';
+import CreateForm from './CreateForm';
 
 function PageList({ root }) {
   const [project] = useContext(ProjectContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
+  const [newForm, setNewForm] = useState(null);
 
   const { setNodeRef } = useDroppable({
     id: 'page-list',
   });
 
-  async function createNewPage() {
+  const switchNewForm = (status: string) => {
+    setNewForm(status);
+  };
+
+  const createNewPage = async (title: string) => {
     const pageArgs = {
       table: 'page',
       columns: {
-        title: '無題1',
+        title,
         project_id: project.id,
         content: '{}',
         position: -1,
@@ -35,7 +41,7 @@ function PageList({ root }) {
     await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
     const newTab = {
       id: newId,
-      title: '無題',
+      title,
       type: 'editor',
       tabId: `tab-editor-${newId}`,
     };
@@ -44,16 +50,16 @@ function PageList({ root }) {
       return prevList;
     });
     setCurrentPage({ id: newId, type: 'editor' });
-  }
+  };
 
-  async function createNewFolder() {
+  const createNewFolder = async (title: string) => {
     const newFolder = new Folder({
-      title: '無題のフォルダ',
+      title,
       project_id: project.id,
     });
     await newFolder.create();
     await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
-  }
+  };
 
   if (!root) {
     return <h1>Now Loading...</h1>;
@@ -63,11 +69,15 @@ function PageList({ root }) {
     <>
       <h1>{project.title}</h1>
       <h2>テキスト</h2>
-      <Button onClick={() => createNewPage()}>新規ページ</Button>
-      <Button onClick={() => createNewFolder()}>新規フォルダ</Button>
-      <List ref={setNodeRef}>
-        {root ? <TreeBranch parentNode={root} /> : null}
-      </List>
+      <Button onClick={() => switchNewForm('page')}>新規ページ</Button>
+      <Button onClick={() => switchNewForm('folder')}>新規フォルダ</Button>
+      {newForm === 'page' && (
+        <CreateForm createFunc={createNewPage} setStatus={switchNewForm} />
+      )}
+      {newForm === 'folder' && (
+        <CreateForm createFunc={createNewFolder} setStatus={switchNewForm} />
+      )}
+      <List ref={setNodeRef}>{root && <TreeBranch parentNode={root} />}</List>
     </>
   );
 }
