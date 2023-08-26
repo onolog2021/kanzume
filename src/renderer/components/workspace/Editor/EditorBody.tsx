@@ -1,5 +1,6 @@
 import { useEffect, useRef, useContext, useState } from 'react';
 import { Button, TextField, InputLabel } from '@mui/material';
+import Page from 'renderer/Classes/Page';
 import MyEditor from '../../MyEditor';
 import {
   CurrentPageContext,
@@ -9,10 +10,8 @@ import {
 
 function EditorBody({ targetId, page_id }) {
   const [project, setProject] = useContext(ProjectContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [editor, setEditor] = useState(null);
 
-  const pageTitleRef = useRef();
   useEffect(() => {
     if (editor) {
       editor.destroy();
@@ -27,12 +26,15 @@ function EditorBody({ targetId, page_id }) {
     return () => clearInterval(timer);
   }, []);
 
+  const addBookmark = () => {};
+
   if (!project) {
     return <h1>Loading...</h1>;
   }
 
   return (
     <div>
+      <Button onClick={() => addBookmark}>ブクマ</Button>
       <div id={targetId} className="editorJS" />
     </div>
   );

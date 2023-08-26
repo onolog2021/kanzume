@@ -33,13 +33,6 @@ function ListItemFolder({ folderData, index }) {
     transition,
   };
 
-  const deleteFolder = () => {
-    window.electron.ipcRenderer.sendMessage('deleteById', [
-      'folder',
-      folder.id,
-    ]);
-  };
-
   const handleClick = () => {
     setOpen(!open);
   };
@@ -62,7 +55,7 @@ function ListItemFolder({ folderData, index }) {
         {...listeners}
         {...attributes}
       >
-        <IconButton edge="start" aria-label="delete" onClick={deleteFolder}>
+        <IconButton edge="start" aria-label="delete" >
           <DeleteIcon />
         </IconButton>
         <ListItemText primary={folder.title} />

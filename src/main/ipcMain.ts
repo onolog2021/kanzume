@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
-import { table } from 'console';
+import { error, table } from 'console';
 import { type } from 'os';
 import { rejects } from 'assert';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
@@ -25,100 +25,14 @@ function formatObjectKeyValuePairs(obj) {
 
   return keyValuePairs.join(', ');
 }
-
-ipcMain.on('deleteById', (_e, ary) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM ${ary[0]} WHERE id = (?)`;
-    db.get(sql, [parseInt(ary[1])], (error, row) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(row);
-      }
-    });
-  });
+// 単体レコードの更新
+ipcMain.on('updateRecord', (_e, args) => {
+  updateRecord(args);
 });
 
-ipcMain.handle('savePage', (_e, map) => {
-  return new Promise((resolve, reject) => {
-    if (!map.get('title')) {
-      map.set('title', '無題');
-    }
-    const sql =
-      'INSERT OR REPLACE INTO page(id, title, project_id, content, position) VALUES(?, ?, ?, ?, ?)';
-    const value = [
-      map.get('page_id'),
-      map.get('title'),
-      map.get('project_id'),
-      map.get('content'),
-      map.get('position'),
-    ];
-    const page_id = map.get('page_id');
-    db.run(sql, value, function (error) {
-      if (error) {
-        reject(error);
-      } else if (page_id) {
-        resolve(page_id);
-      } else {
-        resolve(this.lastID);
-      }
-    });
-  });
-});
-
-ipcMain.on('saveTextData', (_e, ary) => {
-  const sql = 'UPDATE page SET content = ? WHERE id = ?';
-  db.run(sql, ary, (error) => {
-    if (error) {
-      console.error(error);
-    }
-  });
-});
-
+// 複数レコードの取得
 ipcMain.handle('fetchRecords', (event, args) => {
-  const { columns, table, conditions, order, limit } = args;
-  return new Promise((resolve, reject) => {
-    let query;
-    if (columns) {
-      query = `SELECT ${columns.join(', ')} FROM ${table}`;
-    } else {
-      query = `SELECT * FROM ${table}`;
-    }
-
-    if (conditions && Object.keys(conditions).length > 0) {
-      const conditionArray = [];
-      for (const key in conditions) {
-        conditionArray.push(`${key} = ?`);
-      }
-      query += ` WHERE ${conditionArray.join(' AND ')}`;
-    }
-
-    if (order) {
-      query += ` ORDER BY ${order[0]} ${order[1]}`;
-    }
-
-    if (limit) {
-      query += ` LIMIT ${limit}`;
-    }
-
-    db.all(query, Object.values(conditions || {}), (err, rows) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(rows);
-    });
-  });
-});
-
-ipcMain.on('changePageTitle', (_e, ary) => {
-  const sql = 'UPDATE page SET title = ? WHERE id = ?';
-  const value = [ary[1], ary[0]];
-  db.run(sql, value, (error) => {
-    if (error) {
-      console.error(error);
-    }
-  });
+  return fetchRecords(args);
 });
 
 ipcMain.handle('findChildPage', (_e, folderId) => {
@@ -356,9 +270,127 @@ function fetchRecord(args: fetchRecordQuery) {
 ipcMain.handle('fetchRecord', async (event, args) => {
   const result = await fetchRecord(args);
   return result;
-})
+});
 
 ipcMain.handle('insertRecord', async (event, args) => {
   const result = await createRecord(args);
   return result;
 });
+
+// 複数レコードの取得
+function fetchRecords(args) {
+  const { columns, table, conditions, join, order, limit } = args;
+  return new Promise((resolve, reject) => {
+    let query;
+    if (columns) {
+      query = `SELECT ${columns.join(', ')} FROM ${table}`;
+    } else {
+      query = `SELECT * FROM ${table}`;
+    }
+
+    if (join) {
+      const joinSql = `JOIN ${join.table} ON ${join.conditions[0]} = ${join.conditions[1]}`;
+      query += joinSql;
+    }
+
+    if (conditions && Object.keys(conditions).length > 0) {
+      const placeholder = Object.keys(conditions)
+        .map((key) => `${key} = ?`)
+        .join(' AND ');
+      query += ` WHERE ${placeholder}`;
+    }
+
+    if (order) {
+      query += ` ORDER BY ${order[0]} ${order[1]}`;
+    }
+
+    if (limit) {
+      query += ` LIMIT ${limit}`;
+    }
+
+    // console.log(query);
+
+    db.all(query, Object.values(conditions || {}), (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// 更新用SQLの作成
+function createSqlStatementForUpdate(args) {
+  const { table, columns, conditions } = args;
+  let sql = `UPDATE ${table} `;
+  const columnsPlaceholder = Object.keys(columns)
+    .map((key) => `${key} = ?`)
+    .join(', ');
+  sql += `SET ${columnsPlaceholder} `;
+  const conditionsPlaceholder = Object.keys(conditions)
+    .map((key) => `${key} = ?`)
+    .join(', ');
+  sql += `WHERE ${conditionsPlaceholder}`;
+  const values = [...Object.values(columns), ...Object.values(conditions)];
+  return {
+    sql,
+    values,
+  };
+}
+
+// 単体データの更新
+function updateRecord(args) {
+  const query = createSqlStatementForUpdate(args);
+  const { sql, values } = query;
+  return new Promise((resolve, reject) => {
+    db.run(sql, values, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        return resolve;
+      }
+    });
+  });
+}
+
+// 複数データの更新
+function updateRecords(argsArray) {
+  const hasError = false;
+
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+
+    argsArray.forEach((args) => {
+      if (hasError) {
+        return;
+      }
+
+      const query = createSqlStatementForUpdate(args);
+      const { sql, values } = query;
+      db.run(sql, values, (error) => {
+        if (error) {
+          hasError = true;
+          db.run('ROLLBACK');
+          console.error(error.message);
+        }
+      });
+    });
+    if (!hasError) {
+      db.run('COMMIT');
+    }
+  });
+}
+
+function destroyRecord(args) {
+  const { table, conditions } = args;
+  let sql = `DELETE FROM ${table}`;
+  const placeholder = Object.keys(conditions)
+    .map((key) => `${key} = ?`)
+    .join(' AND ');
+  sql += placeholder;
+  const values = Object.values(conditions);
+  db.run(sql, values, (error) => {
+    console.error(error);
+  });
+}

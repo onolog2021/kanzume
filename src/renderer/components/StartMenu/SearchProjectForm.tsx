@@ -5,13 +5,12 @@ import { ReactComponent as SearchIcon } from '../../../../assets/search.svg';
 import TextWithSvg from './TextWithSVG';
 import ProjectItem from './ProjectItem';
 import ProjectIndex from './ProjectIndex';
+import AdvancedSearchProject from './AdvancedSearchProject';
 
 export default function SearchProjectForm({ handleClick }) {
   const [searchValue, setSearchValue] = useState('');
   const [projects, setProjects] = useState([]);
   const [matchProject, setMatchProject] = useState([]);
-  const [displayIndex, setDisplayIndex] = useState(false);
-  const searchRef = useRef();
 
   useEffect(() => {
     const query = {
@@ -27,6 +26,10 @@ export default function SearchProjectForm({ handleClick }) {
   }, []);
 
   useEffect(() => {
+    if (searchValue === '') {
+      setMatchProject([]);
+      return;
+    }
     const values = projects.filter((project) =>
       project.title.includes(searchValue)
     );
@@ -38,12 +41,11 @@ export default function SearchProjectForm({ handleClick }) {
     <>
       <TextWithSvg SvgComponent={SearchIcon} text="既存プロジェクト" />
       <TextField
-        inputRef={searchRef}
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
         size="small"
       />
-      <ProjectIndex projectsData={projects} />
+      <AdvancedSearchProject projects={projects} handleClick={handleClick} />
       {matchProject.map((project) => (
         <ProjectItem
           key={project.id}

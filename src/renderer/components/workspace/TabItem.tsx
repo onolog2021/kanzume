@@ -28,25 +28,7 @@ function TabItem({ tab, index }) {
     setCurrentPage(value);
   };
 
-  function handleClick() {
-    setInput(true);
-  }
-
-  useEffect(() => {
-    titleRef.current?.focus();
-  }, [input]);
-
-  async function saveTitle() {
-    const newTitle = titleRef.current.value;
-    await window.electron.ipcRenderer.sendMessage('changePageTitle', [
-      id,
-      newTitle,
-    ]);
-    await window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
-    setInput(false);
-  }
-
-  const Tab = (
+  return(
     <li
       className={currentPage.id === id ? 'selected' : null}
       onClick={() => handleActiveTab(id)}
@@ -56,23 +38,10 @@ function TabItem({ tab, index }) {
       {...attributes}
     >
       {title}
-      <button onClick={handleClick}>＋</button>
     </li>
   );
 
-  const TitleInput = (
-    <TextField
-      inputRef={titleRef}
-      size="small"
-      value={title}
-      onBlur={() => saveTitle}
-      onChange={(e) => {
-        setTitle(e.target.value);
-      }}
-    />
-  );
 
-  return input ? TitleInput : Tab;
 }
 
 export default TabItem;

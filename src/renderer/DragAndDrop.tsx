@@ -62,7 +62,6 @@ function DragAndDrop() {
   // 他コンポーネントからの更新要請の処理。
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePageList', () => {
-      console.log('update')
       if (project) {
         updatePageList(project);
       }
@@ -93,7 +92,6 @@ function DragAndDrop() {
   }
 
   async function updatePageList(thisProject: Project) {
-    console.log('now')
     const tree: Node = await thisProject.createTree();
     setPageRoot(tree);
     const itemsData = collectNames(tree);

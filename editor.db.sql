@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS "bookmark" (
 	"target"	TEXT NOT NULL,
 	"target_id"	INTEGER NOT NULL,
 	"position"	INTEGER NOT NULL,
+	"project_id"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	UNIQUE("target","target_id")
 );

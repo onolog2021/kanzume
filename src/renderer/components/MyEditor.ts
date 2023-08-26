@@ -24,9 +24,12 @@ export default class MyEditor {
       const getPageData = async () => {
         const query = {
           table: 'page',
-          conditions: {id: pageId}
-        }
-        const pageData = await window.electron.ipcRenderer.invoke('fetchRecord', query);
+          conditions: { id: pageId },
+        };
+        const pageData = await window.electron.ipcRenderer.invoke(
+          'fetchRecord',
+          query
+        );
         const textData = !pageData ? {} : JSON.parse(pageData.content);
 
         this.initializeEditor(textData, targetId, pageId); // getPageData 完了後にエディタを初期化
@@ -61,10 +64,18 @@ export default class MyEditor {
       },
       onChange: debounce(async (api, event) => {
         const data = await api.saver.save();
-        window.electron.ipcRenderer.sendMessage('saveTextData', [
-          JSON.stringify(data),
-          pageId,
-        ]);
+        const textData = JSON.stringify(data);
+        const query = {
+          table: 'page',
+          columns: {
+            content: textData,
+          },
+          conditions: {
+            id: pageId,
+          },
+        };
+        window.electron.ipcRenderer.sendMessage('updateRecord', query);
+
         const contentLen = this.getBlocksTextLen(data.blocks);
         const textCounter = document.getElementById('textCounter');
         if (textCounter) {
@@ -83,21 +94,6 @@ export default class MyEditor {
       sum += block.data.text.length;
       return sum;
     }, 0);
-  }
-
-  saved(map: any) {
-    this.editor
-      .save()
-      .then((outputData: JSON) => {
-        map.set('content', JSON.stringify(outputData));
-        console.log(map);
-        window.electron.ipcRenderer.invoke('savePage', map).then((result) => {
-          console.log('success');
-        });
-      })
-      .catch((error) => {
-        console.warn(error);
-      });
   }
 
   destroy() {
