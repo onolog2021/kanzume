@@ -24,11 +24,28 @@ export default class Project {
   }
 
   async pages() {
-    return await window.electron.ipcRenderer.invoke('getPages', [this.id]);
+    const query = {
+      table: 'page',
+      columns: ['id', 'title', 'position', 'folder_id'],
+      conditions: {
+        project_id: this.id,
+      },
+      order: ['position', 'ASC'],
+    };
+    return await window.electron.ipcRenderer.invoke('fetchRecords', query);
   }
 
   async folders() {
-    return await window.electron.ipcRenderer.invoke('getFolders', [this.id]);
+    const query = {
+      table: 'folder',
+      columns: ['id', 'title', 'position', 'parent_id'],
+      conditions: {
+        project_id: this.id,
+        type: 'folder',
+      },
+      order: ['position', 'ASC'],
+    };
+    return await window.electron.ipcRenderer.invoke('fetchRecords', query);
   }
 
   async stores() {
@@ -36,11 +53,19 @@ export default class Project {
   }
 
   async boards() {
-    return await window.electron.ipcRenderer.invoke('getBoards', [this.id]);
+    const query = {
+      table: 'folder',
+      columns: ['id', 'title', 'position', 'parent_id'],
+      conditions: {
+        project_id: this.id,
+        type: 'border',
+      },
+      order: ['position', 'ASC'],
+    };
+    return await window.electron.ipcRenderer.invoke('fetchRecords', query);
   }
 
   async createTree() {
-    // プロジェクト内のデータを取得
     const folders = await this.folders();
     const pages = await this.pages();
     const stores = await this.stores();

@@ -22,10 +22,11 @@ export default class MyEditor {
   constructor(targetId: string, pageId: number) {
     if (pageId) {
       const getPageData = async () => {
-        const pageData = await window.electron.ipcRenderer.invoke('findById', [
-          'page',
-          pageId,
-        ]);
+        const query = {
+          table: 'page',
+          conditions: {id: pageId}
+        }
+        const pageData = await window.electron.ipcRenderer.invoke('fetchRecord', query);
         const textData = !pageData ? {} : JSON.parse(pageData.content);
 
         this.initializeEditor(textData, targetId, pageId); // getPageData 完了後にエディタを初期化

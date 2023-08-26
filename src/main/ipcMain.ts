@@ -3,6 +3,7 @@ import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
 import { table } from 'console';
 import { type } from 'os';
+import { rejects } from 'assert';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -24,32 +25,6 @@ function formatObjectKeyValuePairs(obj) {
 
   return keyValuePairs.join(', ');
 }
-
-ipcMain.handle('getTableData', (_e, table_name) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM ${table_name}`;
-    db.all(sql, (error, rows) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
-
-ipcMain.handle('findById', (_e, ary) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM ${ary[0]} WHERE id = (?)`;
-    db.get(sql, [parseInt(ary[1])], (error, row) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(row);
-      }
-    });
-  });
-});
 
 ipcMain.on('deleteById', (_e, ary) => {
   return new Promise((resolve, reject) => {
@@ -163,27 +138,9 @@ ipcMain.on('bookmarking', (_e, ary) => {
   executeDbRun(sql, value);
 });
 
-ipcMain.handle('getPages', async (_e, projectId) => {
-  const sql =
-    'SELECT id, title, position, folder_id from page WHERE project_id = ? ORDER BY position ASC';
-  return executeDbAll(sql, projectId);
-});
-
-ipcMain.handle('getFolders', (_e, projectId) => {
-  const sql =
-    "SELECT id, title, position, parent_id from folder WHERE project_id = ? AND type = 'folder' ORDER BY position ASC";
-  return executeDbAll(sql, projectId);
-});
-
 ipcMain.handle('getStores', (_e, projectId) => {
   const sql =
     'SELECT s.folder_id, s.page_id, s.position from store s JOIN page p ON p.id = s.page_id WHERE p.project_id = ? ORDER BY s.position ASC';
-  return executeDbAll(sql, projectId);
-});
-
-ipcMain.handle('getBoards', (_e, projectId) => {
-  const sql =
-    "SELECT id, title, position, parent_id from folder WHERE project_id = ? AND type = 'board' ORDER BY position ASC";
   return executeDbAll(sql, projectId);
 });
 
@@ -353,7 +310,8 @@ function createRecord(args) {
       const placeholder = keys.map((key) => '?').join(',');
       sql += `VALUES (${placeholder})`;
     }
-    const values = Object.values(args.columns)
+
+    const values = Object.values(args.columns);
     db.run(sql, values, function (error) {
       if (error) {
         reject(error);
@@ -364,7 +322,47 @@ function createRecord(args) {
   });
 }
 
+interface fetchRecordQuery {
+  table: string;
+  columns: string[];
+  conditions: { [key: string]: any };
+  order: [string, string];
+  limit: number;
+}
+
+function fetchRecord(args: fetchRecordQuery) {
+  const { table, columns, conditions } = args;
+  let sql;
+
+  return new Promise((resolve, reject) => {
+    if (columns) {
+      const selectedColumns = columns.join(', ');
+      sql = `SELECT ${selectedColumns} `;
+    } else {
+      sql = 'SELECT * ';
+    }
+    sql += `FROM ${table} `;
+    const placeholder = Object.keys(conditions)
+      .map((key) => `${key} = (?)`)
+      .join('AND ');
+    sql += `WHERE ${placeholder}`;
+    const values = Object.values(conditions);
+    db.get(sql, values, (error, row) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+ipcMain.handle('fetchRecord', async (event, args) => {
+  const result = await fetchRecord(args);
+  return result;
+})
+
 ipcMain.handle('insertRecord', async (event, args) => {
   const result = await createRecord(args);
   return result;
-})
+});

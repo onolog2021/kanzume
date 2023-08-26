@@ -48,7 +48,6 @@ function DragAndDrop() {
   const tabs = <TabList tabIndex={tabIndex} />;
   const listArea = ['page-list', 'board-list', 'paper-list'];
 
-  // プロジェクトの初期設定
   useEffect(() => {
     async function fetchData() {
       const ProjectData = await fetchProjectData();
@@ -58,6 +57,7 @@ function DragAndDrop() {
     fetchData();
   }, []);
 
+  // 他コンポーネントからの更新要請の処理。
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePageList', () => {
       if (project) {
@@ -73,10 +73,14 @@ function DragAndDrop() {
 
   async function fetchProjectData() {
     try {
-      const projectData = await window.electron.ipcRenderer.invoke('findById', [
-        'project',
-        projectId,
-      ]);
+      const query = {
+        table: 'project',
+        conditions: { id: projectId },
+      };
+      const projectData = await window.electron.ipcRenderer.invoke(
+        'fetchRecord',
+        query
+      );
       const currentProject = new Project(projectData);
       setProject(currentProject);
       return currentProject;
