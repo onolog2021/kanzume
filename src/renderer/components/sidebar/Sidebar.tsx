@@ -1,10 +1,7 @@
 import { useEffect, useContext } from 'react';
-import Project from 'renderer/Classes/Project';
-import PageList from './PageList/PageList';
-import Board from './Board/Board';
 import { ProjectContext } from '../Context';
 
-function SideBar({ project_id, pageList, boardList }) {
+function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
 
   if (!project) {
@@ -13,6 +10,8 @@ function SideBar({ project_id, pageList, boardList }) {
 
   return (
     <div className="sideBar">
+      <h1>{project.title}</h1>
+      {quickAccessArea}
       {pageList}
       {boardList}
     </div>

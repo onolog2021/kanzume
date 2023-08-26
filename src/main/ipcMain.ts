@@ -101,8 +101,6 @@ ipcMain.handle('fetchRecords', (event, args) => {
       query += ` LIMIT ${limit}`;
     }
 
-    console.log(query);
-
     db.all(query, Object.values(conditions || {}), (err, rows) => {
       if (err) {
         reject(err);
@@ -125,7 +123,7 @@ ipcMain.on('changePageTitle', (_e, ary) => {
 
 ipcMain.handle('findChildPage', (_e, folderId) => {
   const sql =
-    'SELECT p.title, p.id FROM page p INNER JOIN folder f ON f.id = p.folder_id WHERE f.id = ?';
+    'SELECT p.title, p.id FROM store s JOIN page p ON p.id = s.page_id WHERE s.folder_id = ?';
   const value = [folderId];
   return executeDbAll(sql, value);
 });
@@ -171,7 +169,6 @@ ipcMain.on('updatePosition', (event, args) => {
     });
     db.run('COMMIT;');
   });
-  // ここあとで調節
   updatePageList(args.projectId, event);
 });
 
@@ -182,7 +179,6 @@ ipcMain.on('destroyStore', (event, arg) => {
 });
 
 ipcMain.on('updateBoardPapers', (event, array) => {
-  // それぞれに更新した内容を送信する。
   array.forEach((boardId) => {
     getBoardBody(event, boardId);
   });
@@ -285,7 +281,7 @@ function getBoardBody(event: IpcMainEvent, boardId: number) {
 
 async function updatePageList(projectId: number, event: IpcMainEvent) {
   const sql =
-    'SELECT id, title, position, folder_id from page WHERE project_id = ? ORDER BY position ASC';
+    'SELECT id, title, position from page WHERE project_id = ? ORDER BY position ASC';
   const rows = await executeDbAll(sql, [projectId]);
   event.reply('updatePageList', rows);
 }

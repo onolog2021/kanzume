@@ -26,7 +26,7 @@ export default class Project {
   async pages() {
     const query = {
       table: 'page',
-      columns: ['id', 'title', 'position', 'folder_id'],
+      columns: ['id', 'title', 'position'],
       conditions: {
         project_id: this.id,
       },
@@ -58,7 +58,7 @@ export default class Project {
       columns: ['id', 'title', 'position', 'parent_id'],
       conditions: {
         project_id: this.id,
-        type: 'border',
+        type: 'board',
       },
       order: ['position', 'ASC'],
     };

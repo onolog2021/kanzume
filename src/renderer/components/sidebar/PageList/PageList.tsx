@@ -67,7 +67,6 @@ function PageList({ root }) {
 
   return (
     <>
-      <h1>{project.title}</h1>
       <h2>テキスト</h2>
       <Button onClick={() => switchNewForm('page')}>新規ページ</Button>
       <Button onClick={() => switchNewForm('folder')}>新規フォルダ</Button>

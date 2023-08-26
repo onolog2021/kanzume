@@ -16,6 +16,7 @@ import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
 import { collectNames } from './components/GlobalMethods';
 import TabList from './components/workspace/TabList';
+import QuickAccessArea from './components/sidebar/QuickAccess/QuickAccessArea';
 
 interface itemData {
   id: string;
@@ -43,6 +44,7 @@ function DragAndDrop() {
     },
   });
   const sensors = useSensors(mouseSensor);
+  const quickAccessArea = <QuickAccessArea />
   const boardList = <Board boardIndex={boardIndex} boards={boards} />;
   const pageList = <PageList root={pageRoot} />;
   const tabs = <TabList tabIndex={tabIndex} />;
@@ -60,6 +62,7 @@ function DragAndDrop() {
   // 他コンポーネントからの更新要請の処理。
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePageList', () => {
+      console.log('update')
       if (project) {
         updatePageList(project);
       }
@@ -90,6 +93,7 @@ function DragAndDrop() {
   }
 
   async function updatePageList(thisProject: Project) {
+    console.log('now')
     const tree: Node = await thisProject.createTree();
     setPageRoot(tree);
     const itemsData = collectNames(tree);
@@ -123,6 +127,7 @@ function DragAndDrop() {
           project_id={projectId}
           boardList={boardList}
           pageList={pageList}
+          quickAccessArea={quickAccessArea}
         />
         <WorkSpace tabs={tabs} />
       </div>

@@ -17,11 +17,18 @@ export default function CreateForm({ createFunc, setStatus }) {
     titleRef.current.value = '';
   }
 
+  const submitByEnterKey = (event) => {
+    if (event.key === 'Enter') {
+      runCreateFunc();
+    }
+  };
+
   return (
     <TextField
       size="small"
       inputRef={titleRef}
       onBlur={() => runCreateFunc()}
+      onKeyDown={submitByEnterKey}
     />
   );
 }
