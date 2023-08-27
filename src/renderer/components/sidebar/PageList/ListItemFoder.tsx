@@ -5,6 +5,7 @@ import {
   IconButton,
   Collapse,
   ListItemButton,
+  Button,
 } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -55,17 +56,39 @@ function ListItemFolder({ folderData, index }) {
         {...listeners}
         {...attributes}
       >
-        <IconButton edge="start" aria-label="delete" >
+        <IconButton edge="start" aria-label="delete">
           <DeleteIcon />
         </IconButton>
         <ListItemText primary={folder.title} />
         {hasPage.length !== 0 ? open ? <ExpandLess /> : <ExpandMore /> : null}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
-        {folderData.children && <TreeBranch parentNode={folderData} />}
+        {folderData.children && (
+          <>
+            <TreeBranch parentNode={folderData} />
+            <Button
+              onClick={() => {
+                mergeChildrenText(folderData.children);
+              }}
+            >
+              結合する
+            </Button>
+          </>
+        )}
       </Collapse>
     </>
   );
+
+  function mergeChildrenText(children) {
+    // childrenのテキストデータ取得
+    const pageIdArray = children.map((childNode) => childNode.id);
+    const query = {
+      folderName: folderData.title,
+      pageIdArray,
+      projectId: project.id,
+    };
+    window.electron.ipcRenderer.sendMessage('mergeTextData', query);
+  }
 }
 
 export default ListItemFolder;

@@ -211,20 +211,22 @@ ipcMain.on('createNewStore', (event, args) => {
 });
 
 function createRecord(args) {
+  const { columns, table } = args;
   return new Promise((resolve, reject) => {
-    let sql = `INSERT INTO ${args.table}`;
-    if (args.columns) {
-      const keys = Object.keys(args.columns);
-      const columns = keys.join(',');
-      sql += `(${columns}) `;
-      const placeholder = keys.map((key) => '?').join(',');
-      sql += `VALUES (${placeholder})`;
+    let sql = `INSERT INTO ${table}`;
+    if (columns) {
+      const insertColumns = Object.keys(columns).join(', ');
+      sql += `(${insertColumns})`;
+      const placeholder = Object.keys(columns)
+        .map((key) => '?')
+        .join(', ');
+      sql += ` VALUES (${placeholder})`;
     }
 
-    const values = Object.values(args.columns);
 
-    console.log(sql);
-    console.log(values);
+
+    const values = Object.values(columns);
+
     db.run(sql, values, function (error) {
       if (error) {
         reject(error);
@@ -323,6 +325,49 @@ function fetchRecords(args) {
   });
 }
 
+ipcMain.on('mergeTextData', (event, args) => {
+  const { folderName, pageIdArray, projectId } = args;
+  // 該当テキストの取得
+  let sql = 'SELECT content, id FROM page WHERE id in';
+  const placeholder = pageIdArray.map((id) => '?').join(', ');
+  sql += `(${placeholder})`;
+
+  db.all(sql, pageIdArray, (error, rows) => {
+    if (error) {
+      console.log(error);
+    } else {
+      // テキストの結合
+      let combinedBlocks = [];
+      let version;
+      rows.forEach((row) => {
+        const textFragment = JSON.parse(row.content);
+        combinedBlocks = combinedBlocks.concat(textFragment.blocks);
+        version = textFragment.version;
+      })
+
+      const mergedText = {
+        time: Date.now(),
+        blocks: combinedBlocks,
+        version,
+      }
+
+      const stringriedText = JSON.stringify(mergedText);
+
+      const query = {
+        table: 'page',
+        columns: {
+          title: folderName,
+          content: stringriedText,
+          project_id: projectId,
+          position: -1,
+        },
+      };
+      createRecord(query);
+      event.reply('updatePageList', rows);
+    }
+  });
+});
+
 // 更新用SQLの作成
 function createSqlStatementForUpdate(args) {
   const { table, columns, conditions } = args;
@@ -387,7 +432,7 @@ function updateRecords(argsArray) {
 
 ipcMain.on('deleteRecord', (event, args) => {
   destroyRecord(args);
-})
+});
 
 function destroyRecord(args) {
   const { table, conditions } = args;
