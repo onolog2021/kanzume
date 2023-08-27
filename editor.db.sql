@@ -1,36 +1,11 @@
 BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "project" (
-	"id"	INTEGER NOT NULL UNIQUE,
-	"title"	TEXT NOT NULL,
-	"created_at"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	"updated_at"	TEXT,
-	PRIMARY KEY("id" AUTOINCREMENT)
-);
-CREATE TABLE IF NOT EXISTS "folder" (
-	"id"	INTEGER NOT NULL UNIQUE,
-	"title"	TEXT NOT NULL,
-	"position"	INTEGER NOT NULL,
-	"project_id"	INTEGER NOT NULL,
-	"type"	TEXT DEFAULT 'folder',
-	"parent_id"	INTEGER,
-	PRIMARY KEY("id" AUTOINCREMENT)
-);
-CREATE TABLE IF NOT EXISTS "page" (
-	"id"	INTEGER NOT NULL UNIQUE,
-	"title"	TEXT NOT NULL,
-	"project_id"	INTEGER NOT NULL,
-	"content"	TEXT,
-	"json_name"	TEXT,
-	"position"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT)
-);
 CREATE TABLE IF NOT EXISTS "store" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"folder_id"	INTEGER NOT NULL,
 	"page_id"	INTEGER NOT NULL,
 	"position"	INTEGER NOT NULL,
-	FOREIGN KEY("folder_id") REFERENCES "folder"("id"),
 	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("folder_id") REFERENCES "folder"("id"),
 	UNIQUE("folder_id","page_id")
 );
 CREATE TABLE IF NOT EXISTS "bookmark" (
@@ -41,5 +16,33 @@ CREATE TABLE IF NOT EXISTS "bookmark" (
 	"project_id"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	UNIQUE("target","target_id")
+);
+CREATE TABLE IF NOT EXISTS "folder" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"title"	TEXT NOT NULL,
+	"position"	INTEGER NOT NULL,
+	"project_id"	INTEGER NOT NULL,
+	"type"	TEXT DEFAULT 'folder',
+	"parent_id"	INTEGER,
+	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "page" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"title"	TEXT NOT NULL,
+	"project_id"	INTEGER NOT NULL,
+	"content"	TEXT,
+	"json_name"	TEXT,
+	"position"	INTEGER NOT NULL,
+	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "project" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"title"	TEXT NOT NULL,
+	"created_at"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"updated_at"	TEXT,
+	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
 );
 COMMIT;

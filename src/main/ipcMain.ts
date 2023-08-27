@@ -37,7 +37,7 @@ ipcMain.handle('fetchRecords', (event, args) => {
 
 ipcMain.handle('findChildPage', (_e, folderId) => {
   const sql =
-    'SELECT p.title, p.id FROM store s JOIN page p ON p.id = s.page_id WHERE s.folder_id = ?';
+    'SELECT p.title, p.id FROM store s JOIN page p ON p.id = s.page_id WHERE s.folder_id = ? AND p.is_deleted = 0';
   const value = [folderId];
   return executeDbAll(sql, value);
 });
@@ -58,7 +58,7 @@ ipcMain.handle('getStores', (_e, projectId) => {
 
 ipcMain.handle('boardChildren', (_e, folderId) => {
   const sql =
-    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
+    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? AND p.is_deleted = 0 ORDER BY s.position ASC';
   return executeDbAll(sql, folderId);
 });
 
@@ -183,7 +183,7 @@ function transactionSql(children) {
 
 function getBoardBody(event: IpcMainEvent, boardId: number) {
   const sql =
-    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? ORDER BY s.position ASC';
+    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ?  AND p.is_deleted = 0 ORDER BY s.position ASC';
   db.all(sql, boardId, (error, rows) => {
     if (error) {
       console.log(error);
@@ -223,8 +223,6 @@ function createRecord(args) {
       sql += ` VALUES (${placeholder})`;
     }
 
-
-
     const values = Object.values(columns);
 
     db.run(sql, values, function (error) {
@@ -246,7 +244,11 @@ interface fetchRecordQuery {
 }
 
 function fetchRecord(args: fetchRecordQuery) {
-  const { table, columns, conditions } = args;
+  const { table, columns } = args;
+  const conditions = args.conditions || {};
+  if (['page', 'folder', 'project'].includes(table)) {
+    conditions.is_deleted = 0;
+  }
   let sql;
 
   return new Promise((resolve, reject) => {
@@ -284,7 +286,11 @@ ipcMain.handle('insertRecord', async (event, args) => {
 
 // 複数レコードの取得
 function fetchRecords(args) {
-  const { columns, table, conditions, join, order, limit } = args;
+  const { columns, table, join, order, limit } = args;
+  const conditions = args.conditions || {};
+  if (['page', 'folder', 'project'].includes(table)) {
+    conditions.is_deleted = 0;
+  }
   return new Promise((resolve, reject) => {
     let query;
     if (columns) {
@@ -315,7 +321,7 @@ function fetchRecords(args) {
 
     // console.log(query);
 
-    db.all(query, Object.values(conditions || {}), (err, rows) => {
+    db.all(query, Object.values(conditions), (err, rows) => {
       if (err) {
         reject(err);
         return;
@@ -343,13 +349,13 @@ ipcMain.on('mergeTextData', (event, args) => {
         const textFragment = JSON.parse(row.content);
         combinedBlocks = combinedBlocks.concat(textFragment.blocks);
         version = textFragment.version;
-      })
+      });
 
       const mergedText = {
         time: Date.now(),
         blocks: combinedBlocks,
         version,
-      }
+      };
 
       const stringriedText = JSON.stringify(mergedText);
 
@@ -446,3 +452,23 @@ function destroyRecord(args) {
     console.error(error);
   });
 }
+
+function softDelete(args) {
+  const { table, conditions } = args;
+  let sql = `UPDATE ${table} SET is_deleted = ?`;
+  const placeholder = Object.keys(conditions)
+    .map((key) => `${key} = ?`)
+    .join(' AND ');
+  sql += ` WHERE ${placeholder}`;
+  const values = [1].concat(Object.values(conditions));
+  console.log(sql)
+  db.run(sql, values, (error) => {
+    if (error) {
+      console.log(error);
+    }
+  });
+}
+
+ipcMain.on('softDelete', (event, args) => {
+  softDelete(args);
+});

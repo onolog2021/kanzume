@@ -74,6 +74,16 @@ function EditorBody({ targetId, page_id }) {
     setBookmark(false);
   };
 
+  const softDelete = () => {
+    const query = {
+      table: 'page',
+      conditions: {
+        id: page_id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+  };
+
   if (!project) {
     return <h1>Loading...</h1>;
   }
@@ -82,6 +92,7 @@ function EditorBody({ targetId, page_id }) {
     <div>
       {bookmark ? <p>ブクマ済み</p> : null}
       <Button onClick={changeBookmark}>ブクマ</Button>
+      <Button onClick={softDelete} >削除</Button>
       <div id={targetId} className="editorJS" />
     </div>
   );
