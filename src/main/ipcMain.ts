@@ -222,6 +222,9 @@ function createRecord(args) {
     }
 
     const values = Object.values(args.columns);
+
+    console.log(sql);
+    console.log(values);
     db.run(sql, values, function (error) {
       if (error) {
         reject(error);
@@ -253,7 +256,7 @@ function fetchRecord(args: fetchRecordQuery) {
     }
     sql += `FROM ${table} `;
     const placeholder = Object.keys(conditions)
-      .map((key) => `${key} = (?)`)
+      .map((key) => `${key} = (?) `)
       .join('AND ');
     sql += `WHERE ${placeholder}`;
     const values = Object.values(conditions);
@@ -382,13 +385,17 @@ function updateRecords(argsArray) {
   });
 }
 
+ipcMain.on('deleteRecord', (event, args) => {
+  destroyRecord(args);
+})
+
 function destroyRecord(args) {
   const { table, conditions } = args;
-  let sql = `DELETE FROM ${table}`;
+  let sql = `DELETE FROM ${table} `;
   const placeholder = Object.keys(conditions)
     .map((key) => `${key} = ?`)
     .join(' AND ');
-  sql += placeholder;
+  sql += `WHERE ${placeholder}`;
   const values = Object.values(conditions);
   db.run(sql, values, (error) => {
     console.error(error);

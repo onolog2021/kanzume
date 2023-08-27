@@ -11,8 +11,21 @@ import {
 function EditorBody({ targetId, page_id }) {
   const [project, setProject] = useContext(ProjectContext);
   const [editor, setEditor] = useState(null);
+  const [bookmark, setBookmark] = useState(false);
 
   useEffect(() => {
+    const query = {
+      table: 'bookmark',
+      conditions: {
+        target: 'page',
+        target_id: page_id,
+      },
+    };
+    window.electron.ipcRenderer.invoke('fetchRecord', query).then((result) => {
+      console.log(result);
+      setBookmark(!!result);
+    });
+
     if (editor) {
       editor.destroy();
     }
@@ -26,7 +39,40 @@ function EditorBody({ targetId, page_id }) {
     return () => clearInterval(timer);
   }, []);
 
-  const addBookmark = () => {};
+  const changeBookmark = () => {
+    if (bookmark) {
+      removeBookmark();
+    } else {
+      addBookmark();
+    }
+  };
+
+  const addBookmark = () => {
+    const query = {
+      table: 'bookmark',
+      columns: {
+        target: 'page',
+        target_id: page_id,
+        position: -1,
+        project_id: project.id,
+      },
+    };
+    window.electron.ipcRenderer.invoke('insertRecord', query);
+    setBookmark(true);
+  };
+
+  const removeBookmark = () => {
+    const query = {
+      table: 'bookmark',
+      conditions: {
+        target: 'page',
+        target_id: page_id,
+        project_id: project.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('deleteRecord', query);
+    setBookmark(false);
+  };
 
   if (!project) {
     return <h1>Loading...</h1>;
@@ -34,7 +80,8 @@ function EditorBody({ targetId, page_id }) {
 
   return (
     <div>
-      <Button onClick={() => addBookmark}>ブクマ</Button>
+      {bookmark ? <p>ブクマ済み</p> : null}
+      <Button onClick={changeBookmark}>ブクマ</Button>
       <div id={targetId} className="editorJS" />
     </div>
   );
