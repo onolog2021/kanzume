@@ -37,20 +37,20 @@ export default class MenuBuilder {
     return menu;
   }
 
-  setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
+  // setupDevelopmentEnvironment(): void {
+  //   this.mainWindow.webContents.on('context-menu', (_, props) => {
+  //     const { x, y } = props;
 
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
-          },
-        },
-      ]).popup({ window: this.mainWindow });
-    });
-  }
+  //     Menu.buildFromTemplate([
+  //       {
+  //         label: 'Inspect element',
+  //         click: () => {
+  //           this.mainWindow.webContents.inspectElement(x, y);
+  //         },
+  //       },
+  //     ]).popup({ window: this.mainWindow });
+  //   });
+  // }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {

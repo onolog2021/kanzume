@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path, { resolve } from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
@@ -45,6 +45,25 @@ ipcMain.on('ipc-example', async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
 });
+
+// ipcMain.handle('show-context-menu', (event, component) => {
+//   // コンポーネントごとのメニューを定義
+//   const menus = {
+//     componentA: Menu.buildFromTemplate([
+//       { label: 'アイテムA1' },
+//       { label: 'アイテムA2' },
+//     ]),
+//     componentB: Menu.buildFromTemplate([
+//       { label: 'アイテムB1' },
+//       { label: 'アイテムB2' },
+//     ]),
+//   };
+
+//   const menu = menus[component];
+//   if (menu) {
+//     menu.popup(BrowserWindow.fromWebContents(event.sender));
+//   }
+// });
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

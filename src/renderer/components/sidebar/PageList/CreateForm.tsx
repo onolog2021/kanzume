@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { TextField } from '@mui/material';
 
-export default function CreateForm({ createFunc, setStatus }) {
+export default function CreateForm({ createFunc, setStatus, initialValue }) {
   const titleRef = useRef();
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function CreateForm({ createFunc, setStatus }) {
       inputRef={titleRef}
       onBlur={() => runCreateFunc()}
       onKeyDown={submitByEnterKey}
+      defaultValue={initialValue || null}
     />
   );
 }

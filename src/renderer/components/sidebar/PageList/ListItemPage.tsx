@@ -1,11 +1,21 @@
 import { useContext, useEffect, useState } from 'react';
-import { ListItemText, IconButton, ListItemButton } from '@mui/material';
+import {
+  ListItemText,
+  IconButton,
+  ListItemButton,
+  MenuItem,
+} from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Page from 'renderer/Classes/Page';
+import ContextMenu from 'renderer/components/ContextMenu';
+import { create } from 'domain';
 import { CurrentPageContext, TabListContext } from '../../Context';
+import CreateForm from './CreateForm';
 
 function ListItemPage({ pageData, index }) {
+  const [contextMenuOpen, setContextMenuOpen] = useState(null);
+  const [isShowInput, setIsShowInput] = useState(false);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -35,16 +45,96 @@ function ListItemPage({ pageData, index }) {
     setCurrentPage({ id: pageData.id, type: 'editor' });
   };
 
+  const showMenu = (event) => {
+    event.preventDefault();
+    setContextMenuOpen(
+      contextMenuOpen === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : null
+    );
+  };
+
+  const closeContextMenu = () => {
+    setContextMenuOpen(false);
+  };
+
+  const softDelete = () => {
+    const query = {
+      table: 'page',
+      conditions: {
+        id: pageData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+  };
+
+  const showInput = () => {
+    setIsShowInput(true);
+  };
+
+  const setStatus = () => {
+    setIsShowInput(false);
+  };
+
+  const changeName = (title) => {
+    const query = {
+      table: 'page',
+      columns: {
+        title,
+      },
+      conditions: {
+        id: pageData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord',query)
+  };
+
+  const menues = [
+    {
+      id: 'changeName',
+      menuName: '名前の変更',
+      method: showInput,
+    },
+    {
+      id: 'delete',
+      menuName: '削除',
+      method: softDelete,
+    },
+  ];
+
+  if (isShowInput) {
+    return (
+      <CreateForm
+        setStatus={setStatus}
+        createFunc={changeName}
+        initialValue={pageData.title}
+      />
+    );
+  }
+
   return (
-    <ListItemButton
-      onClick={() => handleClick()}
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-    >
-      <ListItemText primary={pageData.title} />
-    </ListItemButton>
+    <>
+      <ListItemButton
+        onClick={() => handleClick()}
+        onContextMenu={showMenu}
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+      >
+        <ListItemText primary={pageData.title} />
+      </ListItemButton>
+      {contextMenuOpen && (
+        <ContextMenu
+          contextMenu={contextMenuOpen}
+          onClose={closeContextMenu}
+          menues={menues}
+        />
+      )}
+    </>
   );
 }
 

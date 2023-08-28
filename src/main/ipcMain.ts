@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, Menu, MenuItem } from 'electron';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
 import { error, table } from 'console';
@@ -386,6 +386,7 @@ function createSqlStatementForUpdate(args) {
     .map((key) => `${key} = ?`)
     .join(', ');
   sql += `WHERE ${conditionsPlaceholder}`;
+  console.log(sql)
   const values = [...Object.values(columns), ...Object.values(conditions)];
   return {
     sql,
@@ -461,7 +462,7 @@ function softDelete(args) {
     .join(' AND ');
   sql += ` WHERE ${placeholder}`;
   const values = [1].concat(Object.values(conditions));
-  console.log(sql)
+  console.log(sql);
   db.run(sql, values, (error) => {
     if (error) {
       console.log(error);
