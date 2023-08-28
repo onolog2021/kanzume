@@ -26,7 +26,6 @@ function QuickAccesItem({ item }) {
 
     window.electron.ipcRenderer.invoke('fetchRecord', query).then((result) => {
       setData(result);
-      console.log(result)
     });
   }, []);
 
@@ -36,11 +35,7 @@ function QuickAccesItem({ item }) {
 
   return (
     <Box>
-      {
-        target === 'page' ?
-        <span>T</span>:
-        <span>F</span>
-      }
+      {target === 'page' ? <span>T</span> : <span>F</span>}
       <Typography>{data.title}</Typography>
     </Box>
   );

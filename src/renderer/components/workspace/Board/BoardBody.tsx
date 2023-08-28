@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Board from 'renderer/Classes/Board';
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, Button } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
+import { ProjectContext } from 'renderer/components/Context';
 import Boardpage from './BoardPage';
 
 export default function BoardBody({ boardData }) {
+  const [project] = useContext(ProjectContext);
   const [board, setBoard] = useState();
   const [pages, setPages] = useState();
   const [index, setIndex] = useState([]);
@@ -34,9 +36,35 @@ export default function BoardBody({ boardData }) {
     });
   }, []);
 
+  const addText = async () => {
+    const query = {
+      table: 'page',
+      columns: {
+        title: '無題',
+        position: -1,
+        project_id: project.id,
+        content: '{}',
+      },
+    };
+    const page_id = await window.electron.ipcRenderer.invoke(
+      'insertRecord',
+      query
+    );
+    const storeQuery = {
+      table: 'store',
+      columns: {
+        page_id,
+        folder_id: boardData.id,
+        position: -1,
+      },
+    };
+    window.electron.ipcRenderer.invoke('insertRecord', storeQuery);
+  };
+
   return (
     <>
       <h1>{board && board.title}</h1>
+      <Button onClick={addText}>テキストの追加</Button>
       <Box
         sx={{
           display: 'flex',

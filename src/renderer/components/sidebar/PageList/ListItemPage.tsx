@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import {
   ListItemText,
-  IconButton,
   ListItemButton,
   MenuItem,
 } from '@mui/material';

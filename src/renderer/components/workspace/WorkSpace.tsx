@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react';
-import { TabListContext, CurrentPageContext } from '../Context';
 import { useDroppable } from '@dnd-kit/core';
-import TabList from './TabList';
+import { TabListContext, CurrentPageContext } from '../Context';
 import EditorBody from './Editor/EditorBody';
 import BoardBody from './Board/BoardBody';
+import TrashBox from '../sidebar/TrashBox/TrashBox';
 
 function WorkSpace({ tabs, paperIndex }) {
   const [tabList, setTabList] = useContext(TabListContext);
@@ -15,21 +15,38 @@ function WorkSpace({ tabs, paperIndex }) {
       : { display: 'none' };
   };
 
+  const panelRender = (tab) => {
+    let content;
+    switch (tab.type) {
+      case 'editor':
+        content = (
+          <div style={isCurrent(tab)} key={`page-${tab.id}`}>
+            <EditorBody targetId={`tab-${tab.id}`} page_id={tab.id} />
+          </div>
+        );
+        break;
+      case 'board':
+        content = (
+          <div style={isCurrent(tab)} key={`board-${tab.id}`}>
+            <BoardBody boardData={tab} />
+          </div>
+        );
+        break;
+      case 'trash':
+        content = (
+          <div style={isCurrent(tab)} key="trash-box">
+            <TrashBox />
+          </div>
+        );
+      default:
+    }
+    return content;
+  };
+
   return (
     <div className="workSpace">
       {tabs}
-      {tabList &&
-        tabList.map((tab) =>
-          tab.type === 'editor' ? (
-            <div style={isCurrent(tab)} key={`page-${tab.id}`}>
-              <EditorBody targetId={`tab-${tab.id}`} page_id={tab.id} />
-            </div>
-          ) : (
-            <div style={isCurrent(tab)} key={`board-${tab.id}`}>
-              <BoardBody boardData={tab} />
-            </div>
-          )
-        )}
+      {tabList && tabList.map((tab) => panelRender(tab))}
     </div>
   );
 }

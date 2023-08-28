@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Box, Paper } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Box, Paper, TextField } from '@mui/material';
 import MyEditor from 'renderer/components/MyEditor';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 function Boardpage({ pageData, index, boardId }) {
   const [editor, setEditor] = useState();
+  const titleRef = useRef();
   const targetId = `boardItem-${pageData.id}`;
 
   const { attributes, listeners, setNodeRef, transform } = useSortable({
@@ -24,7 +25,22 @@ function Boardpage({ pageData, index, boardId }) {
 
   useEffect(() => {
     const newEditor = new MyEditor(targetId, pageData.id);
+    setEditor(newEditor);
   }, []);
+
+  const changeName = (title) => {
+    const query = {
+      table: 'page',
+      columns: {
+        title: titleRef.current.value,
+      },
+      conditions: {
+        id: pageData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord',query)
+  };
+
 
   return (
     <Paper
@@ -34,7 +50,12 @@ function Boardpage({ pageData, index, boardId }) {
       {...listeners}
       {...attributes}
     >
-      <h1>{pageData.title}</h1>
+      <TextField
+        size="small"
+        inputRef={titleRef}
+        onBlur={changeName}
+        defaultValue={pageData.title || null}
+      />
       <div id={targetId} />
     </Paper>
   );
