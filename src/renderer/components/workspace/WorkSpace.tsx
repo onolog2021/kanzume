@@ -21,7 +21,11 @@ function WorkSpace({ tabs, paperIndex }) {
       case 'editor':
         content = (
           <div style={isCurrent(tab)} key={`page-${tab.id}`}>
-            <EditorBody targetId={`tab-${tab.id}`} page_id={tab.id} />
+            <EditorBody
+              targetId={`tab-${tab.id}`}
+              page_id={tab.id}
+              title={tab.title}
+            />
           </div>
         );
         break;
