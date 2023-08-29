@@ -10,12 +10,15 @@ import {
 } from '../../Context';
 import BoardItem from './BoardItem';
 import CreateForm from '../PageList/CreateForm';
+import CategoryTitle from '../CategoryTitle';
+import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 
 function Board({ boards, boardIndex }) {
   const [project] = useContext(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
+  const svg = <BoardIcon />;
 
   const switchFormDisplay = (status: string) => {
     setFormDisplay(status);
@@ -56,7 +59,7 @@ function Board({ boards, boardIndex }) {
 
   return (
     <>
-      <h2>ボード</h2>
+      <CategoryTitle svg={svg} categoryName="ボード" />
       <Button onClick={() => switchFormDisplay('board')}>新しいボード</Button>
       {formDisplay && (
         <CreateForm createFunc={createNewBoard} setStatus={switchFormDisplay} />

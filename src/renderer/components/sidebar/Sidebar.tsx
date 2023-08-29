@@ -15,7 +15,9 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
       {quickAccessArea}
       {pageList}
       {boardList}
-      <OpenTrashBoxButton />
+      <div className="trashButton">
+        <OpenTrashBoxButton />
+      </div>
     </div>
   );
 }

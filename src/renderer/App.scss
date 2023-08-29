@@ -1,7 +1,11 @@
 $main-color: #6b9ebb;
+$font: (
+  'main': 'Meiryo',
+  'sub': 'MS UI Gothic'
+);
 
 * {
-  margin: 0px;
+  margin: 0;
   box-sizing: inherit;
 }
 
@@ -12,7 +16,7 @@ html {
 body {
   box-sizing: border-box;
   position: relative;
-  margin: 0px;
+  margin: 0;
 }
 
 // StartMenu
@@ -51,10 +55,16 @@ body {
 }
 
 .startMenu {
-  display: flex;
-  gap: 12vw;
+  display: grid;
+  gap: 4vw;
   margin: 0 auto;
   justify-content: center;
+  grid-template-columns: repeat(2,1fr);
+  padding: 0 8vw;
+}
+
+.searchProjects{
+  margin-top: 64px;
 }
 
 .advancedSearchProjectWindow {
@@ -76,9 +86,16 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     overflow-y: auto;
   }
+}
+
+// sideBar
+.trashButton{
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
 }
 
 // Editor

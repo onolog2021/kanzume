@@ -1,11 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import QuickAccesItem from './QuickAccessItem';
+import { ReactComponent as QuickLogo } from '../../../../../assets/bookmark.svg';
+import CategoryTitle from '../CategoryTitle';
 
 function QuickAccessArea() {
   const [project, setProject] = useContext(ProjectContext);
   const [bookmarks, setBookmarks] = useState([]);
   const [items, setItems] = useState([]);
+  const svg = <QuickLogo />;
 
   useEffect(() => {
     async function fetchBookmarks() {
@@ -29,7 +32,7 @@ function QuickAccessArea() {
 
   return (
     <>
-      <h2>クイックアクセス</h2>
+      <CategoryTitle svg={svg} categoryName="クイックアクセス" />
       {bookmarks &&
         bookmarks.map((item) => (
           <QuickAccesItem

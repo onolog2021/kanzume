@@ -9,12 +9,15 @@ import {
 } from '../../Context';
 import TreeBranch from './TreeBranch';
 import CreateForm from './CreateForm';
+import {ReactComponent as PageIcon} from '../../../../../assets/paper.svg'
+import CategoryTitle from '../CategoryTitle';
 
 function PageList({ root }) {
   const [project] = useContext(ProjectContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [newForm, setNewForm] = useState(null);
+  const svg = <PageIcon />
 
   const { setNodeRef } = useDroppable({
     id: 'page-list',
@@ -67,7 +70,7 @@ function PageList({ root }) {
 
   return (
     <>
-      <h2>テキスト</h2>
+      <CategoryTitle svg={svg} categoryName={'テキスト'} />
       <Button onClick={() => switchNewForm('page')}>新規ページ</Button>
       <Button onClick={() => switchNewForm('folder')}>新規フォルダ</Button>
       {newForm === 'page' && (

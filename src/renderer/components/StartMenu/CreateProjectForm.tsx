@@ -6,7 +6,7 @@ import { ReactComponent as PlusSvg } from '../../../../assets/new.svg';
 export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
 
-  function createNewPage() {
+  const createNewPage = () => {
     const titleValue = projectTitleRef.current.value;
     const title = titleValue || '無題';
     const json = {
@@ -18,7 +18,7 @@ export default function CreateProjectForm({ handleClick }) {
     window.electron.ipcRenderer.invoke('insertRecord', json).then((result) => {
       handleClick(result);
     });
-  }
+  };
 
   return (
     <>
@@ -31,7 +31,11 @@ export default function CreateProjectForm({ handleClick }) {
           inputRef={projectTitleRef}
           sx={{ mr: 2 }}
         />
-        <Button size="small" variant="contained" onClick={createNewPage}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={createNewPage}
+        >
           新規作成
         </Button>
       </Box>

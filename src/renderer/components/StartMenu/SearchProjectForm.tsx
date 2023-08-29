@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { TextField, Box } from '@mui/material';
 import { error } from 'console';
 import { ReactComponent as SearchIcon } from '../../../../assets/search.svg';
 import TextWithSvg from './TextWithSVG';
@@ -38,14 +38,19 @@ export default function SearchProjectForm({ handleClick }) {
   }, [searchValue]);
 
   return (
-    <>
+    <div className="searchProjects">
       <TextWithSvg SvgComponent={SearchIcon} text="既存プロジェクト" />
-      <TextField
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-        size="small"
-      />
-      <AdvancedSearchProject projects={projects} handleClick={handleClick} />
+      <Box display="flex">
+        <TextField
+          value={searchValue}
+          label="プロジェクト名"
+          onChange={(e) => setSearchValue(e.target.value)}
+          size="small"
+          sx={{ mr: 2 }}
+        />
+        <AdvancedSearchProject projects={projects} handleClick={handleClick} />
+      </Box>
+
       {matchProject.map((project) => (
         <ProjectItem
           key={project.id}
@@ -53,6 +58,6 @@ export default function SearchProjectForm({ handleClick }) {
           handleClick={handleClick}
         />
       ))}
-    </>
+    </div>
   );
 }

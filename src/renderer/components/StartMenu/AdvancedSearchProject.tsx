@@ -9,24 +9,24 @@ function AdvancedSearchProject({ projects, handleClick }) {
   const [searchedWord, setSearchedWord] = useState<string>('');
   const [visible, setVisible] = useState(false);
 
+  const clickOutside = (event) => {
+    if (windowRef.current && !contentRef.current.contains(event.target)) {
+      setVisible(false);
+    }
+  };
 
   useEffect(() => {
-    const handleDocumentClick = (event) => {
-      if (windowRef.current && contentRef.current) {
-        if (
-          windowRef.current.contains(event.target) &&
-          !contentRef.current.contains(event.target)
-        ) {
-          switchVisible();
-        }
-      }
-    };
+    if (visible) {
+      document.addEventListener('mousedown', clickOutside);
+    } else {
+      document.removeEventListener('mousedown', clickOutside);
+    }
 
-    document.addEventListener('click', handleDocumentClick);
+    // クリーンアップ関数: コンポーネントのアンマウント時にイベントリスナーを削除
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('mousedown', clickOutside);
     };
-  }, []);
+  }, [visible]);
 
   useEffect(() => {
     setMatchProjects(projects);
@@ -50,7 +50,12 @@ function AdvancedSearchProject({ projects, handleClick }) {
 
   return (
     <>
-      <Button onClick={switchVisible}>一覧表示</Button>
+      <Button
+        onClick={switchVisible}
+        sx={{ textDecoration: 'underline', textUnderlineOffset: 4 }}
+      >
+        一覧表示
+      </Button>
       {visible ? (
         <div className="advancedSearchProjectWindow" ref={windowRef}>
           <div className="windowContent" ref={contentRef}>
@@ -58,6 +63,8 @@ function AdvancedSearchProject({ projects, handleClick }) {
             <TextField
               size="small"
               onChange={(e) => setSearchedWord(e.target.value)}
+              label="プロジェクト名"
+              sx={{ my: 2 }}
             />
             {matchProjects.map((project) => (
               <ProjectItem

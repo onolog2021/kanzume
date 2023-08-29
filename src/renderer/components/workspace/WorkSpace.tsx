@@ -42,6 +42,7 @@ function WorkSpace({ tabs, paperIndex }) {
             <TrashBox />
           </div>
         );
+        break;
       default:
     }
     return content;
