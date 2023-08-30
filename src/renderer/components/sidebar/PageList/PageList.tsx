@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { List, Button } from '@mui/material';
+import { List, Box, IconButton } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
 import {
@@ -9,15 +9,17 @@ import {
 } from '../../Context';
 import TreeBranch from './TreeBranch';
 import CreateForm from './CreateForm';
-import {ReactComponent as PageIcon} from '../../../../../assets/paper.svg'
+import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import CategoryTitle from '../CategoryTitle';
+import { ReactComponent as AddPageButton } from '../../../../../assets/paper-plus.svg';
+import { ReactComponent as AddFolderButton } from '../../../../../assets/folder-plus.svg';
 
 function PageList({ root }) {
   const [project] = useContext(ProjectContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [newForm, setNewForm] = useState(null);
-  const svg = <PageIcon />
+  const svg = <PageIcon />;
 
   const { setNodeRef } = useDroppable({
     id: 'page-list',
@@ -70,9 +72,16 @@ function PageList({ root }) {
 
   return (
     <>
-      <CategoryTitle svg={svg} categoryName={'テキスト'} />
-      <Button onClick={() => switchNewForm('page')}>新規ページ</Button>
-      <Button onClick={() => switchNewForm('folder')}>新規フォルダ</Button>
+      <div className='sideBarSectionName'>
+        <CategoryTitle svg={svg} categoryName="テキスト" />
+        <IconButton onClick={() => switchNewForm('page')}>
+          <AddPageButton />
+        </IconButton>
+        <IconButton onClick={() => switchNewForm('folder')}>
+          <AddFolderButton />
+        </IconButton>
+      </div>
+
       {newForm === 'page' && (
         <CreateForm createFunc={createNewPage} setStatus={switchNewForm} />
       )}

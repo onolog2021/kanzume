@@ -32,7 +32,9 @@ function QuickAccessArea() {
 
   return (
     <>
-      <CategoryTitle svg={svg} categoryName="クイックアクセス" />
+      <div className='sidebarSectionName'>
+        <CategoryTitle svg={svg} categoryName="クイックアクセス" />
+      </div>
       {bookmarks &&
         bookmarks.map((item) => (
           <QuickAccesItem

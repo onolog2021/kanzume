@@ -59,11 +59,11 @@ body {
   gap: 4vw;
   margin: 0 auto;
   justify-content: center;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(2, 1fr);
   padding: 0 8vw;
 }
 
-.searchProjects{
+.searchProjects {
   margin-top: 64px;
 }
 
@@ -92,10 +92,29 @@ body {
 }
 
 // sideBar
-.trashButton{
+.trashButton {
   position: absolute;
   bottom: 8px;
   left: 8px;
+}
+
+.sideBarSectionName {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+  button {
+    svg {
+      width: 18px;
+    }
+  }
+}
+
+.sidebarItemIcon{
+  width: 16px;
+  margin-right: 8px;
+  &.open{
+    fill: #999;
+  }
 }
 
 // Editor

@@ -1,22 +1,12 @@
 import { useContext, useState, useEffect } from 'react';
-import {
-  List,
-  ListItemText,
-  IconButton,
-  Collapse,
-  ListItemButton,
-  Button,
-} from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { ListItemText, Collapse, ListItemButton, Button } from '@mui/material';
 import Folder from 'renderer/Classes/Folder';
 import { CSS } from '@dnd-kit/utilities';
-import Node from 'renderer/Classes/Node';
 import { useSortable } from '@dnd-kit/sortable';
 import { ProjectContext } from '../../Context';
-import ListItemPage from './ListItemPage';
 import TreeBranch from './TreeBranch';
+import { ReactComponent as OpenFolder } from '../../../../../assets/folder-fill.svg';
+import { ReactComponent as ClosedFolder } from '../../../../../assets/folder-outline.svg';
 
 function ListItemFolder({ folderData, index }) {
   const folder = new Folder(folderData);
@@ -56,13 +46,14 @@ function ListItemFolder({ folderData, index }) {
         {...listeners}
         {...attributes}
       >
-        <IconButton edge="start" aria-label="delete">
-          <DeleteIcon />
-        </IconButton>
+        {open ? (
+          <OpenFolder className="sidebarItemIcon open" />
+        ) : (
+          <ClosedFolder className="sidebarItemIcon" />
+        )}
         <ListItemText primary={folder.title} />
-        {hasPage.length !== 0 ? open ? <ExpandLess /> : <ExpandMore /> : null}
       </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 2 }}>
         {folderData.children && (
           <>
             <TreeBranch parentNode={folderData} />

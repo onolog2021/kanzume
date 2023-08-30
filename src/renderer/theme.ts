@@ -33,6 +33,15 @@ const theme = createTheme({
         },
       },
     },
+    MuiIconButton: {
+      defaultProps: {
+        sx: {
+          ':hover': {
+            backgroundColor: 'white',
+          },
+        },
+      },
+    },
     MuiTextField: {
       defaultProps: {
         fullWidth: true,

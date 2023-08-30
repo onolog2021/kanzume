@@ -1,9 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import {
-  ListItemText,
-  ListItemButton,
-  MenuItem,
-} from '@mui/material';
+import { ListItemText, ListItemButton, MenuItem } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Page from 'renderer/Classes/Page';
@@ -11,6 +7,7 @@ import ContextMenu from 'renderer/components/ContextMenu';
 import { create } from 'domain';
 import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
+import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 
 function ListItemPage({ pageData, index }) {
   const [contextMenuOpen, setContextMenuOpen] = useState(null);
@@ -88,7 +85,7 @@ function ListItemPage({ pageData, index }) {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord',query)
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
   };
 
   const menues = [
@@ -124,6 +121,7 @@ function ListItemPage({ pageData, index }) {
         {...listeners}
         {...attributes}
       >
+        <PageIcon className="sidebarItemIcon" />
         <ListItemText primary={pageData.title} />
       </ListItemButton>
       {contextMenuOpen && (
