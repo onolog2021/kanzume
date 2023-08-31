@@ -68,7 +68,11 @@ function Board({ boards, boardIndex }) {
       </div>
 
       {formDisplay && (
-        <CreateForm createFunc={createNewBoard} setStatus={switchFormDisplay} />
+        <CreateForm
+          createFunc={createNewBoard}
+          setStatus={switchFormDisplay}
+          label="ボード名"
+        />
       )}
       <SortableContext items={boardIndex}>
         <List ref={setNodeRef}>

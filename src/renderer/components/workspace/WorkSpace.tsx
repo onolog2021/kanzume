@@ -49,7 +49,7 @@ function WorkSpace({ tabs, paperIndex }) {
   };
 
   return (
-    <div className="workSpace">
+    <div className="workSpace" >
       {tabs}
       {tabList && tabList.map((tab) => panelRender(tab))}
     </div>

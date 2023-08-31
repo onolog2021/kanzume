@@ -9,6 +9,7 @@ import { ReactComponent as TraxhBoxIcon } from '../../../../../assets/trash.svg'
 function OpenTrashBoxButton() {
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+
   const addTabList = () => {
     const value = {
       id: 0,
@@ -23,7 +24,11 @@ function OpenTrashBoxButton() {
   };
 
   return (
-    <IconButton onClick={addTabList} aria-label="削除">
+    <IconButton
+      onClick={addTabList}
+      aria-label="削除"
+      sx={{ width: 'fit-content', display: 'block', mt: 'auto' }}
+    >
       <TraxhBoxIcon />
     </IconButton>
   );

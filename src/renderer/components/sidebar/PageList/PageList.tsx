@@ -72,7 +72,7 @@ function PageList({ root }) {
 
   return (
     <>
-      <div className='sideBarSectionName'>
+      <div className="sideBarSectionName">
         <CategoryTitle svg={svg} categoryName="テキスト" />
         <IconButton onClick={() => switchNewForm('page')}>
           <AddPageButton />
@@ -83,10 +83,18 @@ function PageList({ root }) {
       </div>
 
       {newForm === 'page' && (
-        <CreateForm createFunc={createNewPage} setStatus={switchNewForm} />
+        <CreateForm
+          createFunc={createNewPage}
+          setStatus={switchNewForm}
+          label="ページタイトル"
+        />
       )}
       {newForm === 'folder' && (
-        <CreateForm createFunc={createNewFolder} setStatus={switchNewForm} />
+        <CreateForm
+          createFunc={createNewFolder}
+          setStatus={switchNewForm}
+          label="フォルダタイトル"
+        />
       )}
       <List ref={setNodeRef}>{root && <TreeBranch parentNode={root} />}</List>
     </>

@@ -91,39 +91,12 @@ body {
   }
 }
 
-// sideBar
-.trashButton {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-}
-
-.sideBarSectionName {
-  display: flex;
-  align-items: center;
-  margin-top: 24px;
-  button {
-    svg {
-      width: 18px;
-    }
-  }
-}
-
-.sidebarItemIcon{
-  width: 16px;
-  margin-right: 8px;
-  &.open{
-    fill: #999;
-  }
-}
 
 // Editor
-
 .editorPage {
   width: 100%;
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  grid-gap: 16px;
+  display: flex;
+  align-items: flex-start;
   min-height: 100vh;
 }
 
@@ -144,11 +117,18 @@ body {
   }
 }
 
+.workSpace{
+  padding: 0 16px;
+  width: calc(100vw - 240px);
+}
+
 // sideBar
 .sideBar {
-  padding: 16px;
+  padding: 16px 16px 60px;
   border-right: 0.5px solid grey;
-  min-height: 100%;
+  width: 240px;
+  height: 100vh;
+  overflow-y: auto;
   h1 {
     font-size: 1.2rem;
     font-weight: normal;
@@ -156,5 +136,31 @@ body {
   }
   h2 {
     font-size: 1.8rem;
+  }
+}
+
+.trashButton {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+}
+
+.sideBarSectionName {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  button {
+    svg {
+      width: 18px;
+    }
+  }
+}
+
+.sidebarItemIcon{
+  width: 16px;
+  margin-right: 8px;
+  &.close{
+    fill: #999;
   }
 }
