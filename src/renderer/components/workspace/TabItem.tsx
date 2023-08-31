@@ -5,7 +5,7 @@ import {
 } from 'renderer/components/Context';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Button, TextField } from '@mui/material';
+import { Button, Tab } from '@mui/material';
 
 function TabItem({ tab, index }) {
   const [project] = useContext(ProjectContext);
@@ -28,9 +28,9 @@ function TabItem({ tab, index }) {
     setCurrentPage(value);
   };
 
-  return(
-    <li
-      className={currentPage.id === id ? 'selected' : null}
+  return (
+    <button
+      className={currentPage.id === id ? 'tab selected' : 'tab'}
       onClick={() => handleActiveTab(id)}
       ref={setNodeRef}
       style={style}
@@ -38,10 +38,8 @@ function TabItem({ tab, index }) {
       {...attributes}
     >
       {title}
-    </li>
+    </button>
   );
-
-
 }
 
 export default TabItem;
