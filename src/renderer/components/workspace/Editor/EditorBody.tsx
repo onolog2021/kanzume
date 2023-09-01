@@ -1,5 +1,5 @@
 import { useEffect, useRef, useContext, useState } from 'react';
-import { Button, TextField, InputLabe, Select, MenuItem } from '@mui/material';
+import { Button, Box, InputLabe, Select, MenuItem } from '@mui/material';
 import Page from 'renderer/Classes/Page';
 import MyEditor from '../../MyEditor';
 import {
@@ -7,46 +7,35 @@ import {
   ProjectContext,
   PageListContext,
 } from '../../Context';
+import EditorPageTitle from './EditorPageTitle';
+import BookmarkButton from './BookmarkButton';
+import TextSetting from './TextSetting';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
+  const [page, setPage] = useState();
   const [editor, setEditor] = useState(null);
-  const [bookmark, setBookmark] = useState(false);
-  const titleRef = useRef();
-  const [fontStyle, setFontStyle] = useState('');
-  const [fontList, setFontList] = useState({});
+  const [fontStyle, setFontStyle] = useState('Meiryo');
 
   const style = {
     fontFamily: fontStyle,
   };
 
   useEffect(() => {
-    setFontStyle('Meiryo');
-    const list = {
-      游ゴシック: 'YuGothic',
-      メイリオ: 'Meiryo',
-      'ＭＳ ゴシック': 'MS Gothic',
-      'ＭＳ 明朝': 'MS Mincho',
-      ヒラギノ角ゴシック: 'Hiragino Kaku Gothic',
-      ヒラギノ明朝: 'Hiragino Mincho',
-      小塚ゴシック: 'Kozuka Gothic',
-      小塚明朝: 'Kozuka Mincho',
-      'Source Han Sans': 'Source Han Sans',
-      'Source Han Serif': 'Source Han Serif',
-      'Noto Sans CJK': 'Noto Sans CJK',
-      'Noto Serif CJK': 'Noto Serif CJK',
-    };
-    setFontList(list);
-    const query = {
-      table: 'bookmark',
-      conditions: {
-        target: 'page',
-        target_id: page_id,
-      },
-    };
-    window.electron.ipcRenderer.invoke('fetchRecord', query).then((result) => {
-      setBookmark(!!result);
-    });
+    async function setPageData() {
+      const query = {
+        table: 'page',
+        conditions: {
+          id: page_id,
+        },
+      };
+      const pageData = await window.electron.ipcRenderer.invoke(
+        'fetchRecord',
+        query
+      );
+      setPage(pageData);
+    }
+    setPageData();
 
     if (editor) {
       editor.destroy();
@@ -61,55 +50,6 @@ function EditorBody({ targetId, page_id, title }) {
     return () => clearInterval(timer);
   }, []);
 
-  const changeBookmark = () => {
-    if (bookmark) {
-      removeBookmark();
-    } else {
-      addBookmark();
-    }
-  };
-
-  const addBookmark = () => {
-    const query = {
-      table: 'bookmark',
-      columns: {
-        target: 'page',
-        target_id: page_id,
-        position: -1,
-        project_id: project.id,
-      },
-    };
-    window.electron.ipcRenderer.invoke('insertRecord', query);
-    setBookmark(true);
-  };
-
-  const saveTitle = () => {
-    const newTitle = titleRef.current.value;
-    const query = {
-      table: 'page',
-      columns: {
-        title: newTitle,
-      },
-      conditions: {
-        id: page_id,
-      },
-    };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
-  };
-
-  const removeBookmark = () => {
-    const query = {
-      table: 'bookmark',
-      conditions: {
-        target: 'page',
-        target_id: page_id,
-        project_id: project.id,
-      },
-    };
-    window.electron.ipcRenderer.sendMessage('deleteRecord', query);
-    setBookmark(false);
-  };
-
   const softDelete = () => {
     const query = {
       table: 'page',
@@ -120,9 +60,8 @@ function EditorBody({ targetId, page_id, title }) {
     window.electron.ipcRenderer.sendMessage('softDelete', query);
   };
 
-  const changeFontStyle = (event) => {
-    const newFontStyle = event.target.value;
-    setFontStyle(newFontStyle);
+  const changeFontStyle = (font: string) => {
+    setFontStyle(font);
   };
 
   if (!project) {
@@ -130,29 +69,17 @@ function EditorBody({ targetId, page_id, title }) {
   }
 
   return (
-    <div>
-      <TextField
-        inputRef={titleRef}
-        onChange={saveTitle}
-        defaultValue={title}
-      />
-      {bookmark ? <p>ブクマ済み</p> : null}
-      <Button onClick={changeBookmark}>ブクマ</Button>
-      <Button onClick={softDelete}>削除</Button>
-      <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
-        value={fontStyle}
-        onChange={changeFontStyle}
-      >
-        {fontList &&
-          Object.entries(fontList).map(([key, value]) => (
-            <MenuItem value={value as string} key={value as string}>
-              {key}
-            </MenuItem>
-          ))}
-      </Select>
-      <div id={targetId} className="editorJS" style={style} />
+    <div className="editorBody">
+      {page && <EditorPageTitle page={page} />}
+      <Box sx={{ position: 'relative' }}>
+        <Box display="grid" gridTemplateColumns="1fr 24px">
+          <div id={targetId} className="editorJS" style={style} />
+          <div className="editorTools">
+            <BookmarkButton page={page} />
+            <TextSetting changeFontFunc={changeFontStyle} />
+          </div>
+        </Box>
+      </Box>
     </div>
   );
 }

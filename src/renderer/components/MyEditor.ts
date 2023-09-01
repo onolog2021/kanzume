@@ -1,7 +1,6 @@
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header';
 import Undo from 'editorjs-undo';
-import Page from 'renderer/Classes/Page';
 
 function debounce(func, wait) {
   let timeout;
