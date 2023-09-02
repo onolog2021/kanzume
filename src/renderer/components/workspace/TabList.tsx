@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useEffect } from 'react';
+import { useContext, useState, useRef, useMemo } from 'react';
 import { TabListContext } from 'renderer/components/Context';
 import { IconButton } from '@mui/material';
 import {
@@ -13,7 +13,7 @@ function TabList({ tabIndex }) {
   const [tabList, setTabList] = useContext(TabListContext);
 
   return (
-    <ul className="tablist">
+    <ul className="tablist" id="tabList">
       <SortableContext items={index} strategy={horizontalListSortingStrategy}>
         {tabList.map((tab) => (
           <TabItem key={`tab-${tab.type}-${tab.id}`} tab={tab} index={index} />

@@ -52,10 +52,11 @@ function TextSettingWindow({ closeWindow, changeFontFunc }) {
           left: '50%',
           transform: 'translate(-50%,-50%)',
           width: 520,
-          p: 2,
+          p: 4,
           border: '1px solid rgba(0, 0, 0, 0.20)',
-          backgroundColor: 'rgba(255, 255, 255, 0.9);',
-          boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95);',
+          boxShadow: '0px 2px 2px 0px rgba(0, 0, 0, 0.2)',
+          zIndex: 10,
         }}
       >
         <Typography variant="h6">テキスト設定</Typography>

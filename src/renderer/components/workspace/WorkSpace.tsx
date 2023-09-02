@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { TabListContext, CurrentPageContext } from '../Context';
 import EditorBody from './Editor/EditorBody';
@@ -49,7 +49,7 @@ function WorkSpace({ tabs, paperIndex }) {
   };
 
   return (
-    <div className="workSpace" >
+    <div className="workSpace">
       {tabs}
       {tabList && tabList.map((tab) => panelRender(tab))}
     </div>

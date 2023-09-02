@@ -98,4 +98,5 @@ export default class MyEditor {
   destroy() {
     this.editor?.destroy();
   }
+
 }

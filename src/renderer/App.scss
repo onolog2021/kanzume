@@ -4,6 +4,16 @@ $font: (
   'sub': 'MS UI Gothic'
 );
 
+$tab-list-height: 48px;
+$editor-title-height: 48px;
+$editor-body-height: calc(100vh - #{$tab-list-height + $editor-title-height});
+
+$editor-height: (
+  'tab-list': $tab-list-height,
+  'editor-title': $editor-title-height,
+  'editor-body': $editor-body-height
+);
+
 * {
   margin: 0;
   box-sizing: inherit;
@@ -17,6 +27,12 @@ body {
   box-sizing: border-box;
   position: relative;
   margin: 0;
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #999;
+  }
 }
 
 // StartMenu
@@ -97,20 +113,30 @@ body {
   display: flex;
   align-items: flex-start;
   min-height: 100vh;
+  .tablist {
+    height: map-get($editor-height, 'tab-list');
+  }
+  .editor-title {
+    height: map-get($editor-height, 'editor-title');
+  }
 }
 
 .editorJS {
-  background-color: #f8f8f8;
+  font-size: 1.6rem;
+  min-height: map-get($map: $editor-height, $key: editor-body);
+  position: relative;
+  z-index: 0;
 }
 
 .workSpace {
   padding: 0 16px;
   width: calc(100vw - 240px);
+  min-height: 100vh;
 }
 
 .editorTools {
+  position: fixed;
   right: 16px;
-  top: 0;
   width: 24px;
   svg {
     width: 24px;
@@ -119,6 +145,10 @@ body {
     z-index: 10;
     margin-bottom: 24px;
   }
+}
+
+.editorBody {
+  padding-top: map-get($map: $editor-height, $key: tab-list);
 }
 
 // sideBar
@@ -166,10 +196,15 @@ body {
 
 // tab
 .tablist {
+  position: fixed;
+  height: map-get($map: $editor-height, $key: tab-list);
+  z-index: 10;
   display: flex;
   padding: 0;
   margin: 0 0 24px;
   overflow-x: auto;
+  width: 100%;
+  background: white;
   &::-webkit-scrollbar {
     height: 2px;
     background-color: transparent;
@@ -187,7 +222,7 @@ body {
 .tab {
   display: -webkit-box;
   white-space: nowrap;
-  padding: 8px 24px;
+  padding: 8px 16px;
   min-width: 160px;
   height: 48px;
   font-size: 1.4rem;
@@ -198,9 +233,16 @@ body {
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   cursor: pointer;
+  text-align: left;
   &.selected {
     font-size: 1.6rem;
     font-weight: bold;
     background-color: white;
+    border-right: .5px solid #e7e7e7;
   }
+}
+
+// editorJs関連
+.ce-toolbar{
+  display: none;
 }

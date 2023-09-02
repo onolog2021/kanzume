@@ -20,6 +20,7 @@ function EditorPageTitle({ page }) {
 
   return (
     <TextField
+      className="editor-title"
       inputRef={titleRef}
       onChange={saveTitle}
       defaultValue={title}

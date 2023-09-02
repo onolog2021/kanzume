@@ -71,14 +71,12 @@ function EditorBody({ targetId, page_id, title }) {
   return (
     <div className="editorBody">
       {page && <EditorPageTitle page={page} />}
-      <Box sx={{ position: 'relative' }}>
-        <Box display="grid" gridTemplateColumns="1fr 24px">
-          <div id={targetId} className="editorJS" style={style} />
-          <div className="editorTools">
-            <BookmarkButton page={page} />
-            <TextSetting changeFontFunc={changeFontStyle} />
-          </div>
-        </Box>
+      <Box display="grid" gridTemplateColumns="1fr 24px" position="relative">
+        <div id={targetId} className="editorJS" style={style} />
+        <div className="editorTools">
+          <BookmarkButton page={page} />
+          <TextSetting changeFontFunc={changeFontStyle} />
+        </div>
       </Box>
     </div>
   );
