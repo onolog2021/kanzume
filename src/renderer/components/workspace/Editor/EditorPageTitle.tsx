@@ -22,7 +22,7 @@ function EditorPageTitle({ page }) {
     <TextField
       className="editor-title"
       inputRef={titleRef}
-      onChange={saveTitle}
+      onBlur={saveTitle}
       defaultValue={title}
       variant="standard"
       aria-label="title"

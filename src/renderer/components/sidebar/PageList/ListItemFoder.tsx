@@ -57,6 +57,13 @@ function ListItemFolder({ folderData, index }) {
         style={style}
         {...listeners}
         {...attributes}
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '24px 1fr',
+          gap: 1,
+          height: 40,
+          alignItems: 'center',
+        }}
       >
         <Expand
           style={

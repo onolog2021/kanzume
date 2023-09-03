@@ -1,10 +1,11 @@
 import { useContext } from 'react';
-import { ListItemButton, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CurrentPageContext } from 'renderer/components/Context';
 // import Folder from 'renderer/Classes/Folder';
 import { TabListContext } from 'renderer/components/Context';
+import { ReactComponent as BoardLogo } from '../../../../../assets/square.svg';
 
 function BoadItem({ board, index }) {
   // const thisFolder = new Folder(folder);
@@ -45,7 +46,15 @@ function BoadItem({ board, index }) {
       style={style}
       {...listeners}
       {...attributes}
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: '24px 1fr',
+        gap: 1,
+        height: 40,
+        alignItems: 'center',
+      }}
     >
+      <BoardLogo style={{ width: 16, margin: '0 auto' }} />
       <ListItemText primary={board.title} />
     </ListItemButton>
   );

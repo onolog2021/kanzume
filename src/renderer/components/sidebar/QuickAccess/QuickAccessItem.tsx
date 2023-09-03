@@ -1,43 +1,40 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import ListItemPage from '../PageList/ListItemPage';
+import BoadItem from '../Board/BoardItem';
 
-function QuickAccesItem({ item }) {
+function QuickAccesItem({ item, items }) {
   const { target, target_id } = item;
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    let query;
-
-    if (target === 'page') {
-      query = {
-        table: 'page',
+    const fetchData = async () => {
+      const query = {
         conditions: {
           id: target_id,
         },
       };
-    } else {
-      query = {
-        table: 'folder',
-        conditions: {
-          id: target_id,
-        },
-      };
-    }
 
-    window.electron.ipcRenderer.invoke('fetchRecord', query).then((result) => {
+      query.table = target === 'page' ? 'page' : 'folder';
+
+      const result = await window.electron.ipcRenderer.invoke(
+        'fetchRecord',
+        query
+      );
       setData(result);
-    });
+      console.log(result);
+    };
+    fetchData();
   }, []);
 
-  if (!data) {
-    return <p>loading...</p>;
-  }
-
   return (
-    <Box>
-      {target === 'page' ? <span>T</span> : <span>F</span>}
-      <Typography>{data.title}</Typography>
-    </Box>
+    <>
+      {data &&
+        (target === 'page' ? (
+          <ListItemPage pageData={data} index={items} />
+        ) : (
+          <BoadItem board={data} index={items} />
+        ))}
+    </>
   );
 }
 

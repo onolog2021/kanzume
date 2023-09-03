@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
-import { ListItemText, ListItemButton, MenuItem } from '@mui/material';
+import { ListItemText, ListItemButton } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Page from 'renderer/Classes/Page';
 import ContextMenu from 'renderer/components/ContextMenu';
-import { create } from 'domain';
 import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
@@ -120,9 +119,28 @@ function ListItemPage({ pageData, index }) {
         style={style}
         {...listeners}
         {...attributes}
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '24px 1fr',
+          gap: 1,
+          height: 40,
+          alignItems: 'center',
+        }}
       >
-        <PageIcon className="sidebarItemIcon" />
-        <ListItemText primary={pageData.title} />
+        <PageIcon className="sidebarItemIcon" style={{ margin: '0 auto' }} />
+        <ListItemText
+          primary={pageData.title}
+          primaryTypographyProps={{
+            sx: {
+              fontSize: 14,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 1,
+              overflow: 'hidden',
+              wordBreak: 'break-all',
+            },
+          }}
+        />
       </ListItemButton>
       {contextMenuOpen && (
         <ContextMenu

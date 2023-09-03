@@ -234,11 +234,11 @@ body {
   text-overflow: ellipsis;
   cursor: pointer;
   text-align: left;
+  border-right: .1px solid #d5d5d5;
   &.selected {
     font-size: 1.6rem;
     font-weight: bold;
     background-color: white;
-    border-right: .5px solid #e7e7e7;
   }
 }
 
