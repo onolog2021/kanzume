@@ -3,11 +3,18 @@ import { Box, Paper, TextField } from '@mui/material';
 import MyEditor from 'renderer/components/MyEditor';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Resizable } from 're-resizable';
 
 function Boardpage({ pageData, index, boardId }) {
   const [editor, setEditor] = useState();
   const titleRef = useRef();
   const targetId = `boardItem-${pageData.id}`;
+  const resizeRef = useRef()
+
+  const size = {
+    width: '100%',
+    height: 200,
+  };
 
   // const { attributes, listeners, setNodeRef, transform } = useSortable({
   //   id: `paper-${pageData.id}`,
@@ -42,27 +49,29 @@ function Boardpage({ pageData, index, boardId }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      // ref={setNodeRef}
-      // style={style}
-      // {...listeners}
-      // {...attributes}
-      sx={{
-        width: '100%',
-        p: 4,
-        height: 400,
-        overflow: 'auto',
-      }}
-    >
-      <TextField
-        size="small"
-        inputRef={titleRef}
-        onBlur={changeName}
-        defaultValue={pageData.title || null}
-      />
-      <div id={targetId} />
-    </Paper>
+    <Resizable defaultSize={size} maxWidth={'100%'} bounds={'HTMLElement'} ref={resizeRef}>
+      <Paper
+        elevation={3}
+        // ref={setNodeRef}
+        // style={style}
+        // {...listeners}
+        // {...attributes}
+        sx={{
+          width: size.width,
+          height: size.height,
+          p: 4,
+          overflow: 'auto',
+        }}
+      >
+        <TextField
+          size="small"
+          inputRef={titleRef}
+          onBlur={changeName}
+          defaultValue={pageData.title || null}
+        />
+        <div id={targetId} />
+      </Paper>
+    </Resizable>
   );
 }
 
