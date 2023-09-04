@@ -2,7 +2,7 @@ import { useState, useContext, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { TabListContext, CurrentPageContext } from '../Context';
 import EditorBody from './Editor/EditorBody';
-import BoardBody from './Board/BoardBody';
+import BoardSpace from './Board/BoardSpace';
 import TrashBox from '../sidebar/TrashBox/TrashBox';
 
 function WorkSpace({ tabs, paperIndex }) {
@@ -20,7 +20,7 @@ function WorkSpace({ tabs, paperIndex }) {
     switch (tab.type) {
       case 'editor':
         content = (
-          <div style={isCurrent(tab)} key={`page-${tab.id}`}>
+          <div style={isCurrent(tab)} key={`page-${tab.id}`} className="panel">
             <EditorBody
               targetId={`tab-${tab.id}`}
               page_id={tab.id}
@@ -31,14 +31,14 @@ function WorkSpace({ tabs, paperIndex }) {
         break;
       case 'board':
         content = (
-          <div style={isCurrent(tab)} key={`board-${tab.id}`}>
-            <BoardBody boardData={tab} />
+          <div style={isCurrent(tab)} key={`board-${tab.id}`} className="panel">
+            <BoardSpace boardData={tab} />
           </div>
         );
         break;
       case 'trash':
         content = (
-          <div style={isCurrent(tab)} key="trash-box">
+          <div style={isCurrent(tab)} key="trash-box" className="panel">
             <TrashBox />
           </div>
         );

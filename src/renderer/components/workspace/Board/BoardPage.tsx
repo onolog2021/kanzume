@@ -9,19 +9,19 @@ function Boardpage({ pageData, index, boardId }) {
   const titleRef = useRef();
   const targetId = `boardItem-${pageData.id}`;
 
-  const { attributes, listeners, setNodeRef, transform } = useSortable({
-    id: `paper-${pageData.id}`,
-    data: {
-      area: 'board-body',
-      type: 'paper',
-      itemId: pageData.id,
-      parentId: boardId,
-      index,
-    },
-  });
-  const style = {
-    transform: CSS.Translate.toString(transform),
-  };
+  // const { attributes, listeners, setNodeRef, transform } = useSortable({
+  //   id: `paper-${pageData.id}`,
+  //   data: {
+  //     area: 'board-body',
+  //     type: 'paper',
+  //     itemId: pageData.id,
+  //     parentId: boardId,
+  //     index,
+  //   },
+  // });
+  // const style = {
+  //   transform: CSS.Translate.toString(transform),
+  // };
 
   useEffect(() => {
     const newEditor = new MyEditor(targetId, pageData.id);
@@ -38,17 +38,22 @@ function Boardpage({ pageData, index, boardId }) {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord',query)
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
   };
-
 
   return (
     <Paper
-      elevation={2}
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
+      elevation={3}
+      // ref={setNodeRef}
+      // style={style}
+      // {...listeners}
+      // {...attributes}
+      sx={{
+        width: '100%',
+        p: 4,
+        height: 400,
+        overflow: 'auto',
+      }}
     >
       <TextField
         size="small"

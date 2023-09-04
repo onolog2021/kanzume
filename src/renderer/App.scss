@@ -11,7 +11,6 @@ $editor-body-height: calc(100vh - #{$tab-list-height + $editor-title-height});
 $editor-height: (
   'tab-list': $tab-list-height,
   'editor-title': $editor-title-height,
-  'editor-body': $editor-body-height
 );
 
 * {
@@ -27,6 +26,7 @@ body {
   box-sizing: border-box;
   position: relative;
   margin: 0;
+  font-size: 1.6rem;
   &::-webkit-scrollbar {
     width: 3px;
   }
@@ -107,18 +107,27 @@ body {
   }
 }
 
+// workSpace
+.panel{
+  padding-top: 80px;
+  min-height: 100vh;
+}
+
 // Editor
 .editorPage {
   width: 100%;
   display: flex;
   align-items: flex-start;
-  min-height: 100vh;
   .tablist {
     height: map-get($editor-height, 'tab-list');
   }
   .editor-title {
     height: map-get($editor-height, 'editor-title');
   }
+}
+
+.editorBody{
+  min-height: calc(100vh - 48px);
 }
 
 .editorJS {
@@ -145,10 +154,6 @@ body {
     z-index: 10;
     margin-bottom: 24px;
   }
-}
-
-.editorBody {
-  padding-top: map-get($map: $editor-height, $key: tab-list);
 }
 
 // sideBar
@@ -201,7 +206,6 @@ body {
   z-index: 10;
   display: flex;
   padding: 0;
-  margin: 0 0 24px;
   overflow-x: auto;
   width: 100%;
   background: white;
