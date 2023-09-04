@@ -1,10 +1,13 @@
-import { Box, Rating } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Rating, Typography } from '@mui/material';
 import { ReactComponent as Rectangle } from '../../../../../assets/square.svg';
+import { useState } from 'react';
 
 function ColumnsCountSelector({ changeColumnsCount }) {
-  const itemStyle = {
-    padding: 10,
+  const [count, setCount] = useState()
+
+  const runChangeColumnsCount = (event, newValue) => {
+    changeColumnsCount(newValue);
+    setCount(newValue)
   };
 
   return (
@@ -14,7 +17,9 @@ function ColumnsCountSelector({ changeColumnsCount }) {
         defaultValue={2}
         icon={<Rectangle style={{ height: 30, fill: 'tomato' }} />}
         emptyIcon={<Rectangle style={{ height: 30, fill: 'white' }} />}
+        onChange={runChangeColumnsCount}
       />
+      <Typography>{count}列</Typography>
     </Box>
   );
 }

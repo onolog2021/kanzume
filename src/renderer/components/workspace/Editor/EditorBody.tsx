@@ -10,6 +10,7 @@ import {
 import EditorPageTitle from './EditorPageTitle';
 import BookmarkButton from './BookmarkButton';
 import TextSetting from './TextSetting';
+import PageTitleForm from '../PageTitleForm';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
@@ -64,13 +65,26 @@ function EditorBody({ targetId, page_id, title }) {
     setFontStyle(font);
   };
 
+  const saveTitle = (title: string) => {
+    const query = {
+      table: 'page',
+      columns: {
+        title,
+      },
+      conditions: {
+        id: page_id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+  };
+
   if (!project) {
     return <h1>Loading...</h1>;
   }
 
   return (
     <div className="editorBody">
-      {page && <EditorPageTitle page={page} />}
+      {page && <PageTitleForm onBlur={saveTitle} defaultValue={page.title} />}
       <Box display="grid" gridTemplateColumns="1fr 24px" position="relative">
         <div id={targetId} className="editorJS" style={style} />
         <div className="editorTools">

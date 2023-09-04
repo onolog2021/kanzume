@@ -21,7 +21,6 @@ function QuickAccesItem({ item, items }) {
         query
       );
       setData(result);
-      console.log(result);
     };
     fetchData();
   }, []);

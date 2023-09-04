@@ -5,9 +5,8 @@ import { Box } from '@mui/material';
 import Boardpage from './BoardPage';
 import { useDroppable } from '@dnd-kit/core';
 
-function BoardGrid({ board,columnsCount }) {
+function BoardGrid({ board,columnsCount, pages }) {
   const [index, setIndex] = useState([]);
-  const [pages, setPages] = useState([]);
   const { setNodeRef } = useDroppable({
     id: 'paper-list',
     data: { parentId: board.id },
@@ -15,9 +14,7 @@ function BoardGrid({ board,columnsCount }) {
 
   useEffect(() => {
     const getPages = async () => {
-      const result = await board.pages();
-      setPages(result);
-      const newAry = await result.map((item) => `paper-${item.id}`);
+      const newAry = await pages.map((item) => `paper-${item.id}`);
       setIndex(newAry);
     };
     getPages();

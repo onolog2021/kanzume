@@ -1,31 +1,21 @@
 import { useRef } from 'react';
 import { TextField } from '@mui/material';
 
-function EditorPageTitle({ page }) {
-  const { id, title } = page;
+function PageTitleForm({ onBlur, defaultValue }) {
   const titleRef = useRef();
-  const saveTitle = () => {
-    const newTitle = titleRef.current.value;
-    const query = {
-      table: 'page',
-      columns: {
-        title: newTitle,
-      },
-      conditions: {
-        id,
-      },
-    };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
-  };
+
+  const runOnBlurFunc = () => {
+    const title = titleRef.current.value
+    onBlur(title);
+  }
 
   return (
     <TextField
-      className="editor-title"
       inputRef={titleRef}
-      onBlur={saveTitle}
-      defaultValue={title}
+      defaultValue={defaultValue}
       variant="standard"
       aria-label="title"
+      onBlur={runOnBlurFunc}
       sx={{
         '& input': {
           fontWeight: '700',
@@ -46,4 +36,4 @@ function EditorPageTitle({ page }) {
   );
 }
 
-export default EditorPageTitle;
+export default PageTitleForm;
