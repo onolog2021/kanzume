@@ -40,15 +40,13 @@ function BoadItem({ board, index }) {
     }
   }
 
-  const icon =  <BoardLogo  />
+  const icon = <BoardLogo />;
 
   const functions = {
-    click: handleClick
-  }
+    click: handleClick,
+  };
 
-  return (
-    <SidebarItem icon={icon} text={board.title} functions={functions} />
-  );
+  return <SidebarItem icon={icon} text={board.title} functions={functions} />;
 }
 
 export default BoadItem;

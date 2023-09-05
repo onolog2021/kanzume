@@ -1,15 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import { ListItemText, ListItemButton } from '@mui/material';
-import { CSS } from '@dnd-kit/utilities';
-import Page from 'renderer/Classes/Page';
-import ContextMenu from 'renderer/components/ContextMenu';
 import SidebarItem from '../SidebarItem';
 import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 
 function ListItemPage({ pageData, index }) {
-  const [contextMenuOpen, setContextMenuOpen] = useState(null);
   const [isShowInput, setIsShowInput] = useState(false);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
@@ -29,22 +24,6 @@ function ListItemPage({ pageData, index }) {
       setTabList((prevTabs) => [...prevTabs, value]);
     }
     setCurrentPage({ id: pageData.id, type: 'editor' });
-  };
-
-  const showMenu = (event) => {
-    event.preventDefault();
-    setContextMenuOpen(
-      contextMenuOpen === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-          }
-        : null
-    );
-  };
-
-  const closeContextMenu = () => {
-    setContextMenuOpen(false);
   };
 
   const softDelete = () => {
@@ -93,6 +72,7 @@ function ListItemPage({ pageData, index }) {
 
   const functions = {
     click: handleClick,
+    contextMenu: menues,
   };
 
   if (isShowInput) {
@@ -106,16 +86,7 @@ function ListItemPage({ pageData, index }) {
   }
 
   return (
-    <>
-      <SidebarItem icon={icon} text={pageData.title} functions={functions} />
-      {contextMenuOpen && (
-        <ContextMenu
-          contextMenu={contextMenuOpen}
-          onClose={closeContextMenu}
-          menues={menues}
-        />
-      )}
-    </>
+    <SidebarItem icon={icon} text={pageData.title} functions={functions} />
   );
 }
 
