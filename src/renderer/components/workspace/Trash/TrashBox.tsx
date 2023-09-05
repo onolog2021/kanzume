@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
+import { Box } from '@mui/material';
 import TrashedItem from './TrashedItem';
+import TrashActiveWindow from './TrashActiveWindow';
+import TrashIndex from './TrashIndex';
 
 function TrashBox() {
   const [project] = useContext(ProjectContext);
@@ -14,6 +17,7 @@ function TrashBox() {
         columns: ['title', 'id'],
         conditions: {
           is_deleted: true,
+          project_id: project.id,
         },
       };
       const trashedPage = await window.electron.ipcRenderer.invoke(
@@ -25,6 +29,7 @@ function TrashBox() {
         columns: ['id', 'title', 'type'],
         conditions: {
           is_deleted: true,
+          project_id: project.id,
         },
       };
       const trashedFolder = await window.electron.ipcRenderer.invoke(
@@ -33,16 +38,28 @@ function TrashBox() {
       );
       const combinedItems = trashedPage.concat(trashedFolder);
       setTrashedItems(combinedItems);
-      console.log(combinedItems);
     }
     fetchTrashedData();
+
+    window.electron.ipcRenderer.on(
+      'updateTrashIndex',
+      (event, newTrashedItems) => {
+        fetchTrashedData();
+      }
+    );
   }, []);
 
   return (
-    <div>
-      {trashedItems &&
-        trashedItems.map((item) => <TrashedItem key={item.id} item={item} />)}
-    </div>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 2,
+      }}
+    >
+      <TrashIndex items={trashedItems} />
+      <TrashActiveWindow />
+    </Box>
   );
 }
 

@@ -288,7 +288,10 @@ ipcMain.handle('insertRecord', async (event, args) => {
 function fetchRecords(args) {
   const { columns, table, join, order, limit } = args;
   const conditions = args.conditions || {};
-  if (['page', 'folder', 'project'].includes(table)) {
+  if (
+    ['page', 'folder', 'project'].includes(table) &&
+    !Object.keys(conditions).includes('is_deleted')
+  ) {
     conditions.is_deleted = 0;
   }
   return new Promise((resolve, reject) => {
@@ -319,9 +322,9 @@ function fetchRecords(args) {
       query += ` LIMIT ${limit}`;
     }
 
-    // console.log(query);
+    const values = Object.values(conditions);
 
-    db.all(query, Object.values(conditions), (err, rows) => {
+    db.all(query, values, (err, rows) => {
       if (err) {
         reject(err);
         return;
@@ -461,7 +464,6 @@ function softDelete(args) {
     .join(' AND ');
   sql += ` WHERE ${placeholder}`;
   const values = [1].concat(Object.values(conditions));
-  console.log(sql);
   db.run(sql, values, (error) => {
     if (error) {
       console.log(error);
@@ -471,4 +473,16 @@ function softDelete(args) {
 
 ipcMain.on('softDelete', (event, args) => {
   softDelete(args);
+});
+
+ipcMain.on('runUpdateTrashIndex', (event) => {
+  event.reply('updateTrashIndex');
+});
+
+ipcMain.on('runUpdatePageList', (event) => {
+  event.reply('updatePageList');
+});
+
+ipcMain.on('runUpdateBoardList', (event) => {
+  event.reply('updateBoardList');
 });

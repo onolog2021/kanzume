@@ -50,7 +50,7 @@ function BoadItem({ board, index }) {
     setIsShowInput(false);
   };
 
-  const changeName = (title) => {
+  const changeName = async (title) => {
     const query = {
       table: 'folder',
       columns: {
@@ -60,17 +60,19 @@ function BoadItem({ board, index }) {
         id: board.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
   };
 
-  const softDelete = () => {
+  const softDelete = async () => {
     const query = {
       table: 'folder',
       conditions: {
         id: board.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
   };
 
   const icon = <BoardLogo />;

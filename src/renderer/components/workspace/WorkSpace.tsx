@@ -3,7 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { TabListContext, CurrentPageContext } from '../Context';
 import EditorBody from './Editor/EditorBody';
 import BoardSpace from './Board/BoardSpace';
-import TrashBox from '../sidebar/TrashBox/TrashBox';
+import TrashBox from './Trash/TrashBox';
 
 function WorkSpace({ tabs, paperIndex }) {
   const [tabList, setTabList] = useContext(TabListContext);

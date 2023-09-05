@@ -66,7 +66,7 @@ function ListItemFolder({ folderData, index }) {
     setIsShowInput(false);
   };
 
-  const changeName = (title) => {
+  const changeName = async (title) => {
     const query = {
       table: 'folder',
       columns: {
@@ -76,17 +76,19 @@ function ListItemFolder({ folderData, index }) {
         id: folderData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
-  const softDelete = () => {
+  const softDelete = async () => {
     const query = {
       table: 'folder',
       conditions: {
         id: folderData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
   const mergeChildrenText = () => {

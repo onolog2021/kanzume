@@ -26,14 +26,15 @@ function ListItemPage({ pageData, index }) {
     setCurrentPage({ id: pageData.id, type: 'editor' });
   };
 
-  const softDelete = () => {
+  const softDelete = async () => {
     const query = {
       table: 'page',
       conditions: {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('softDelete', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
   const showInput = () => {
@@ -44,7 +45,7 @@ function ListItemPage({ pageData, index }) {
     setIsShowInput(false);
   };
 
-  const changeName = (title) => {
+  const changeName = async (title) => {
     const query = {
       table: 'page',
       columns: {
@@ -54,7 +55,8 @@ function ListItemPage({ pageData, index }) {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
   const menues = [
