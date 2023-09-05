@@ -16,6 +16,7 @@ import { ReactComponent as ClosedFolder } from '../../../../../assets/folder-fil
 import { ReactComponent as OpenFolder } from '../../../../../assets/folder-outline.svg';
 import { ReactComponent as MergePages } from '../../../../../assets/papers.svg';
 import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
+import SidebarItem from '../SidebarItem';
 
 function ListItemFolder({ folderData, index }) {
   const { children } = folderData;
@@ -28,6 +29,14 @@ function ListItemFolder({ folderData, index }) {
       id: `folder-${folder.id}`,
       data: { area: 'page-list', type: 'folder', itemId: folder.id, index },
     });
+
+  const icon = (
+    <Expand
+      style={
+        open ? { transform: 'rotate(0deg)' } : { transform: 'rotate(-90deg)' }
+      }
+    />
+  );
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -49,31 +58,13 @@ function ListItemFolder({ folderData, index }) {
     setHasPage(pages);
   }
 
+  const functions = {
+    click: handleClick,
+  }
+
   return (
     <>
-      <ListItemButton
-        onClick={handleClick}
-        ref={setNodeRef}
-        style={style}
-        {...listeners}
-        {...attributes}
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: '24px 1fr',
-          gap: 1,
-          height: 40,
-          alignItems: 'center',
-        }}
-      >
-        <Expand
-          style={
-            open
-              ? { transform: 'rotate(0deg)' }
-              : { transform: 'rotate(-90deg)' }
-          }
-        />
-        <ListItemText primary={folder.title} />
-      </ListItemButton>
+      <SidebarItem icon={icon} text={folderData.title} functions={functions}/>
       <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
         {children && children.length > 0 && (
           <TreeBranch parentNode={folderData} />

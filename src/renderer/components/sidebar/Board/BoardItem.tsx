@@ -6,6 +6,7 @@ import { CurrentPageContext } from 'renderer/components/Context';
 // import Folder from 'renderer/Classes/Folder';
 import { TabListContext } from 'renderer/components/Context';
 import { ReactComponent as BoardLogo } from '../../../../../assets/square.svg';
+import SidebarItem from '../SidebarItem';
 
 function BoadItem({ board, index }) {
   // const thisFolder = new Folder(folder);
@@ -22,7 +23,7 @@ function BoadItem({ board, index }) {
     transition,
   };
 
-  async function handleClick(board: Object) {
+  async function handleClick() {
     await setCurrentPage({ id: board.id, type: 'board' });
     const value = {
       id: board.id,
@@ -39,24 +40,14 @@ function BoadItem({ board, index }) {
     }
   }
 
+  const icon =  <BoardLogo  />
+
+  const functions = {
+    click: handleClick
+  }
+
   return (
-    <ListItemButton
-      onClick={() => handleClick(board)}
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: '24px 1fr',
-        gap: 1,
-        height: 40,
-        alignItems: 'center',
-      }}
-    >
-      <BoardLogo style={{ width: 16, margin: '0 auto' }} />
-      <ListItemText primary={board.title} />
-    </ListItemButton>
+    <SidebarItem icon={icon} text={board.title} functions={functions} />
   );
 }
 

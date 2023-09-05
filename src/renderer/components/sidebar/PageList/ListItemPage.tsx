@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { ListItemText, ListItemButton } from '@mui/material';
-import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Page from 'renderer/Classes/Page';
 import ContextMenu from 'renderer/components/ContextMenu';
+import SidebarItem from '../SidebarItem';
 import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
@@ -13,17 +13,8 @@ function ListItemPage({ pageData, index }) {
   const [isShowInput, setIsShowInput] = useState(false);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: `page-${pageData.id}`,
-      data: { area: 'page-list', type: 'page', itemId: pageData.id, index },
-    });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    color: currentPage === pageData.id ? 'tomato' : '#333',
-  };
+  const icon = <PageIcon />;
 
   const handleClick = () => {
     const value = {
@@ -100,6 +91,10 @@ function ListItemPage({ pageData, index }) {
     },
   ];
 
+  const functions = {
+    click: handleClick,
+  };
+
   if (isShowInput) {
     return (
       <CreateForm
@@ -112,36 +107,7 @@ function ListItemPage({ pageData, index }) {
 
   return (
     <>
-      <ListItemButton
-        onClick={() => handleClick()}
-        onContextMenu={showMenu}
-        ref={setNodeRef}
-        style={style}
-        {...listeners}
-        {...attributes}
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: '24px 1fr',
-          gap: 1,
-          height: 40,
-          alignItems: 'center',
-        }}
-      >
-        <PageIcon className="sidebarItemIcon" style={{ margin: '0 auto' }} />
-        <ListItemText
-          primary={pageData.title}
-          primaryTypographyProps={{
-            sx: {
-              fontSize: 14,
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 1,
-              overflow: 'hidden',
-              wordBreak: 'break-all',
-            },
-          }}
-        />
-      </ListItemButton>
+      <SidebarItem icon={icon} text={pageData.title} functions={functions} />
       {contextMenuOpen && (
         <ContextMenu
           contextMenu={contextMenuOpen}

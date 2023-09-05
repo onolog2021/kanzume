@@ -2,6 +2,7 @@ import { useEffect, useContext } from 'react';
 import { Drawer, Box } from '@mui/material';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
+import SidebarItem from './SidebarItem';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
@@ -36,7 +37,6 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
         {pageList}
         {boardList}
       </Box>
-
       <OpenTrashBoxButton />
     </Drawer>
   );
