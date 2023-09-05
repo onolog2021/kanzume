@@ -37,7 +37,6 @@ export default function BoardSpace({ boardData }) {
         'fetchRecord',
         bookmarkQuery
       );
-      console.log(isBookmarked);
       if (isBookmarked) {
         setBookmark(true);
       }
@@ -67,7 +66,7 @@ export default function BoardSpace({ boardData }) {
       query
     );
     const storeQuery = {
-      table: 'bookmark',
+      table: 'store',
       columns: {
         page_id,
         folder_id: boardData.id,
@@ -97,8 +96,6 @@ export default function BoardSpace({ boardData }) {
   };
 
   const changeBookmark = () => {
-    console.log('fire');
-
     if (bookmark) {
       const query = {
         table: 'bookmark',

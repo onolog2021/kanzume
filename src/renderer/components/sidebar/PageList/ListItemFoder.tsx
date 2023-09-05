@@ -17,6 +17,7 @@ import { ReactComponent as OpenFolder } from '../../../../../assets/folder-outli
 import { ReactComponent as MergePages } from '../../../../../assets/papers.svg';
 import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
 import SidebarItem from '../SidebarItem';
+import CreateForm from './CreateForm';
 
 function ListItemFolder({ folderData, index }) {
   const { children } = folderData;
@@ -24,6 +25,7 @@ function ListItemFolder({ folderData, index }) {
   const [project, setProject] = useContext(ProjectContext);
   const [open, setOpen] = useState(false);
   const [hasPage, setHasPage] = useState([]);
+  const [isShowInput, setIsShowInput] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: `folder-${folder.id}`,
@@ -43,8 +45,6 @@ function ListItemFolder({ folderData, index }) {
     transition,
   };
 
-  const childrenTypeArray = Object.values(children);
-
   const handleClick = () => {
     setOpen(!open);
   };
@@ -58,13 +58,87 @@ function ListItemFolder({ folderData, index }) {
     setHasPage(pages);
   }
 
+  const showInput = () => {
+    setIsShowInput(true);
+  };
+
+  const setStatus = () => {
+    setIsShowInput(false);
+  };
+
+  const changeName = (title) => {
+    const query = {
+      table: 'folder',
+      columns: {
+        title,
+      },
+      conditions: {
+        id: folderData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+  };
+
+  const softDelete = () => {
+    const query = {
+      table: 'folder',
+      conditions: {
+        id: folderData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+  };
+
+  const mergeChildrenText = () => {
+    // childrenのテキストデータ取得
+    if(folderData.children){
+      const children = folderData.children;
+      const pageIdArray = children.map((childNode) => childNode.id);
+      const query = {
+        folderName: folderData.title,
+        pageIdArray,
+        projectId: project.id,
+      };
+      window.electron.ipcRenderer.sendMessage('mergeTextData', query);
+    }
+  }
+
+  const menues = [
+    {
+      id: 'changeName',
+      menuName: '名前の変更',
+      method: showInput,
+    },
+    {
+      id: 'delete',
+      menuName: '削除',
+      method: softDelete,
+    },
+    {
+      id: 'merge',
+      menuName: '結合する',
+      method: mergeChildrenText,
+    }
+  ];
+
   const functions = {
     click: handleClick,
+    contextMenu: menues,
+  };
+
+  if (isShowInput) {
+    return (
+      <CreateForm
+        setStatus={setStatus}
+        createFunc={changeName}
+        initialValue={folderData.title}
+      />
+    );
   }
 
   return (
     <>
-      <SidebarItem icon={icon} text={folderData.title} functions={functions}/>
+      <SidebarItem icon={icon} text={folderData.title} functions={functions} />
       <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
         {children && children.length > 0 && (
           <TreeBranch parentNode={folderData} />
@@ -86,16 +160,7 @@ function ListItemFolder({ folderData, index }) {
     </>
   );
 
-  function mergeChildrenText(children) {
-    // childrenのテキストデータ取得
-    const pageIdArray = children.map((childNode) => childNode.id);
-    const query = {
-      folderName: folderData.title,
-      pageIdArray,
-      projectId: project.id,
-    };
-    window.electron.ipcRenderer.sendMessage('mergeTextData', query);
-  }
+
 }
 
 export default ListItemFolder;
