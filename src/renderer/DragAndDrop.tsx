@@ -85,6 +85,11 @@ function DragAndDrop() {
       );
       const currentProject = new Project(projectData);
       setProject(currentProject);
+      const currentTime = new Date();
+      query.columns = {
+        updated_at: currentTime.toString(),
+      }
+      window.electron.ipcRenderer.sendMessage('updateRecord', query);
       return currentProject;
     } catch (error) {
       console.error(error);

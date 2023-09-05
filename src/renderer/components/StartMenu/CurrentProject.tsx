@@ -16,7 +16,7 @@ function CurrentProjects({ handleClick }) {
   useEffect(() => {
     const queryJson = {
       table: 'project',
-      order: ['created_at', 'DESC'],
+      order: ['updated_at', 'DESC'],
       limit: 5,
     };
 

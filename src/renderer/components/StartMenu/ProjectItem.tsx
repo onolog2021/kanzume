@@ -2,8 +2,9 @@ import { ListItemButton, ListItemText } from '@mui/material';
 import { dateTranslateForYYMMDD } from '../GlobalMethods';
 
 function ProjectItem({ project, handleClick }) {
-  const createdDate = new Date(project.created_at);
-  const date = dateTranslateForYYMMDD(createdDate);
+  console.log(project.updated_at)
+  const openedDate = new Date(project.updated_at);
+  const date = dateTranslateForYYMMDD(openedDate);
 
   return (
     <ListItemButton onClick={() => handleClick(project.id)}>

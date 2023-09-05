@@ -207,8 +207,8 @@ body {
   display: flex;
   padding: 0;
   overflow-x: auto;
-  width: 100%;
   background: white;
+  width: 100%;
   &::-webkit-scrollbar {
     height: 2px;
     background-color: transparent;
@@ -224,8 +224,7 @@ body {
 }
 
 .tab {
-  display: -webkit-box;
-  white-space: nowrap;
+  position: relative;
   padding: 8px 16px;
   min-width: 160px;
   height: 48px;
@@ -235,10 +234,18 @@ body {
   overflow: hidden;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
   cursor: pointer;
   text-align: left;
   border-right: .1px solid #d5d5d5;
+  max-width: 120px;
+  p{
+  display: -webkit-box;
+  white-space: nowrap;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 48px;
+  }
   &.selected {
     font-size: 1.6rem;
     font-weight: bold;

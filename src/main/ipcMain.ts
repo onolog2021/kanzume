@@ -386,7 +386,6 @@ function createSqlStatementForUpdate(args) {
     .map((key) => `${key} = ?`)
     .join(', ');
   sql += `WHERE ${conditionsPlaceholder}`;
-  console.log(sql)
   const values = [...Object.values(columns), ...Object.values(conditions)];
   return {
     sql,
