@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS "store" (
 	"folder_id"	INTEGER NOT NULL,
 	"page_id"	INTEGER NOT NULL,
 	"position"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("folder_id") REFERENCES "folder"("id"),
+	PRIMARY KEY("id" AUTOINCREMENT),
 	UNIQUE("folder_id","page_id")
 );
 CREATE TABLE IF NOT EXISTS "bookmark" (
@@ -27,21 +27,21 @@ CREATE TABLE IF NOT EXISTS "folder" (
 	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE TABLE IF NOT EXISTS "page" (
-	"id"	INTEGER NOT NULL UNIQUE,
-	"title"	TEXT NOT NULL,
-	"project_id"	INTEGER NOT NULL,
-	"content"	TEXT,
-	"json_name"	TEXT,
-	"position"	INTEGER NOT NULL,
-	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("id" AUTOINCREMENT)
-);
 CREATE TABLE IF NOT EXISTS "project" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"title"	TEXT NOT NULL,
 	"created_at"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_at"	TEXT,
+	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "page" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"title"	TEXT NOT NULL,
+	"project_id"	INTEGER NOT NULL,
+	"content"	TEXT,
+	"setting"	TEXT DEFAULT '{"fontSize": 16}',
+	"position"	INTEGER NOT NULL,
 	"is_deleted"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );

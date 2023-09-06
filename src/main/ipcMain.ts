@@ -552,6 +552,41 @@ ipcMain.on('initProject', async (event, newId) => {
   }
 });
 
+ipcMain.on('commitPage', async (event, pageId) => {
+  console.log('Now on Fire !!!')
+  const query = {
+    table: 'page',
+    conditions: {
+      id: pageId,
+    },
+  };
+  const page = await fetchRecord(query);
+  const projectFilePath = path.resolve(
+    __dirname,
+    '../../assets/projects',
+    `${page.project_id}`
+  );
+  const pageFilePath = `${projectFilePath}/${page.id}.json`;
+
+  const textJson = JSON.stringify(page.content, null, 2);
+  fs.writeFile(pageFilePath, textJson, (err) => {
+    if (err) {
+      console.error('JSONファイルの書き出しエラー:', err);
+    } else {
+      console.log('JSONファイルが正常に書き出されました:', projectFilePath);
+    }
+  });
+
+  // git処理
+  const isGit = checkGit();
+  if (isGit) {
+    const git = simpleGit(projectFilePath);
+    const date = new Date();
+    const time = date.toString();
+    git.add(pageFilePath).commit(`${time}`);
+  }
+});
+
 // gitを導入しているか
 function checkGit(): Boolean {
   exec('git --version', (error, stdout, stderr) => {
