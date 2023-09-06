@@ -78,6 +78,21 @@ function EditorBody({ targetId, page_id, title }) {
     window.electron.ipcRenderer.sendMessage('updateRecord', query);
   };
 
+  const exportJson = async () => {
+    const query = {
+      table: 'page',
+      conditions: {
+        id: page_id,
+      },
+    };
+    const currentPageData = await window.electron.ipcRenderer.invoke(
+      'fetchRecord',
+      query
+    );
+    const jsonData = JSON.parse(currentPageData.content);
+    window.electron.ipcRenderer.sendMessage('importText', page_id);
+  };
+
   if (!project) {
     return <h1>Loading...</h1>;
   }
@@ -90,6 +105,7 @@ function EditorBody({ targetId, page_id, title }) {
         <div className="editorTools">
           <BookmarkButton page={page} />
           <TextSetting changeFontFunc={changeFontStyle} />
+          <Button onClick={exportJson}>JSON出力</Button>
         </div>
       </Box>
     </div>

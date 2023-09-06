@@ -13,7 +13,7 @@ import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../../assets/square.svg';
 import { ReactComponent as FolderIcon } from '../../../../../assets/folder-outline.svg';
 
-function TrashedItem({ item }) {
+function TrashedItem({ item, setSelectedItem }) {
   const { id, title } = item;
   const [project] = useContext(ProjectContext);
 
@@ -44,10 +44,21 @@ function TrashedItem({ item }) {
     } else {
       window.electron.ipcRenderer.sendMessage('runUpdatePageList');
     }
+    setSelectedItem(null);
+  };
+
+  const showPreview = () => {
+    if (!item.type) {
+      const type = 'page';
+      const data = { id: item.id };
+      const itemData = { type, data };
+      setSelectedItem(itemData);
+    }
   };
 
   return (
     <ListItemButton
+      onClick={showPreview}
       sx={{
         ':hover': {
           background: 'none',

@@ -1,9 +1,12 @@
 import { ipcMain, Menu, MenuItem } from 'electron';
+import fs from 'fs';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
 import { error, table } from 'console';
 import { type } from 'os';
 import { rejects } from 'assert';
+import simpleGit from 'simple-git';
+import { exec } from 'child_process';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -246,7 +249,10 @@ interface fetchRecordQuery {
 function fetchRecord(args: fetchRecordQuery) {
   const { table, columns } = args;
   const conditions = args.conditions || {};
-  if (['page', 'folder', 'project'].includes(table)) {
+  if (
+    ['page', 'folder', 'project'].includes(table) &&
+    !Object.keys(conditions).includes('is_deleted')
+  ) {
     conditions.is_deleted = 0;
   }
   let sql;
@@ -486,3 +492,74 @@ ipcMain.on('runUpdatePageList', (event) => {
 ipcMain.on('runUpdateBoardList', (event) => {
   event.reply('updateBoardList');
 });
+
+ipcMain.on('exportText', (event, jsonText) => {
+  const filename = 'test';
+  const projectsFilePath = path.resolve(
+    __dirname,
+    '../../assets/projects',
+    `${filename}.json`
+  );
+  fs.writeFile(projectsFilePath, JSON.stringify(jsonText, null, 2), (err) => {
+    if (err) {
+      console.error('JSONファイルの書き出しエラー:', err);
+    } else {
+      console.log('JSONファイルが正常に書き出されました:', projectsFilePath);
+    }
+  });
+});
+
+ipcMain.on('importText', async (event, pageId) => {
+  const filename = 'test';
+  const projectsFilePath = path.resolve(
+    __dirname,
+    '../../assets/projects',
+    `${filename}.json`
+  );
+
+  const query = {
+    table: 'page',
+    conditions: {
+      id: pageId,
+    },
+  };
+
+  fs.readFile(projectsFilePath, 'utf-8', (err, data) => {
+    if (err) throw err;
+    query.columns = {
+      content: data.toString(),
+    };
+    updateRecord(query);
+  });
+});
+
+ipcMain.on('initProject', async (event, newId) => {
+  const fileTitle = `${newId}`;
+  const filePath = path.resolve(
+    __dirname,
+    '../../assets/projects',
+    `${fileTitle}`
+  );
+  fs.mkdir(filePath, { recursive: true }, (error) => {
+    if (error) throw error;
+  });
+
+  // git initを実行する
+  const isGit = checkGit();
+  if (isGit) {
+    const git = simpleGit(filePath);
+    git.init();
+  }
+});
+
+// gitを導入しているか
+function checkGit(): Boolean {
+  exec('git --version', (error, stdout, stderr) => {
+    if (error) {
+      console.error('Git is not installed:', error);
+      return false;
+    }
+    console.log('Git version:', stdout);
+    return true;
+  });
+}

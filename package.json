@@ -110,7 +110,8 @@
     "re-resizable": "^6.9.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.2"
+    "react-router-dom": "^6.11.2",
+    "simple-git": "^3.19.1"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",

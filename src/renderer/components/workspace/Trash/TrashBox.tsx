@@ -5,10 +5,17 @@ import TrashedItem from './TrashedItem';
 import TrashActiveWindow from './TrashActiveWindow';
 import TrashIndex from './TrashIndex';
 
+interface TrashItem{
+  type: string;
+  data: any;
+}
+
 function TrashBox() {
   const [project] = useContext(ProjectContext);
-  const [selectedItem, setSelectedItem] = useState();
+  const [selectedItem, setSelectedItem] = useState<TrashItem | null>(null);
   const [trashedItems, setTrashedItems] = useState([]);
+
+
 
   useEffect(() => {
     async function fetchTrashedData() {
@@ -49,6 +56,10 @@ function TrashBox() {
     );
   }, []);
 
+  const changeSelectedItem = (item) => {
+    setSelectedItem(item)
+  }
+
   return (
     <Box
       sx={{
@@ -57,8 +68,8 @@ function TrashBox() {
         gap: 2,
       }}
     >
-      <TrashIndex items={trashedItems} />
-      <TrashActiveWindow />
+      <TrashIndex items={trashedItems} click={changeSelectedItem}/>
+      <TrashActiveWindow previewItem={selectedItem} />
     </Box>
   );
 }
