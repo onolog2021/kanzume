@@ -2,10 +2,11 @@ import { Button } from '@mui/material';
 import { profile } from 'console';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
+import { editorTextToPlaneText } from 'renderer/components/GlobalMethods';
 
 export default function HistoryPreviewWindow({ pageId, log }) {
   const [project] = useContext(ProjectContext);
-  const [logProfile, setLotProfile] = useState();
+  const [logText, setLogText] = useState();
   const [diff, setDiff] = useState();
 
   useEffect(() => {
@@ -24,7 +25,10 @@ export default function HistoryPreviewWindow({ pageId, log }) {
         query
       );
       setDiff(diffData);
-      setLotProfile(profile);
+      const json = JSON.parse(profile);
+      const text = editorTextToPlaneText(json);
+      setLogText(text);
+      console.log(text);
     }
 
     if (log) {
@@ -35,7 +39,6 @@ export default function HistoryPreviewWindow({ pageId, log }) {
   const rollBack = async () => {
     // 現在の状態をコミット
     await window.electron.ipcRenderer.invoke('commitPage', pageId);
-
     // 該当のハッシュへcheckout
     const query = {
       hash: log.hash,
@@ -43,25 +46,25 @@ export default function HistoryPreviewWindow({ pageId, log }) {
       pageId,
     };
     await window.electron.ipcRenderer.invoke('gitCheckOut', query);
-
     // JSONの内容をページに読み込み
     const importQuery = {
       pageId,
       projectId: project.id,
     };
-
     window.electron.ipcRenderer.sendMessage('importText', importQuery);
   };
 
   return (
     <>
-      {logProfile && (
-        <>
-          <h3>{logProfile}</h3>
-          <p>{diff}</p>
-          <Button onClick={rollBack}>ここに戻る</Button>
-        </>
+      {logText && (
+        <div>
+          {logText.map((text) => (
+            <p key={text}>{text}</p>
+          ))}
+        </div>
       )}
+      <p>{diff}</p>
+      <Button onClick={rollBack}>ここに戻る</Button>
     </>
   );
 }

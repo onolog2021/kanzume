@@ -15,3 +15,9 @@ export function dateTranslateForYYMMDD(date: Date) {
 
   return `${year}/${month}/${day}`;
 }
+
+export function editorTextToPlaneText(json) {
+  const textArray = json.blocks;
+  const planeText = textArray.map((block) => block.data.text);
+  return planeText;
+}

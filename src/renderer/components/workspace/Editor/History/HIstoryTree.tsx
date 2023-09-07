@@ -14,7 +14,9 @@ export default function HistoryTree({ pageId, selectFunc }) {
         project_id: project.id,
       };
       const result = await window.electron.ipcRenderer.invoke('gitLog', query);
-      setLogs(result.all);
+      if(result){
+        setLogs(result.all);
+      }
     }
 
     if (project) {
@@ -31,7 +33,7 @@ export default function HistoryTree({ pageId, selectFunc }) {
           content: '""',
           position: 'absolute',
           width: '2px',
-          height: 100,
+          height: '100%',
           top: '24px',
           left: -2,
           backgroundColor: 'gray',
