@@ -11,12 +11,14 @@ import EditorPageTitle from './EditorPageTitle';
 import BookmarkButton from './BookmarkButton';
 import TextSetting from './TextSetting';
 import PageTitleForm from '../PageTitleForm';
+import HistorySpace from './History/HistorySpace';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
   const [page, setPage] = useState();
   const [editor, setEditor] = useState(null);
   const [fontStyle, setFontStyle] = useState('Meiryo');
+  const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
 
   const style = {
     fontFamily: fontStyle,
@@ -79,11 +81,20 @@ function EditorBody({ targetId, page_id, title }) {
   };
 
   const commitPage = async () => {
-    window.electron.ipcRenderer.sendMessage('commitPage', page.id);
+    // await editor.save();
+    await window.electron.ipcRenderer.invoke('commitPage', page.id);
+  };
+
+  const togglePageStatus = () => {
+    setPageStatus('history');
   };
 
   if (!project) {
     return <h1>Loading...</h1>;
+  }
+
+  if (pageStatus === 'history') {
+    return <HistorySpace pageId={page.id} />;
   }
 
   return (
@@ -95,6 +106,7 @@ function EditorBody({ targetId, page_id, title }) {
           <BookmarkButton page={page} />
           <TextSetting changeFontFunc={changeFontStyle} />
           <Button onClick={commitPage}>JSON出力</Button>
+          <Button onClick={togglePageStatus}>切り替え</Button>
         </div>
       </Box>
     </div>

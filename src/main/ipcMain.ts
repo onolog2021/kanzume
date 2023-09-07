@@ -500,7 +500,7 @@ ipcMain.on('exportText', (event, jsonText) => {
     '../../assets/projects',
     `${filename}.json`
   );
-  fs.writeFile(projectsFilePath, JSON.stringify(jsonText, null, 2), (err) => {
+  fs.writeFile(projectsFilePath, JSON.stringify(jsonText), (err) => {
     if (err) {
       console.error('JSONファイルの書き出しエラー:', err);
     } else {
@@ -509,27 +509,29 @@ ipcMain.on('exportText', (event, jsonText) => {
   });
 });
 
-ipcMain.on('importText', async (event, pageId) => {
-  const filename = 'test';
-  const projectsFilePath = path.resolve(
+ipcMain.on('importText', async (event, { projectId, pageId }) => {
+  const pageFilePath = path.resolve(
     __dirname,
     '../../assets/projects',
-    `${filename}.json`
+    `${projectId}`,
+    `${pageId}.json`
   );
 
-  const query = {
-    table: 'page',
-    conditions: {
-      id: pageId,
-    },
-  };
-
-  fs.readFile(projectsFilePath, 'utf-8', (err, data) => {
-    if (err) throw err;
-    query.columns = {
-      content: data.toString(),
-    };
-    updateRecord(query);
+  fs.readFile(pageFilePath, 'utf-8', (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const query = {
+        table: 'page',
+        columns: {
+          content: data,
+        },
+        conditions: {
+          id: pageId,
+        },
+      };
+      updateRecord(query);
+    }
   });
 });
 
@@ -545,56 +547,162 @@ ipcMain.on('initProject', async (event, newId) => {
   });
 
   // git initを実行する
-  const isGit = checkGit();
+  const isGit = await checkGit();
   if (isGit) {
     const git = simpleGit(filePath);
     git.init();
   }
 });
 
-ipcMain.on('commitPage', async (event, pageId) => {
-  console.log('Now on Fire !!!')
-  const query = {
-    table: 'page',
-    conditions: {
-      id: pageId,
-    },
-  };
-  const page = await fetchRecord(query);
-  const projectFilePath = path.resolve(
-    __dirname,
-    '../../assets/projects',
-    `${page.project_id}`
-  );
-  const pageFilePath = `${projectFilePath}/${page.id}.json`;
+ipcMain.handle('commitPage', (event, pageId) => {
+  return new Promise(async (resolve, reject) => {
+    // 現在のページの内容を取得する
+    const query = {
+      table: 'page',
+      conditions: {
+        id: pageId,
+      },
+    };
+    const page = await fetchRecord(query);
 
-  const textJson = JSON.stringify(page.content, null, 2);
-  fs.writeFile(pageFilePath, textJson, (err) => {
-    if (err) {
-      console.error('JSONファイルの書き出しエラー:', err);
-    } else {
-      console.log('JSONファイルが正常に書き出されました:', projectFilePath);
+    // ページ内容をファイルに書き出す
+    const projectFilePath = path.resolve(
+      __dirname,
+      '../../assets/projects',
+      `${page.project_id}`
+    );
+    const pageFilePath = `${projectFilePath}/${page.id}.json`;
+
+    const textJson = page.content;
+
+    fs.writeFileSync(pageFilePath, textJson, (err) => {
+      if (err) {
+        console.error('Error:', err);
+      } else {
+        console.log('Success:', projectFilePath);
+      }
+    });
+
+    // 現在の内容をcommitする
+    const isGit = await checkGit();
+    if (isGit) {
+      const git = simpleGit(projectFilePath);
+      const date = new Date();
+      const time = date.toString();
+      try {
+        await git.add(pageFilePath).commit(`${time}`);
+        resolve(true);
+      } catch (err) {
+        console.log('error happen:', err);
+        reject(err);
+      }
     }
   });
-
-  // git処理
-  const isGit = checkGit();
-  if (isGit) {
-    const git = simpleGit(projectFilePath);
-    const date = new Date();
-    const time = date.toString();
-    git.add(pageFilePath).commit(`${time}`);
-  }
 });
 
 // gitを導入しているか
-function checkGit(): Boolean {
-  exec('git --version', (error, stdout, stderr) => {
-    if (error) {
-      console.error('Git is not installed:', error);
-      return false;
-    }
-    console.log('Git version:', stdout);
-    return true;
+function checkGit() {
+  return new Promise((resolve, reject) => {
+    exec('git --version', (error, stdout, stderr) => {
+      if (error) {
+        // console.error('Git is not installed:', error);
+        reject(false);
+      }
+      // console.log('Git version:', stdout);
+      resolve(true);
+    });
   });
 }
+
+ipcMain.handle('gitLog', async (event, { page_id, project_id }) => {
+  const isGit = await checkGit();
+  if (isGit) {
+    const projectFilePath = path.resolve(
+      __dirname,
+      '../../assets/projects',
+      `${project_id}`
+    );
+    const git = simpleGit(projectFilePath);
+    const pageFilePath = `${projectFilePath}/${page_id}.json`;
+
+    try {
+      const logList = await git.log(['-p', pageFilePath]);
+      return logList;
+    } catch (error) {
+      console.error('Error fetching git log:', error);
+      return null;
+    }
+  }
+});
+
+ipcMain.handle('gitShow', async (event, { pageId, hash, projectId }) => {
+  const isGit = await checkGit();
+  if (isGit) {
+    return new Promise((resolve, reject) => {
+      const projectFilePath = path.resolve(
+        __dirname,
+        '../../assets/projects',
+        `${projectId}`
+      );
+
+      const pageFilePath = `${pageId}.json`;
+
+      const git = simpleGit(projectFilePath);
+      git.show([`${hash}:${pageFilePath}`], (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+});
+
+ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
+  const isGit = await checkGit();
+  if (isGit) {
+    return new Promise((resolve, reject) => {
+      const projectFilePath = path.resolve(
+        __dirname,
+        '../../assets/projects',
+        `${projectId}`
+      );
+
+      const pageFilePath = `${pageId}.json`;
+
+      const git = simpleGit(projectFilePath);
+      git.diff([`${hash}`, 'HEAD', pageFilePath], (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+});
+
+ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
+  const isGit = await checkGit();
+  if (!isGit) {
+    return;
+  }
+  const projectFilePath = path.resolve(
+    __dirname,
+    '../../assets/projects',
+    `${projectId}`
+  );
+
+  const pageFilePath = `${pageId}.json`;
+
+  const git = simpleGit(projectFilePath);
+
+  await git.checkout([hash, '--', pageFilePath], (error, result) => {
+    if (error) {
+      console.log(error);
+      return error;
+    }
+    return true;
+  });
+});

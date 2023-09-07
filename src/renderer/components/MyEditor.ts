@@ -29,6 +29,7 @@ export default class MyEditor {
           'fetchRecord',
           query
         );
+
         const textData = !pageData ? {} : JSON.parse(pageData.content);
 
         this.initializeEditor(textData, targetId, pageId); // getPageData 完了後にエディタを初期化
@@ -99,4 +100,7 @@ export default class MyEditor {
     this.editor?.destroy();
   }
 
+  // save()の処理を書いておく
+  // それをcommitPageのときに実行できるようにする
+  // 完成したらこのコメントは消すこと
 }
