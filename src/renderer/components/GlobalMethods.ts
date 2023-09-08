@@ -21,3 +21,11 @@ export function editorTextToPlaneText(json) {
   const planeText = textArray.map((block) => block.data.text);
   return planeText;
 }
+
+export function gitDiffParse(diff: string) {
+  // const lines = diff.split('\n');
+  // const minus = lines.filter((item) => item.startsWith('-{'));
+  // const plus = lines.filter((item) => item.startsWith('+{'));
+  // console.log(minus,plus)
+  return diff;
+}

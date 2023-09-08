@@ -1,5 +1,4 @@
 import EditorJS from '@editorjs/editorjs';
-import Header from '@editorjs/header';
 import Undo from 'editorjs-undo';
 
 function debounce(func, wait) {
@@ -64,11 +63,17 @@ export default class MyEditor {
       },
       onChange: debounce(async (api, event) => {
         const data = await api.saver.save();
-        const textData = JSON.stringify(data);
+
+        const formattedJson = JSON.stringify(data, null, 2);
+        const paramData = formattedJson.replace(
+          /({\s+"id":.*?}\s+)/gs,
+          (match) => match.replace(/\s+/g, ' ').replace(/ : /g, ': ')
+        );
+
         const query = {
           table: 'page',
           columns: {
-            content: textData,
+            content: paramData,
           },
           conditions: {
             id: pageId,

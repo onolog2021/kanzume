@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  TextField,
-  Button,
   List,
-  ListItemButton,
-  ListItemText,
 } from '@mui/material';
 import ProjectItem from './ProjectItem';
 import TextWithSvg from './TextWithSVG';

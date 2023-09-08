@@ -672,7 +672,7 @@ ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
       const pageFilePath = `${pageId}.json`;
 
       const git = simpleGit(projectFilePath);
-      git.diff([`${hash}`, 'HEAD', pageFilePath], (error, result) => {
+      git.diff([`${hash}`, 'HEAD', '-U0', pageFilePath], (error, result) => {
         if (error) {
           reject(error);
         } else {

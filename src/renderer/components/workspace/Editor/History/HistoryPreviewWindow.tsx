@@ -2,7 +2,10 @@ import { Button } from '@mui/material';
 import { profile } from 'console';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
-import { editorTextToPlaneText } from 'renderer/components/GlobalMethods';
+import {
+  editorTextToPlaneText,
+  gitDiffParse,
+} from 'renderer/components/GlobalMethods';
 
 export default function HistoryPreviewWindow({ pageId, log }) {
   const [project] = useContext(ProjectContext);
@@ -24,11 +27,11 @@ export default function HistoryPreviewWindow({ pageId, log }) {
         'gitDiff',
         query
       );
-      setDiff(diffData);
+      const translatedDiff = gitDiffParse(diffData);
+      setDiff(translatedDiff);
       const json = JSON.parse(profile);
       const text = editorTextToPlaneText(json);
       setLogText(text);
-      console.log(text);
     }
 
     if (log) {
