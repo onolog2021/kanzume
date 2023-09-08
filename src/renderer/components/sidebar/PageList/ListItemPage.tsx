@@ -4,12 +4,25 @@ import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 
-function ListItemPage({ pageData, index }) {
+function ListItemPage({ pageData, index, bookmark }) {
   const [isShowInput, setIsShowInput] = useState(false);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
 
   const icon = <PageIcon />;
+
+  let dndTag;
+  if (bookmark) {
+    dndTag = {
+      id: `qp${pageData.id}`,
+      data: { area: 'quickAccess', type: 'page', id: pageData.id },
+    };
+  } else {
+    dndTag = {
+      id: `p${pageData.id}`,
+      data: { area: 'pageList', type: 'page', id: pageData.id },
+    };
+  }
 
   const handleClick = () => {
     const value = {
@@ -88,7 +101,12 @@ function ListItemPage({ pageData, index }) {
   }
 
   return (
-    <SidebarItem icon={icon} text={pageData.title} functions={functions} />
+    <SidebarItem
+      icon={icon}
+      text={pageData.title}
+      functions={functions}
+      dndTag={dndTag}
+    />
   );
 }
 

@@ -6,30 +6,31 @@ import {
   Typography,
 } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { CSS } from '@dnd-kit/utilities';
+import { useContext, useState } from 'react';
 import { ReactComponent as MenuIcon } from '../../../../assets/dots.svg';
 import ContextMenu from '../ContextMenu';
+import { CurrentPageContext } from '../Context';
 
 interface contextMenu {
   mouseX: number;
   mouseY: number;
 }
 
-function SidebarItem({ icon, text, functions }) {
+function SidebarItem({ icon, text, functions, dndTag }) {
+  // const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const { click, contextMenu } = functions;
   const [contextMenuStatus, setContextMenuStatus] =
     useState<contextMenu | null>(null);
-  // const { attributes, listeners, setNodeRef, transform, transition } =
-  //   useSortable({
-  //     id: `page-${pageData.id}`,
-  //     data: { area: 'page-list', type: 'page', itemId: pageData.id, index },
-  //   });
 
-  // const style = {
-  //   transform: CSS.Transform.toString(transform),
-  //   transition,
-  //   color: currentPage === pageData.id ? 'tomato' : '#333',
-  // };
+  // dnd
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable(dndTag);
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   const contextMenuOpen = (event) => {
     event.stopPropagation();
@@ -69,10 +70,10 @@ function SidebarItem({ icon, text, functions }) {
             },
           },
         }}
-        // ref={setNodeRef}
-        // style={style}
-        // {...listeners}
-        // {...attributes}
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
       >
         {icon}
         <Typography

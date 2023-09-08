@@ -1,13 +1,13 @@
-import { useContext, useState,  useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
 import {
   CurrentPageContext,
   ProjectContext,
   TabListContext,
 } from 'renderer/components/Context';
-import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, IconButton, Tab } from '@mui/material';
-import {ReactComponent as CloseButton} from '../../../../assets/times.svg'
+import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 
 function TabItem({ tab, index }) {
   const [project] = useContext(ProjectContext);
@@ -17,12 +17,31 @@ function TabItem({ tab, index }) {
   const { id } = tab;
   const [input, setInput] = useState(false);
 
-  const { attributes, listeners, setNodeRef, transform } = useSortable({
-    id: tab.tabId,
-    data: { type: 'tab', itemId: id, index },
-  });
+  // dndTag
+  let dndTag;
+  if (tab.type === 'editor') {
+    dndTag = {
+      id: `te${tab.id}`,
+      data: { area: 'tab', type: 'editor', id: tab.id },
+    };
+  } else if (tab.type === 'board') {
+    dndTag = {
+      id: `tb${tab.id}`,
+      data: { area: 'tab', type: 'board-tab', id: tab.id },
+    };
+  } else {
+    dndTag = {
+      id: `trash`,
+      data: { area: 'tab', type: 'trash', id: tab.id },
+    };
+  }
+
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable(dndTag);
+
   const style = {
-    transform: CSS.Translate.toString(transform),
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
   const handleActiveTab = (id: number) => {
@@ -32,11 +51,13 @@ function TabItem({ tab, index }) {
 
   const closeTab = (event) => {
     event.stopPropagation();
-    const closedTabIndex = tabList.findIndex((item) => item.tabId === tab.tabId);
+    const closedTabIndex = tabList.findIndex(
+      (item) => item.tabId === tab.tabId
+    );
     const newTabList = [...tabList];
     newTabList.splice(closedTabIndex, 1);
     setTabList(newTabList);
-  }
+  };
 
   return (
     <div
@@ -55,12 +76,12 @@ function TabItem({ tab, index }) {
           right: 2,
           height: 48,
           top: 0,
-          ":hover": {
-            background: 'transparent'
-          }
+          ':hover': {
+            background: 'transparent',
+          },
         }}
       >
-        <CloseButton style={{fill: 'gray', width: 12, height: 12}}/>
+        <CloseButton style={{ fill: 'gray', width: 12, height: 12 }} />
       </IconButton>
     </div>
   );

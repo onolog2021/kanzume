@@ -47,14 +47,14 @@ export default class MyEditor {
     this.editor = new EditorJS({
       holder: targetId,
       tools: {
-        header: {
-          class: Header,
-          config: {
-            placeholder: 'Header',
-          },
-          shortcut: 'CMD+SHIFT+H',
-          inlineToolbar: true,
-        },
+        // header: {
+        //   class: Header,
+        //   config: {
+        //     placeholder: 'Header',
+        //   },
+        //   shortcut: 'CMD+SHIFT+H',
+        //   inlineToolbar: true,
+        // },
       },
       data: textData,
       inlineToolbar: true,

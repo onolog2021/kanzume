@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import Board from 'renderer/Classes/Board';
 import { Box, Paper, Button, IconButton } from '@mui/material';
-import { useDroppable } from '@dnd-kit/core';
 import { ProjectContext } from 'renderer/components/Context';
 import Page from 'renderer/Classes/Page';
 import BoardGrid from './BoardGrid';

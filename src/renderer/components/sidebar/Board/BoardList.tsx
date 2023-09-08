@@ -14,7 +14,7 @@ import CategoryTitle from '../CategoryTitle';
 import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 import { ReactComponent as AddBoardButton } from '../../../../../assets/grid-plus.svg';
 
-function Board({ boards, boardIndex }) {
+function BoardList({ boards, boardIndex }) {
   const [project] = useContext(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
@@ -27,6 +27,7 @@ function Board({ boards, boardIndex }) {
 
   const { setNodeRef } = useDroppable({
     id: 'board-list',
+    data: {area: 'boardList'}
   });
 
   const createNewBoard = async (title: string) => {
@@ -86,4 +87,4 @@ function Board({ boards, boardIndex }) {
   );
 }
 
-export default Board;
+export default BoardList;

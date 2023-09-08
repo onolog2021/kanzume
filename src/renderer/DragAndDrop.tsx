@@ -8,10 +8,11 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { Box } from '@mui/material';
 import WorkSpace from './components/workspace/WorkSpace';
 import SideBar from './components/sidebar/Sidebar';
 import { ProjectContext, TabListContext } from './components/Context';
-import Board from './components/sidebar/Board/Board';
+import BoardList from './components/sidebar/Board/BoardList';
 import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
 import { collectNames } from './components/GlobalMethods';
@@ -19,12 +20,12 @@ import TabList from './components/workspace/TabList';
 import QuickAccessArea from './components/sidebar/QuickAccess/QuickAccessArea';
 
 interface itemData {
-  id: string;
-  itemId: number;
+  dndId: string;
   type: string;
+  id: number;
   area: string;
   index: any;
-  parentId: number | null;
+  parentId: number;
 }
 
 function DragAndDrop() {
@@ -38,14 +39,16 @@ function DragAndDrop() {
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
   const [tabIndex, setTabIndex] = useState([]);
+  const [droppable, setDroppable] = useState<Boolean>(true);
+
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 20,
     },
   });
   const sensors = useSensors(mouseSensor);
-  const quickAccessArea = <QuickAccessArea />
-  const boardList = <Board boardIndex={boardIndex} boards={boards} />;
+  const quickAccessArea = <QuickAccessArea />;
+  const boardList = <BoardList boardIndex={boardIndex} boards={boards} />;
   const pageList = <PageList root={pageRoot} />;
   const tabs = <TabList tabIndex={tabIndex} />;
   const listArea = ['page-list', 'board-list', 'paper-list'];
@@ -88,7 +91,7 @@ function DragAndDrop() {
       const currentTime = new Date();
       query.columns = {
         updated_at: currentTime.toString(),
-      }
+      };
       window.electron.ipcRenderer.sendMessage('updateRecord', query);
       return currentProject;
     } catch (error) {
@@ -118,12 +121,74 @@ function DragAndDrop() {
     }
   }
 
+  function canDrop(over): Boolean {
+    // 可能なエリアとタイプの組み合わせ
+    const availableSet = {
+      quickAccess: ['board', 'page'],
+      pageList: ['page', 'board', 'folder', 'paper'],
+      boardList: ['board', 'folder'],
+      boardBody: ['page', 'paper'],
+      tab: ['editor', 'board-tab', 'trash'],
+    };
+    if (activeItem.area === over) {
+      return true;
+    }
+    return availableSet[`${over.area}`].includes(activeItem.type);
+  }
+
+  const DragStart = ({ active }) => {
+    if (!active) {
+      return;
+    }
+
+    const { type, id, area, parentId } = active.data.current;
+    const activeItemData = {
+      dndId: active.id,
+      type,
+      id,
+      area,
+      index: active.data.current.index,
+      parentId,
+    };
+    setActiveItem(activeItemData);
+  };
+
+  const DragOver = ({ over }) => {
+    if (!over) {
+      return;
+    }
+    const { type, id, area, parentId } = over.data.current;
+    const overItemData = {
+      dndId: over.id,
+      type,
+      id,
+      area,
+      index: over.data.current.index,
+      parentId,
+    };
+    setOverItem(overItemData);
+
+    const isDroppable = canDrop(overItemData);
+    if (isDroppable) {
+      setDroppable(true);
+    } else {
+      setDroppable(false);
+    }
+  };
+
+  const DragEnd = ({active, over}) => {
+    if (!droppable) {
+      return;
+    }
+
+  };
+
   return (
     <DndContext
       sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
+      onDragStart={DragStart}
+      onDragOver={DragOver}
+      onDragEnd={DragEnd}
     >
       <div className="editorPage">
         <SideBar
@@ -134,42 +199,11 @@ function DragAndDrop() {
         />
         <WorkSpace tabs={tabs} />
       </div>
-      <DragOverlay>
-        <p>・・・</p>
+      <DragOverlay style={{ zIndex: 1200 }}>
+        {droppable ? <p>OK</p> : <p>NO</p>}
       </DragOverlay>
     </DndContext>
   );
-
-  function handleDragStart({ active }) {
-    setActiveItem({
-      id: active.id,
-      type: active.data.current.type,
-      itemId: active.data.current.itemId,
-      area: active.data.current.area,
-      index: active.data.current.index,
-      parentId: active.data.current.parentId,
-    });
-  }
-
-  function handleDragOver({ over }) {
-    if (over && !listArea.includes(over.id)) {
-      setOverItem({
-        id: over.id,
-        type: over.data.current.type,
-        itemId: over.data.current.itemId,
-        area: over.data.current.area,
-        index: over.data.current.index,
-        parentId: over.data.current.parentId,
-      });
-    }
-    if (over && listArea.includes(over.id)) {
-      setOverItem({
-        id: over.id,
-        type: 'new',
-        parentId: over.data.current?.parentId,
-      });
-    }
-  }
 
   // 要調査・先頭ドラッグの挙動がおかしいかも
   function createNewIndex() {
@@ -233,66 +267,66 @@ function DragAndDrop() {
   }
 
   // ドロップ後にドラッグしたものとドロップした場所の更新
-  async function handleDragEnd({ active, over }) {
-    if (active && over && active.id !== over.id) {
-      if (overItem.type === 'new') {
-        // 落とした場所とアイテムに合わせて処理
-        // フォルダ→ボード
-        if (overItem.id === 'board-list' && activeItem.type === 'folder') {
-          const arg = createNewArg();
-          const query = { projectId: project.id, values: [arg] };
-          await window.electron.ipcRenderer.sendMessage(
-            'updatePosition',
-            query
-          );
-          await updateBoardList(project);
-        }
-        // ボード→フォルダ
-        if (
-          overItem.id === 'page-list' &&
-          (activeItem.type === 'paper' || activeItem.type === 'board')
-        ) {
-          const item = createNewArg();
-          const args = { projectId: project.id, values: [item] };
-          await window.electron.ipcRenderer.sendMessage('updatePosition', args);
-          await updatePageList(project);
-        }
-        // ページ→ボード内
-        if (overItem.id === 'paper-list' && activeItem.type === 'page') {
-          const args = createNewArg();
-          await window.electron.ipcRenderer.sendMessage('createNewStore', args);
-          await updatePageList(project);
-        }
-        return;
-      }
-      // 新しいIndexを作成
-      const newIndex = createNewIndex();
-      // newindex.length>0のときに実施するコード
+  // async function handleDragEnd({ active, over }) {
+  //   if (active && over && active.id !== over.id) {
+  //     if (overItem.type === 'new') {
+  //       // 落とした場所とアイテムに合わせて処理
+  //       // フォルダ→ボード
+  //       if (overItem.id === 'board-list' && activeItem.type === 'folder') {
+  //         const arg = createNewArg();
+  //         const query = { projectId: project.id, values: [arg] };
+  //         await window.electron.ipcRenderer.sendMessage(
+  //           'updatePosition',
+  //           query
+  //         );
+  //         await updateBoardList(project);
+  //       }
+  //       // ボード→フォルダ
+  //       if (
+  //         overItem.id === 'page-list' &&
+  //         (activeItem.type === 'paper' || activeItem.type === 'board')
+  //       ) {
+  //         const item = createNewArg();
+  //         const args = { projectId: project.id, values: [item] };
+  //         await window.electron.ipcRenderer.sendMessage('updatePosition', args);
+  //         await updatePageList(project);
+  //       }
+  //       // ページ→ボード内
+  //       if (overItem.id === 'paper-list' && activeItem.type === 'page') {
+  //         const args = createNewArg();
+  //         await window.electron.ipcRenderer.sendMessage('createNewStore', args);
+  //         await updatePageList(project);
+  //       }
+  //       return;
+  //     }
+  //     // 新しいIndexを作成
+  //     const newIndex = createNewIndex();
+  //     // newindex.length>0のときに実施するコード
 
-      if (overItem.area === 'page-list') {
-        const valuesArray = translateForSidebar(newIndex);
-        const args = { projectId: project.id, values: valuesArray };
-        window.electron.ipcRenderer.sendMessage('updatePosition', args);
-      }
+  //     if (overItem.area === 'page-list') {
+  //       const valuesArray = translateForSidebar(newIndex);
+  //       const args = { projectId: project.id, values: valuesArray };
+  //       window.electron.ipcRenderer.sendMessage('updatePosition', args);
+  //     }
 
-      // 発火の条件分けでfolderとboardのときのみにするのを忘れずにね。
-      if (overItem.area === 'board-list' && activeItem.type !== 'page') {
-        const valuesArray = translateForSidebar(newIndex);
-        const args = { projectId: project.id, values: valuesArray };
-        window.electron.ipcRenderer.sendMessage('updatePosition', args);
-      }
+  //     // 発火の条件分けでfolderとboardのときのみにするのを忘れずにね。
+  //     if (overItem.area === 'board-list' && activeItem.type !== 'page') {
+  //       const valuesArray = translateForSidebar(newIndex);
+  //       const args = { projectId: project.id, values: valuesArray };
+  //       window.electron.ipcRenderer.sendMessage('updatePosition', args);
+  //     }
 
-      if (overItem.area === 'board-body') {
-        const valuesArray = updatePaperIndex(newIndex);
-        window.electron.ipcRenderer.sendMessage(
-          'droppedBoardBody',
-          valuesArray
-        );
-      }
+  //     if (overItem.area === 'board-body') {
+  //       const valuesArray = updatePaperIndex(newIndex);
+  //       window.electron.ipcRenderer.sendMessage(
+  //         'droppedBoardBody',
+  //         valuesArray
+  //       );
+  //     }
 
-      caseUpdate();
-    }
-  }
+  //     caseUpdate();
+  //   }
+  // }
 
   // 新規に登録する場合
   function createNewArg() {

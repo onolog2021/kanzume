@@ -9,7 +9,7 @@ function BoardGrid({ board,columnsCount, pages }) {
   const [index, setIndex] = useState([]);
   const { setNodeRef } = useDroppable({
     id: 'paper-list',
-    data: { parentId: board.id },
+    data: { area: 'boardBody', parentId: board.id },
   });
 
   useEffect(() => {

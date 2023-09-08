@@ -1,36 +1,19 @@
 import { useContext, useState, useEffect } from 'react';
-import {
-  ListItemText,
-  Collapse,
-  ListItemButton,
-  Button,
-  Typography,
-} from '@mui/material';
+import { Collapse } from '@mui/material';
 import Folder from 'renderer/Classes/Folder';
-import { CSS } from '@dnd-kit/utilities';
-import { useSortable } from '@dnd-kit/sortable';
-import { Rotate90DegreesCcw } from '@mui/icons-material';
 import { ProjectContext } from '../../Context';
 import TreeBranch from './TreeBranch';
-import { ReactComponent as ClosedFolder } from '../../../../../assets/folder-fill.svg';
-import { ReactComponent as OpenFolder } from '../../../../../assets/folder-outline.svg';
-import { ReactComponent as MergePages } from '../../../../../assets/papers.svg';
 import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from './CreateForm';
 
-function ListItemFolder({ folderData, index }) {
+function ListItemFolder({ folderData, bookmark, index }) {
   const { children } = folderData;
   const folder = new Folder(folderData);
   const [project, setProject] = useContext(ProjectContext);
   const [open, setOpen] = useState(false);
   const [hasPage, setHasPage] = useState([]);
   const [isShowInput, setIsShowInput] = useState(false);
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: `folder-${folder.id}`,
-      data: { area: 'page-list', type: 'folder', itemId: folder.id, index },
-    });
 
   const icon = (
     <Expand
@@ -40,9 +23,9 @@ function ListItemFolder({ folderData, index }) {
     />
   );
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+  const dndTag = {
+    id: `f${folderData.id}`,
+    data: { area: 'pageList', type: 'folder', id: folderData.id },
   };
 
   const handleClick = () => {
@@ -93,8 +76,8 @@ function ListItemFolder({ folderData, index }) {
 
   const mergeChildrenText = () => {
     // childrenのテキストデータ取得
-    if(folderData.children){
-      const children = folderData.children;
+    if (folderData.children) {
+      const { children } = folderData;
       const pageIdArray = children.map((childNode) => childNode.id);
       const query = {
         folderName: folderData.title,
@@ -103,7 +86,7 @@ function ListItemFolder({ folderData, index }) {
       };
       window.electron.ipcRenderer.sendMessage('mergeTextData', query);
     }
-  }
+  };
 
   const menues = [
     {
@@ -120,7 +103,7 @@ function ListItemFolder({ folderData, index }) {
       id: 'merge',
       menuName: '結合する',
       method: mergeChildrenText,
-    }
+    },
   ];
 
   const functions = {
@@ -140,29 +123,19 @@ function ListItemFolder({ folderData, index }) {
 
   return (
     <>
-      <SidebarItem icon={icon} text={folderData.title} functions={functions} />
+      <SidebarItem
+        icon={icon}
+        text={folderData.title}
+        functions={functions}
+        dndTag={dndTag}
+      />
       <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
         {children && children.length > 0 && (
           <TreeBranch parentNode={folderData} />
         )}
       </Collapse>
-      {/* {open && childrenTypeArray.includes('folder') ? null : (
-        <Button
-          sx={{ ml: 1 }}
-          onClick={() => {
-            mergeChildrenText(children);
-          }}
-        >
-          <MergePages style={{ width: 12 }} />
-          <Typography color="#333" sx={{ fontSize: 13, mt: 0.5, ml: 1 }}>
-            結合する
-          </Typography>
-        </Button>
-      )} */}
     </>
   );
-
-
 }
 
 export default ListItemFolder;

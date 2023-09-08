@@ -29,9 +29,9 @@ function QuickAccesItem({ item, items }) {
     <>
       {data &&
         (target === 'page' ? (
-          <ListItemPage pageData={data} index={items} />
+          <ListItemPage pageData={data} index={items} bookmark />
         ) : (
-          <BoadItem board={data} index={items} />
+          <BoadItem board={data} index={items} bookmark />
         ))}
     </>
   );

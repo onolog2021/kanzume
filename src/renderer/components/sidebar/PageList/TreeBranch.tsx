@@ -13,6 +13,7 @@ export default function TreeBranch({ parentNode }) {
   }
 
   useEffect(() => {
+    hasParent();
     if (children) {
       setItems(parentNode.getChildrenAry());
     }

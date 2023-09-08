@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { List, Box, IconButton } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
+import { SortableContext } from '@dnd-kit/sortable';
 import {
   ProjectContext,
   CurrentPageContext,
@@ -23,6 +24,7 @@ function PageList({ root }) {
 
   const { setNodeRef } = useDroppable({
     id: 'page-list',
+    data: { area: 'pageList' },
   });
 
   const switchNewForm = (status: string) => {

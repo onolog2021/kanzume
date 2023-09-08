@@ -3,12 +3,18 @@ import { ProjectContext } from 'renderer/components/Context';
 import QuickAccesItem from './QuickAccessItem';
 import { ReactComponent as QuickLogo } from '../../../../../assets/bookmark.svg';
 import CategoryTitle from '../CategoryTitle';
+import { useDroppable } from '@dnd-kit/core';
 
 function QuickAccessArea() {
   const [project, setProject] = useContext(ProjectContext);
   const [bookmarks, setBookmarks] = useState([]);
   const [items, setItems] = useState([]);
   const svg = <QuickLogo />;
+
+  const { setNodeRef } = useDroppable({
+    id: 'quickAccess',
+    data: {area: 'quickAccess'}
+  });
 
   useEffect(() => {
     async function fetchBookmarks() {
@@ -32,17 +38,19 @@ function QuickAccessArea() {
 
   return (
     <>
-      <div className='sidebarSectionName'>
+      <div className="sidebarSectionName">
         <CategoryTitle svg={svg} categoryName="クイックアクセス" />
       </div>
-      {bookmarks &&
-        bookmarks.map((item) => (
-          <QuickAccesItem
-            key={item.target + item.id}
-            item={item}
-            items={items}
-          />
-        ))}
+      <div>
+        {bookmarks &&
+          bookmarks.map((item) => (
+            <QuickAccesItem
+              key={item.target + item.id}
+              item={item}
+              items={items}
+            />
+          ))}
+      </div>
     </>
   );
 }

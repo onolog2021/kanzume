@@ -16,19 +16,18 @@ function Boardpage({ pageData, index, boardId }) {
     height: 200,
   };
 
-  // const { attributes, listeners, setNodeRef, transform } = useSortable({
-  //   id: `paper-${pageData.id}`,
-  //   data: {
-  //     area: 'board-body',
-  //     type: 'paper',
-  //     itemId: pageData.id,
-  //     parentId: boardId,
-  //     index,
-  //   },
-  // });
-  // const style = {
-  //   transform: CSS.Translate.toString(transform),
-  // };
+  const { attributes, listeners, setNodeRef, transform } = useSortable({
+    id: `bp${pageData.id}`,
+    data: {
+      area: 'boardBody',
+      type: 'paper',
+      id: pageData.id,
+      parentId: boardId,
+    },
+  });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
 
   useEffect(() => {
     const newEditor = new MyEditor(targetId, pageData.id);
@@ -52,10 +51,10 @@ function Boardpage({ pageData, index, boardId }) {
     <Resizable defaultSize={size} maxWidth={'100%'} bounds={'HTMLElement'} ref={resizeRef}>
       <Paper
         elevation={3}
-        // ref={setNodeRef}
-        // style={style}
-        // {...listeners}
-        // {...attributes}
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
         sx={{
           width: size.width,
           height: size.height,

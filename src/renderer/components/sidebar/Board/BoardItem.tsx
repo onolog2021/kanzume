@@ -1,7 +1,5 @@
 import { useContext, useState } from 'react';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+
 import { CurrentPageContext } from 'renderer/components/Context';
 // import Folder from 'renderer/Classes/Folder';
 import { TabListContext } from 'renderer/components/Context';
@@ -9,21 +7,24 @@ import { ReactComponent as BoardLogo } from '../../../../../assets/square.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from '../PageList/CreateForm';
 
-function BoadItem({ board, index }) {
+function BoadItem({ board, index, bookmark }) {
   // const thisFolder = new Folder(folder);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [isShowInput, setIsShowInput] = useState(false);
-  // const { attributes, listeners, setNodeRef, transform, transition } =
-  //   useSortable({
-  //     id: `board-${board.id}`,
-  //     data: { type: 'board', area: 'board-list', itemId: board.id, index },
-  //   });
 
-  // const style = {
-  //   transform: CSS.Transform.toString(transform),
-  //   transition,
-  // };
+  let dndTag;
+  if (bookmark) {
+    dndTag = {
+      id: `b${board.id}`,
+      data: { area: 'quickAccess', type: 'board', id: board.id },
+    };
+  } else {
+    dndTag = {
+      id: `b${board.id}`,
+      data: { area: 'boardList', type: 'board', id: board.id },
+    };
+  }
 
   async function handleClick() {
     await setCurrentPage({ id: board.id, type: 'board' });
@@ -105,7 +106,14 @@ function BoadItem({ board, index }) {
     );
   }
 
-  return <SidebarItem icon={icon} text={board.title} functions={functions} />;
+  return (
+    <SidebarItem
+      icon={icon}
+      text={board.title}
+      functions={functions}
+      dndTag={dndTag}
+    />
+  );
 }
 
 export default BoadItem;
