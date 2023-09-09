@@ -7,7 +7,7 @@ import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from './CreateForm';
 
-function ListItemFolder({ folderData, bookmark, index }) {
+function ListItemFolder({ folderData, orderArray, parentId }) {
   const { children } = folderData;
   const folder = new Folder(folderData);
   const [project, setProject] = useContext(ProjectContext);
@@ -24,8 +24,14 @@ function ListItemFolder({ folderData, bookmark, index }) {
   );
 
   const dndTag = {
-    id: `f${folderData.id}`,
-    data: { area: 'pageList', type: 'folder', id: folderData.id },
+    id: `f-${folderData.id}`,
+    data: {
+      area: parentId ? 'folder' : 'pageList',
+      type: 'folder',
+      id: folderData.id,
+      parentId,
+      orderArray,
+    },
   };
 
   const handleClick = () => {
@@ -131,7 +137,7 @@ function ListItemFolder({ folderData, bookmark, index }) {
       />
       <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
         {children && children.length > 0 && (
-          <TreeBranch parentNode={folderData} />
+          <TreeBranch parentNode={folderData} parentId={folderData.id} />
         )}
       </Collapse>
     </>

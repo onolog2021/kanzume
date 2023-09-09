@@ -4,7 +4,7 @@ import Node from 'renderer/Classes/Node';
 import ListItemFolder from './ListItemFoder';
 import ListItemPage from './ListItemPage';
 
-export default function TreeBranch({ parentNode }) {
+export default function TreeBranch({ parentNode, parentId }) {
   const { children } = parentNode;
   const [items, setItems] = useState([]);
 
@@ -13,9 +13,8 @@ export default function TreeBranch({ parentNode }) {
   }
 
   useEffect(() => {
-    hasParent();
     if (children) {
-      setItems(parentNode.getChildrenAry());
+      setItems(parentNode.createOrderArrayForDndTag());
     }
   }, [children]);
 
@@ -28,13 +27,15 @@ export default function TreeBranch({ parentNode }) {
               <ListItemFolder
                 key={`folder-${item.id}`}
                 folderData={item}
-                index={items}
+                orderArray={items}
+                parentId={parentId}
               />
             ) : (
               <ListItemPage
                 key={`page-${item.id}`}
                 pageData={item}
-                index={items}
+                orderArray={items}
+                parentId={parentId}
               />
             )
           )}

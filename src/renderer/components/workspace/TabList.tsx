@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useMemo } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { TabListContext } from 'renderer/components/Context';
 import { IconButton } from '@mui/material';
 import {
@@ -8,10 +8,25 @@ import {
 import TabItem from './TabItem';
 import { ReactComponent as TrackButton } from '../../../../assets/expand.svg';
 
-function TabList({ tabIndex }) {
-  const [index, setIndex] = useState(tabIndex);
+function TabList() {
+  const [orderArray, setOrderArray] = useState();
   const [tabList, setTabList] = useContext(TabListContext);
   const tabListRef = useRef();
+
+  useEffect(() => {
+    const tabOrderArray = tabList.map((tab) => {
+      let dndtagId;
+      if (tab.type === 'editor') {
+        dndtagId = `te-${tab.id}`;
+      } else if (tab.type === 'board') {
+        dndtagId = `tb-${tab.id}`;
+      } else {
+        dndtagId = 'trash';
+      }
+      return dndtagId;
+    });
+    setOrderArray(tabOrderArray);
+  }, [tabList]);
 
   const isScrollBar = () => {
     const element = tabListRef.current;
@@ -53,11 +68,20 @@ function TabList({ tabIndex }) {
       >
         <TrackButton fontSize="small" />
       </IconButton>
-      <SortableContext items={index} strategy={horizontalListSortingStrategy}>
-        {tabList.map((tab) => (
-          <TabItem key={`tab-${tab.type}-${tab.id}`} tab={tab} index={index} />
-        ))}
-      </SortableContext>
+      {orderArray && (
+        <SortableContext
+          items={orderArray}
+          strategy={horizontalListSortingStrategy}
+        >
+          {tabList.map((tab) => (
+            <TabItem
+              key={`tab-${tab.type}-${tab.id}`}
+              tab={tab}
+              orderArray={orderArray}
+            />
+          ))}
+        </SortableContext>
+      )}
       <IconButton
         onClick={scrollRightList}
         sx={{

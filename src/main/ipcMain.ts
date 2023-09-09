@@ -45,6 +45,10 @@ ipcMain.handle('findChildPage', (_e, folderId) => {
   return executeDbAll(sql, value);
 });
 
+ipcMain.on('eventReply', (event, channel) => {
+  event.reply(channel);
+})
+
 ipcMain.on('bookmarking', (_e, ary) => {
   const sql = ary[2]
     ? 'INSERT OR REPLACE INTO bookmark(target, target_id) VALUES (?, ?)'
@@ -216,7 +220,7 @@ ipcMain.on('createNewStore', (event, args) => {
 function createRecord(args) {
   const { columns, table } = args;
   return new Promise((resolve, reject) => {
-    let sql = `INSERT INTO ${table}`;
+    let sql = `INSERT OR IGNORE INTO ${table}`;
     if (columns) {
       const insertColumns = Object.keys(columns).join(', ');
       sql += `(${insertColumns})`;
@@ -392,8 +396,8 @@ function createSqlStatementForUpdate(args) {
     .join(', ');
   sql += `SET ${columnsPlaceholder} `;
   const conditionsPlaceholder = Object.keys(conditions)
-    .map((key) => `${key} = ?`)
-    .join(', ');
+    .map((key) => `${key} = ? `)
+    .join('AND ');
   sql += `WHERE ${conditionsPlaceholder}`;
   const values = [...Object.values(columns), ...Object.values(conditions)];
   return {
@@ -402,6 +406,10 @@ function createSqlStatementForUpdate(args) {
   };
 }
 
+ipcMain.handle('updateRecords', (event, argsArray) => {
+  updateRecords(argsArray);
+});
+
 // 単体データの更新
 function updateRecord(args) {
   const query = createSqlStatementForUpdate(args);
@@ -409,6 +417,7 @@ function updateRecord(args) {
   return new Promise((resolve, reject) => {
     db.run(sql, values, (error) => {
       if (error) {
+        console.log(error)
         reject(error);
       } else {
         return resolve;
@@ -419,29 +428,45 @@ function updateRecord(args) {
 
 // 複数データの更新
 function updateRecords(argsArray) {
-  const hasError = false;
+  console.log(argsArray)
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      let errorOccurred = null;
 
-  db.serialize(() => {
-    db.run('BEGIN TRANSACTION');
+      db.run('BEGIN TRANSACTION', (err) => {
+        if (err) {
+          return reject(err.message);
+        }
 
-    argsArray.forEach((args) => {
-      if (hasError) {
-        return;
-      }
+        for (let i = 0; i < argsArray.length; i++) {
+          if (errorOccurred) {
+            break;
+          }
 
-      const query = createSqlStatementForUpdate(args);
-      const { sql, values } = query;
-      db.run(sql, values, (error) => {
-        if (error) {
-          hasError = true;
-          db.run('ROLLBACK');
-          console.error(error.message);
+          const query = createSqlStatementForUpdate(argsArray[i]);
+          const { sql, values } = query;
+
+          db.run(sql, values, (error) => {
+            if (error) {
+              console.log(error);
+              errorOccurred = error;
+            }
+          });
         }
       });
+
+      if (errorOccurred) {
+        reject(errorOccurred.message);
+      } else {
+        db.run('COMMIT', (err) => {
+          if (err) {
+            reject(err.message);
+          } else {
+            resolve(true);
+          }
+        });
+      }
     });
-    if (!hasError) {
-      db.run('COMMIT');
-    }
   });
 }
 

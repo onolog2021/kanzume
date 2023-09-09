@@ -7,7 +7,7 @@ import { ReactComponent as BoardLogo } from '../../../../../assets/square.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from '../PageList/CreateForm';
 
-function BoadItem({ board, index, bookmark }) {
+function BoadItem({ board, orderArray, bookmark }) {
   // const thisFolder = new Folder(folder);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
@@ -16,13 +16,13 @@ function BoadItem({ board, index, bookmark }) {
   let dndTag;
   if (bookmark) {
     dndTag = {
-      id: `b${board.id}`,
-      data: { area: 'quickAccess', type: 'board', id: board.id },
+      id: `qb-${board.id}`,
+      data: { area: 'quickAccess', type: 'board', id: board.id, orderArray },
     };
   } else {
     dndTag = {
-      id: `b${board.id}`,
-      data: { area: 'boardList', type: 'board', id: board.id },
+      id: `b-${board.id}`,
+      data: { area: 'boardList', type: 'board', id: board.id, orderArray },
     };
   }
 

@@ -26,6 +26,7 @@ interface itemData {
   area: string;
   index: any;
   parentId: number;
+  orderArray: string[];
 }
 
 function DragAndDrop() {
@@ -38,7 +39,6 @@ function DragAndDrop() {
   const [pageIndex, setPageIndex] = useState();
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
-  const [tabIndex, setTabIndex] = useState([]);
   const [droppable, setDroppable] = useState<Boolean>(true);
 
   const mouseSensor = useSensor(MouseSensor, {
@@ -48,10 +48,9 @@ function DragAndDrop() {
   });
   const sensors = useSensors(mouseSensor);
   const quickAccessArea = <QuickAccessArea />;
-  const boardList = <BoardList boardIndex={boardIndex} boards={boards} />;
+  const boardList = <BoardList boards={boards} />;
   const pageList = <PageList root={pageRoot} />;
-  const tabs = <TabList tabIndex={tabIndex} />;
-  const listArea = ['page-list', 'board-list', 'paper-list'];
+  // const tabs = <TabList  />;
 
   useEffect(() => {
     async function fetchData() {
@@ -114,8 +113,6 @@ function DragAndDrop() {
     try {
       const result = await params.boards();
       setBoards(result);
-      const newAry = result.map((element) => `board-${element.id}`);
-      setBoardIndex(newAry);
     } catch (error) {
       console.log(error);
     }
@@ -126,6 +123,7 @@ function DragAndDrop() {
     const availableSet = {
       quickAccess: ['board', 'page'],
       pageList: ['page', 'board', 'folder', 'paper'],
+      folder: ['page', 'board', 'folder', 'paper'],
       boardList: ['board', 'folder'],
       boardBody: ['page', 'paper'],
       tab: ['editor', 'board-tab', 'trash'],
@@ -141,7 +139,7 @@ function DragAndDrop() {
       return;
     }
 
-    const { type, id, area, parentId } = active.data.current;
+    const { type, id, area, parentId, orderArray } = active.data.current;
     const activeItemData = {
       dndId: active.id,
       type,
@@ -149,6 +147,7 @@ function DragAndDrop() {
       area,
       index: active.data.current.index,
       parentId,
+      orderArray,
     };
     setActiveItem(activeItemData);
   };
@@ -157,14 +156,14 @@ function DragAndDrop() {
     if (!over) {
       return;
     }
-    const { type, id, area, parentId } = over.data.current;
+    const { type, id, area, parentId, orderArray } = over.data.current;
     const overItemData = {
       dndId: over.id,
       type,
       id,
       area,
-      index: over.data.current.index,
       parentId,
+      orderArray,
     };
     setOverItem(overItemData);
 
@@ -176,12 +175,222 @@ function DragAndDrop() {
     }
   };
 
-  const DragEnd = ({active, over}) => {
+  const dataFlowAfterDrop = {
+    quickAccess: handleDataDroppedInQuickAccessArea,
+    pageList: handleDataDroppedInPageList,
+    folder: handleDataDroppedInFolder,
+    boardList: ['board', 'folder'],
+    boardBody: ['page', 'paper'],
+    tab: ['editor', 'board-tab', 'trash'],
+  };
+
+  const DragEnd = () => {
     if (!droppable) {
       return;
     }
-
+    // 新しい順番の作成
+    const newOrder = createNewOrderArray();
+    // データの処理
+    const areaFunction = dataFlowAfterDrop[overItem?.area];
+    if (areaFunction) {
+      areaFunction(newOrder);
+    }
+    // 関連箇所のデータ更新
   };
+
+  // クイックアクセスのデータ処理
+  async function handleDataDroppedInQuickAccessArea(order: string[]) {
+    if (activeItem?.area !== overItem.area) {
+      const target = overItem.type === 'page' ? 'page' : 'folder';
+      const position = order.indexOf(activeItem?.dndId);
+      const query = {
+        table: 'bookmark',
+        columns: {
+          position,
+          target,
+          target_id: activeItem?.id,
+          project_id: project.id,
+        },
+      };
+      await window.electron.ipcRenderer.invoke('insertRecord', query);
+    }
+
+    const queryArgs = [];
+    order.forEach((element, index) => {
+      const hash = element.split('-');
+      const targetHash = ['qp', 'qb'];
+      if (targetHash.includes(hash[0])) {
+        const target = hash[0] === 'qp' ? 'page' : 'folder';
+        const bookmarkQuery = {
+          table: 'bookmark',
+          columns: {
+            position: index,
+          },
+          conditions: {
+            target,
+            target_id: parseInt(hash[1]),
+          },
+        };
+        queryArgs.push(bookmarkQuery);
+      }
+    });
+    await window.electron.ipcRenderer.invoke('updateRecords', queryArgs);
+  }
+
+  async function handleDataDroppedInPageList(order: string[]) {
+    if (activeItem.type === 'paper') {
+      const deleteStoreQuery = {
+        table: 'store',
+        conditions: {
+          page_id: activeItem?.id,
+          folder_id: activeItem?.parentId,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage('deleteRecord', deleteStoreQuery);
+
+      const position = order.indexOf(activeItem?.dndId);
+      const updatePaperQuery = {
+        table: 'page',
+        columns: {
+          position,
+        },
+        conditions: {
+          id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage('updateRecord', updatePaperQuery);
+    }
+
+    if (activeItem.type === 'board') {
+      const position = order.indexOf(activeItem?.dndId);
+      const updateFolderQuery = {
+        table: 'folder',
+        columns: {
+          type: 'folder',
+          position,
+        },
+        conditions: {
+          id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage(
+        'updateRecord',
+        updateFolderQuery
+      );
+
+      const deleteBookmarkQuery = {
+        table: 'bookmark',
+        conditions: {
+          target: 'folder',
+          target_id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage(
+        'deleteRecord',
+        deleteBookmarkQuery
+      );
+    }
+
+    const argsArray = [];
+    const targetType = ['p', 'f'];
+    order.forEach((element, index) => {
+      const hash = element.split('-');
+      if (targetType.includes(element.charAt(0))) {
+        const query = {
+          table: element.charAt(0) === 'p' ? 'page' : 'folder',
+          columns: {
+            position: index,
+          },
+          conditions: {
+            id: parseInt(hash[1]),
+          },
+        };
+        argsArray.push(query);
+      }
+    });
+    window.electron.ipcRenderer.invoke('updateRecords', argsArray);
+  }
+
+  async function handleDataDroppedInFolder(order: string[]) {
+    if (activeItem.type === 'paper') {
+      const position = order.indexOf(activeItem?.dndId);
+      const query = {
+        table: 'store',
+        columns: {
+          position,
+          folder_id: overItem?.parentId,
+        },
+        conditions: {
+          page_id: activeItem?.id,
+          folder_id: activeItem?.parentId,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    }
+
+    if (activeItem.type === 'board') {
+      const position = order.indexOf(activeItem?.dndId);
+      const query = {
+        table: 'folder',
+        columns: {
+          position,
+          parent_id: overItem?.parentId,
+          type: 'folder',
+        },
+        conditions: {
+          id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage('updateRecord', query);
+      const deleteBookmarkQuery = {
+        table: 'bookmark',
+        conditions: {
+          target: 'folder',
+          target_id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage(
+        'deleteRecord',
+        deleteBookmarkQuery
+      );
+    }
+
+    const argsArray = [];
+    const targetType = ['p', 'f'];
+    order.forEach((element, index) => {
+      if (targetType.includes(element.charAt(0))) {
+        const hash = element.split('-');
+
+        if (hash[0] === 'p') {
+          const query = {
+            table: 'store',
+            columns: {
+              position: index,
+            },
+            conditions: {
+              folder_id: overItem?.parentId,
+              page_id: parseInt(hash[1]),
+            },
+          };
+          argsArray.push(query);
+        } else {
+          const query = {
+            table: 'folder',
+            columns: {
+              position: index,
+              parent_id: overItem?.parentId,
+            },
+            conditions: {
+              id: parseInt(hash[1]),
+            },
+          };
+          argsArray.push(query);
+        }
+      }
+    });
+    console.log(argsArray)
+    window.electron.ipcRenderer.invoke('updateRecords', argsArray);
+  }
 
   return (
     <DndContext
@@ -197,7 +406,7 @@ function DragAndDrop() {
           pageList={pageList}
           quickAccessArea={quickAccessArea}
         />
-        <WorkSpace tabs={tabs} />
+        <WorkSpace />
       </div>
       <DragOverlay style={{ zIndex: 1200 }}>
         {droppable ? <p>OK</p> : <p>NO</p>}
@@ -205,33 +414,23 @@ function DragAndDrop() {
     </DndContext>
   );
 
-  // 要調査・先頭ドラッグの挙動がおかしいかも
-  function createNewIndex() {
-    let newIndex: string[];
-    // areaが同じ場合
+  function createNewOrderArray() {
+    // 同じ場所でドラッグ＆ドロップした場合
     if (activeItem.area === overItem.area) {
-      if (activeItem && overItem && activeItem.id !== overItem.id) {
-        const oldIndex = activeItem.index.findIndex(
-          (page) => page === activeItem.id
-        );
-        const newPosition = overItem.index.findIndex(
-          (page) => page === overItem.id
-        );
-        if (oldIndex !== -1 && newPosition !== -1) {
-          newIndex = arrayMove(activeItem.index, oldIndex, newPosition);
-        }
+      if (activeItem?.dndId !== overItem.dndId) {
+        const oldOrderArray = overItem?.orderArray;
+        const oldIndex = oldOrderArray.indexOf(activeItem?.dndId);
+        const newIndex = oldOrderArray.indexOf(overItem?.dndId);
+
+        return arrayMove(oldOrderArray, oldIndex, newIndex);
       }
     } else {
-      // areaがちがう場合
-      const oldIndex = overItem?.index;
-      const newPosition = oldIndex.findIndex((item) => item === overItem.id);
-      if (newPosition !== -1) {
-        const newOverIndex = [...overItem.index];
-        newOverIndex.splice(newPosition, 0, activeItem.id);
-        newIndex = newOverIndex;
-      }
+      // 違う場所でドラッグ＆ドロップした場合
+      const addedArray = [...overItem?.orderArray, activeItem?.dndId];
+      const oldIndex = addedArray.indexOf(activeItem?.dndId);
+      const newIndex = addedArray.indexOf(overItem?.dndId);
+      return arrayMove(addedArray, oldIndex, newIndex);
     }
-    return newIndex;
   }
 
   // 引数にあわせて更新する
@@ -265,68 +464,6 @@ function DragAndDrop() {
       updateList(overItem.area);
     }
   }
-
-  // ドロップ後にドラッグしたものとドロップした場所の更新
-  // async function handleDragEnd({ active, over }) {
-  //   if (active && over && active.id !== over.id) {
-  //     if (overItem.type === 'new') {
-  //       // 落とした場所とアイテムに合わせて処理
-  //       // フォルダ→ボード
-  //       if (overItem.id === 'board-list' && activeItem.type === 'folder') {
-  //         const arg = createNewArg();
-  //         const query = { projectId: project.id, values: [arg] };
-  //         await window.electron.ipcRenderer.sendMessage(
-  //           'updatePosition',
-  //           query
-  //         );
-  //         await updateBoardList(project);
-  //       }
-  //       // ボード→フォルダ
-  //       if (
-  //         overItem.id === 'page-list' &&
-  //         (activeItem.type === 'paper' || activeItem.type === 'board')
-  //       ) {
-  //         const item = createNewArg();
-  //         const args = { projectId: project.id, values: [item] };
-  //         await window.electron.ipcRenderer.sendMessage('updatePosition', args);
-  //         await updatePageList(project);
-  //       }
-  //       // ページ→ボード内
-  //       if (overItem.id === 'paper-list' && activeItem.type === 'page') {
-  //         const args = createNewArg();
-  //         await window.electron.ipcRenderer.sendMessage('createNewStore', args);
-  //         await updatePageList(project);
-  //       }
-  //       return;
-  //     }
-  //     // 新しいIndexを作成
-  //     const newIndex = createNewIndex();
-  //     // newindex.length>0のときに実施するコード
-
-  //     if (overItem.area === 'page-list') {
-  //       const valuesArray = translateForSidebar(newIndex);
-  //       const args = { projectId: project.id, values: valuesArray };
-  //       window.electron.ipcRenderer.sendMessage('updatePosition', args);
-  //     }
-
-  //     // 発火の条件分けでfolderとboardのときのみにするのを忘れずにね。
-  //     if (overItem.area === 'board-list' && activeItem.type !== 'page') {
-  //       const valuesArray = translateForSidebar(newIndex);
-  //       const args = { projectId: project.id, values: valuesArray };
-  //       window.electron.ipcRenderer.sendMessage('updatePosition', args);
-  //     }
-
-  //     if (overItem.area === 'board-body') {
-  //       const valuesArray = updatePaperIndex(newIndex);
-  //       window.electron.ipcRenderer.sendMessage(
-  //         'droppedBoardBody',
-  //         valuesArray
-  //       );
-  //     }
-
-  //     caseUpdate();
-  //   }
-  // }
 
   // 新規に登録する場合
   function createNewArg() {

@@ -5,11 +5,11 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Resizable } from 're-resizable';
 
-function Boardpage({ pageData, index, boardId }) {
+function Boardpage({ pageData, orderArray, boardId }) {
   const [editor, setEditor] = useState();
   const titleRef = useRef();
   const targetId = `boardItem-${pageData.id}`;
-  const resizeRef = useRef()
+  const resizeRef = useRef();
 
   const size = {
     width: '100%',
@@ -17,12 +17,13 @@ function Boardpage({ pageData, index, boardId }) {
   };
 
   const { attributes, listeners, setNodeRef, transform } = useSortable({
-    id: `bp${pageData.id}`,
+    id: `bp-${pageData.id}`,
     data: {
       area: 'boardBody',
       type: 'paper',
       id: pageData.id,
       parentId: boardId,
+      orderArray,
     },
   });
   const style = {
@@ -48,7 +49,12 @@ function Boardpage({ pageData, index, boardId }) {
   };
 
   return (
-    <Resizable defaultSize={size} maxWidth={'100%'} bounds={'HTMLElement'} ref={resizeRef}>
+    <Resizable
+      defaultSize={size}
+      maxWidth="100%"
+      bounds="HTMLElement"
+      ref={resizeRef}
+    >
       <Paper
         elevation={3}
         ref={setNodeRef}

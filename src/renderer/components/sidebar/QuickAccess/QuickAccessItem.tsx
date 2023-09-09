@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ListItemPage from '../PageList/ListItemPage';
 import BoadItem from '../Board/BoardItem';
 
-function QuickAccesItem({ item, items }) {
+function QuickAccesItem({ item, orderArray }) {
   const { target, target_id } = item;
   const [data, setData] = useState(null);
 
@@ -29,9 +29,9 @@ function QuickAccesItem({ item, items }) {
     <>
       {data &&
         (target === 'page' ? (
-          <ListItemPage pageData={data} index={items} bookmark />
+          <ListItemPage pageData={data} orderArray={orderArray} bookmark />
         ) : (
-          <BoadItem board={data} index={items} bookmark />
+          <BoadItem board={data} orderArray={orderArray} bookmark />
         ))}
     </>
   );

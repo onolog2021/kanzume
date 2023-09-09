@@ -4,7 +4,7 @@ import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 
-function ListItemPage({ pageData, index, bookmark }) {
+function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
   const [isShowInput, setIsShowInput] = useState(false);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
@@ -14,13 +14,24 @@ function ListItemPage({ pageData, index, bookmark }) {
   let dndTag;
   if (bookmark) {
     dndTag = {
-      id: `qp${pageData.id}`,
-      data: { area: 'quickAccess', type: 'page', id: pageData.id },
+      id: `qp-${pageData.id}`,
+      data: {
+        area: 'quickAccess',
+        type: 'page',
+        id: pageData.id,
+        orderArray,
+      },
     };
   } else {
     dndTag = {
-      id: `p${pageData.id}`,
-      data: { area: 'pageList', type: 'page', id: pageData.id },
+      id: `p-${pageData.id}`,
+      data: {
+        area: parentId ? 'folder' : 'pageList',
+        type: 'page',
+        id: pageData.id,
+        parentId,
+        orderArray,
+      },
     };
   }
 

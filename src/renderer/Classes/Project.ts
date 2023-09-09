@@ -97,13 +97,13 @@ export default class Project {
 
     // 各ページを振り分ける
     pages.forEach((page) => {
+      const storeItem = stores.find((item) => item.page_id === page.id);
       const item = new Node({
         id: page.id,
         title: page.title,
         type: 'page',
-        position: page.position,
+        position: storeItem ? storeItem.position : page.position,
       });
-      const storeItem = stores.find((item) => item.page_id === page.id);
       if (storeItem) {
         const folderNode = folderNodes.find(
           (node) => node.id === storeItem.folder_id

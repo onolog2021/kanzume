@@ -3,8 +3,9 @@ import { TabListContext, CurrentPageContext } from '../Context';
 import EditorBody from './Editor/EditorBody';
 import BoardSpace from './Board/BoardSpace';
 import TrashBox from './Trash/TrashBox';
+import TabList from './TabList';
 
-function WorkSpace({ tabs, paperIndex }) {
+function WorkSpace() {
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
 
@@ -49,7 +50,7 @@ function WorkSpace({ tabs, paperIndex }) {
 
   return (
     <div className="workSpace">
-      {tabs}
+      <TabList />
       {tabList && tabList.map((tab) => panelRender(tab))}
     </div>
   );

@@ -27,29 +27,30 @@ export default class Node {
     this.parent = null;
   }
 
-  adjustForPage() {
-    return { id: this.id, title: this.title };
-  }
-
   addChildren(childNode: Node) {
     this.children?.push(childNode);
     childNode.parent = this;
     this.sortChildren();
   }
 
-  findFolder(folderId: number) {
-    const folder = this.children?.find((item) => item.id === folderId);
-    return folder;
-  }
-
   sortChildren() {
     this.children?.sort((a, b) => a.position - b.position);
   }
 
-  getChildrenAry() {
-    const childrenAry = this.children?.map(
-      (child) => `${child.type}-${child.id}`
-    );
+  createOrderArrayForDndTag() {
+    const childrenAry = this.children?.map((child) => {
+      if (child.type === 'page') {
+        return `p-${child.id}`;
+      }
+      return `f-${child.id}`;
+    });
     return childrenAry;
+  }
+
+  getParentNodeId(): number | null {
+    if (this.parent && this.parent instanceof Node) {
+      return this.parent.id;
+    }
+    return null;
   }
 }

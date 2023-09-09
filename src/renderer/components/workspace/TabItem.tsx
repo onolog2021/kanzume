@@ -9,7 +9,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button, IconButton, Tab } from '@mui/material';
 import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 
-function TabItem({ tab, index }) {
+function TabItem({ tab, orderArray }) {
   const [project] = useContext(ProjectContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
@@ -21,18 +21,18 @@ function TabItem({ tab, index }) {
   let dndTag;
   if (tab.type === 'editor') {
     dndTag = {
-      id: `te${tab.id}`,
-      data: { area: 'tab', type: 'editor', id: tab.id },
+      id: `te-${tab.id}`,
+      data: { area: 'tab', type: 'editor', id: tab.id, orderArray },
     };
   } else if (tab.type === 'board') {
     dndTag = {
-      id: `tb${tab.id}`,
-      data: { area: 'tab', type: 'board-tab', id: tab.id },
+      id: `tb-${tab.id}`,
+      data: { area: 'tab', type: 'board-tab', id: tab.id, orderArray },
     };
   } else {
     dndTag = {
       id: `trash`,
-      data: { area: 'tab', type: 'trash', id: tab.id },
+      data: { area: 'tab', type: 'trash', id: tab.id, orderArray },
     };
   }
 

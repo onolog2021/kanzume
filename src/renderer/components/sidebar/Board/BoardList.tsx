@@ -14,11 +14,12 @@ import CategoryTitle from '../CategoryTitle';
 import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 import { ReactComponent as AddBoardButton } from '../../../../../assets/grid-plus.svg';
 
-function BoardList({ boards, boardIndex }) {
+function BoardList({ boards }) {
   const [project] = useContext(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
+  const [orderArray, setOrderArray] = useState();
   const svg = <BoardIcon />;
 
   const switchFormDisplay = (status: string) => {
@@ -27,8 +28,13 @@ function BoardList({ boards, boardIndex }) {
 
   const { setNodeRef } = useDroppable({
     id: 'board-list',
-    data: {area: 'boardList'}
+    data: { area: 'boardList' },
   });
+
+  useEffect(() => {
+    const boardOrderArray = boards.map((board) => `b-${board.id}`);
+    setOrderArray(boardOrderArray);
+  }, []);
 
   const createNewBoard = async (title: string) => {
     const newBoard = new Folder({
@@ -75,14 +81,20 @@ function BoardList({ boards, boardIndex }) {
           label="ボード名"
         />
       )}
-      <SortableContext items={boardIndex}>
-        <List ref={setNodeRef}>
-          {boards &&
-            boards.map((board) => (
-              <BoardItem key={board.id} board={board} index={boardIndex} />
-            ))}
-        </List>
-      </SortableContext>
+      {orderArray && (
+        <SortableContext items={orderArray}>
+          <List ref={setNodeRef}>
+            {boards &&
+              boards.map((board) => (
+                <BoardItem
+                  key={board.id}
+                  board={board}
+                  orderArray={orderArray}
+                />
+              ))}
+          </List>
+        </SortableContext>
+      )}
     </>
   );
 }
