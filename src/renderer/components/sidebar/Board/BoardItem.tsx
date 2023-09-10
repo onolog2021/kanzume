@@ -26,6 +26,7 @@ function BoadItem({ board, orderArray, bookmark }) {
     };
   }
 
+
   async function handleClick() {
     await setCurrentPage({ id: board.id, type: 'board' });
     const value = {

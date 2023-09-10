@@ -46,8 +46,11 @@ ipcMain.handle('findChildPage', (_e, folderId) => {
 });
 
 ipcMain.on('eventReply', (event, channel) => {
+  console.log('/////////')
+  console.log(channel);
   event.reply(channel);
-})
+  console.log('/////////')
+});
 
 ipcMain.on('bookmarking', (_e, ary) => {
   const sql = ary[2]
@@ -290,8 +293,12 @@ ipcMain.handle('fetchRecord', async (event, args) => {
 });
 
 ipcMain.handle('insertRecord', async (event, args) => {
-  const result = await createRecord(args);
-  return result;
+  try {
+    const result = await createRecord(args);
+    return result;
+  } catch (err) {
+    console.log('insertRecord:', err);
+  }
 });
 
 // 複数レコードの取得
@@ -412,61 +419,71 @@ ipcMain.handle('updateRecords', (event, argsArray) => {
 
 // 単体データの更新
 function updateRecord(args) {
-  const query = createSqlStatementForUpdate(args);
-  const { sql, values } = query;
-  return new Promise((resolve, reject) => {
-    db.run(sql, values, (error) => {
-      if (error) {
-        console.log(error)
-        reject(error);
-      } else {
-        return resolve;
-      }
+  try {
+    const query = createSqlStatementForUpdate(args);
+    const { sql, values } = query;
+    return new Promise((resolve, reject) => {
+      db.run(sql, values, (error) => {
+        if (error) {
+          console.log(error);
+          reject(error);
+        } else {
+          return resolve;
+        }
+      });
     });
-  });
+  } catch (error) {
+    console.error('An error occurred in updateRecord:', error);
+    throw error;
+  }
 }
 
 // 複数データの更新
 function updateRecords(argsArray) {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      let errorOccurred = null;
+  try {
+    return new Promise((resolve, reject) => {
+      db.serialize(() => {
+        let errorOccurred = null;
 
-      db.run('BEGIN TRANSACTION', (err) => {
-        if (err) {
-          return reject(err.message);
-        }
-
-        for (let i = 0; i < argsArray.length; i++) {
-          if (errorOccurred) {
-            break;
+        db.run('BEGIN TRANSACTION', (err) => {
+          if (err) {
+            return reject(err.message);
           }
 
-          const query = createSqlStatementForUpdate(argsArray[i]);
-          const { sql, values } = query;
+          for (let i = 0; i < argsArray.length; i++) {
+            if (errorOccurred) {
+              break;
+            }
 
-          db.run(sql, values, (error) => {
-            if (error) {
-              console.log(error);
-              errorOccurred = error;
+            const query = createSqlStatementForUpdate(argsArray[i]);
+            const { sql, values } = query;
+
+            db.run(sql, values, (error) => {
+              if (error) {
+                console.log(error);
+                errorOccurred = error;
+              }
+            });
+          }
+        });
+
+        if (errorOccurred) {
+          reject(errorOccurred.message);
+        } else {
+          db.run('COMMIT', (err) => {
+            if (err) {
+              reject(err.message);
+            } else {
+              resolve(true);
             }
           });
         }
       });
-
-      if (errorOccurred) {
-        reject(errorOccurred.message);
-      } else {
-        db.run('COMMIT', (err) => {
-          if (err) {
-            reject(err.message);
-          } else {
-            resolve(true);
-          }
-        });
-      }
     });
-  });
+  } catch (error) {
+    console.error('An error occurred in updateRecords:', error);
+    throw error;
+  }
 }
 
 ipcMain.on('deleteRecord', (event, args) => {

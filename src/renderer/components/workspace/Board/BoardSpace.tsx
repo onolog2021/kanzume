@@ -43,10 +43,8 @@ export default function BoardSpace({ boardData }) {
 
     initialBoard();
 
-    window.electron.ipcRenderer.on('updatePapers', (args) => {
-      if (args[0] === boardData.id) {
-        setPages(args[1]);
-      }
+    window.electron.ipcRenderer.on('updateBoardBody', () => {
+      initialBoard();
     });
   }, []);
 
@@ -112,7 +110,7 @@ export default function BoardSpace({ boardData }) {
           target: 'folder',
           target_id: board.id,
           position: -1,
-          project_id: project.id
+          project_id: project.id,
         },
       };
       window.electron.ipcRenderer.invoke('insertRecord', query);

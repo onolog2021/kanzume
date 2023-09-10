@@ -171,6 +171,14 @@ function DragAndDrop() {
     boardBody: handleDataDroppedInBoardBody,
   };
 
+  const updateFlowAfterDrop = {
+    quickAccess: 'updateQuickArea',
+    pageList: 'updatePageList',
+    folder: 'updatePageList',
+    boardList: 'updateBoardList',
+    boardBody: 'updateBoardBody',
+  };
+
   const DragEnd = () => {
     if (!droppable) {
       return;
@@ -187,7 +195,16 @@ function DragAndDrop() {
     if (areaFunction) {
       areaFunction(newOrder);
     }
+
     // 関連箇所のデータ更新
+    const updateDropArea = updateFlowAfterDrop[overItem?.area];
+    const updateDragArea = updateFlowAfterDrop[activeItem?.area];
+    if (updateDropArea) {
+      window.electron.ipcRenderer.sendMessage('eventReply', updateDropArea);
+    }
+    if (updateDragArea && updateDropArea !== updateDragArea) {
+      window.electron.ipcRenderer.sendMessage('eventReply', updateDragArea);
+    }
   };
 
   // クイックアクセスのデータ処理
