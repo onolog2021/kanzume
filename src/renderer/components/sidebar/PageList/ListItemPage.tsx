@@ -36,6 +36,7 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
   }
 
   const handleClick = () => {
+    console.log(parentId)
     const value = {
       id: pageData.id,
       title: pageData.title,

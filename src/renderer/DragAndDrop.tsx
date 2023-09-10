@@ -175,12 +175,13 @@ function DragAndDrop() {
     if (!droppable) {
       return;
     }
-    if (activeItem?.dndId === overItem?.dndId) {
+    if (activeItem?.dndId === overItem?.dndId && overItem.type !== 'folder') {
       return;
     }
 
     // 新しい順番の作成
     const newOrder = createNewOrderArray();
+
     // データの処理
     const areaFunction = dataFlowAfterDrop[overItem?.area];
     if (areaFunction) {
@@ -473,7 +474,7 @@ function DragAndDrop() {
 
   function createNewOrderArray() {
     // 同じ場所でドラッグ＆ドロップした場合
-    if (activeItem.area === overItem.area) {
+    if (activeItem.area === overItem.area && overItem?.area !== 'folder') {
       if (activeItem?.dndId !== overItem.dndId) {
         const oldOrderArray = overItem?.orderArray;
         const oldIndex = oldOrderArray.indexOf(activeItem?.dndId);

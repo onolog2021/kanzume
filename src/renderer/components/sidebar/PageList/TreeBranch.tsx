@@ -4,13 +4,22 @@ import Node from 'renderer/Classes/Node';
 import ListItemFolder from './ListItemFoder';
 import ListItemPage from './ListItemPage';
 
-export default function TreeBranch({ parentNode, parentId }) {
+export default function TreeBranch({ parentNode }) {
   const { children } = parentNode;
   const [items, setItems] = useState([]);
+  const [parentId, setParentId] = useState<number>();
+
 
   if (!parentNode) {
     return <p>Now Loading...</p>;
   }
+
+  useEffect(() => {
+    if(parentNode.type === 'folder'){
+      setParentId(parentNode.id);
+    }
+  },[])
+
 
   useEffect(() => {
     if (children) {

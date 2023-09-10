@@ -137,7 +137,7 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
       />
       <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
         {children && children.length > 0 && (
-          <TreeBranch parentNode={folderData} parentId={folderData.id} />
+          <TreeBranch parentNode={folderData} />
         )}
       </Collapse>
     </>

@@ -15,7 +15,10 @@ export default function CreateProjectForm({ handleClick }) {
         title,
       },
     };
-    const newId = await window.electron.ipcRenderer.invoke('insertRecord', json);
+    const newId = await window.electron.ipcRenderer.invoke(
+      'insertRecord',
+      json
+    );
     await window.electron.ipcRenderer.sendMessage('initProject', newId);
     handleClick(newId);
   };
@@ -29,6 +32,11 @@ export default function CreateProjectForm({ handleClick }) {
           size="small"
           label="プロジェクト名"
           inputRef={projectTitleRef}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              createNewPage();
+            }
+          }}
           sx={{ mr: 2 }}
         />
         <Button size="small" variant="contained" onClick={createNewPage}>
