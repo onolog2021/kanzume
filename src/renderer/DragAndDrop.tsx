@@ -24,7 +24,6 @@ interface itemData {
   type: string;
   id: number;
   area: string;
-  index: any;
   parentId: number;
   orderArray: string[];
 }
@@ -179,8 +178,8 @@ function DragAndDrop() {
     quickAccess: handleDataDroppedInQuickAccessArea,
     pageList: handleDataDroppedInPageList,
     folder: handleDataDroppedInFolder,
-    boardList: ['board', 'folder'],
-    boardBody: ['page', 'paper'],
+    boardList: handleDataDroppedInBoardList,
+    boardBody: handleDataDroppedInBoardBody,
     tab: ['editor', 'board-tab', 'trash'],
   };
 
@@ -188,6 +187,10 @@ function DragAndDrop() {
     if (!droppable) {
       return;
     }
+    if (activeItem?.dndId === overItem?.dndId) {
+      return;
+    }
+
     // 新しい順番の作成
     const newOrder = createNewOrderArray();
     // データの処理
@@ -388,8 +391,74 @@ function DragAndDrop() {
         }
       }
     });
-    console.log(argsArray)
     window.electron.ipcRenderer.invoke('updateRecords', argsArray);
+  }
+
+  async function handleDataDroppedInBoardList(order: string[]) {
+    if (activeItem.type === 'folder') {
+      const position = order.indexOf(activeItem?.dndId);
+      const query = {
+        table: 'folder',
+        columns: {
+          type: 'board',
+          position,
+        },
+        conditions: {
+          id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    }
+
+    const argsArray = [];
+    order.forEach((element, index) => {
+      const hash = element.split('-');
+      const query = {
+        table: 'folder',
+        columns: {
+          position: index,
+        },
+        conditions: {
+          id: parseInt(hash[1]),
+        },
+      };
+      argsArray.push(query);
+    });
+    window.electron.ipcRenderer.invoke('updateRecords', argsArray);
+  }
+
+  async function handleDataDroppedInBoardBody(order: string[]) {
+    if (activeItem.type === 'page') {
+      const position = order.indexOf(activeItem?.dndId);
+      const query = {
+        table: 'store',
+        columns: {
+          position,
+          folder_id: overItem?.parentId,
+          page_id: activeItem?.id,
+        },
+      };
+      window.electron.ipcRenderer.invoke('insertRecord', query);
+    }
+
+    const argsArray = [];
+    order.forEach((element, index) => {
+      const hash = element.split('-');
+      if (hash.includes('bp')) {
+        const query = {
+          table: 'store',
+          columns: {
+            position: index,
+          },
+          conditions: {
+            page_id: parseInt(hash[1]),
+            folder_id: overItem?.parentId,
+          },
+        };
+        argsArray.push(query);
+      }
+      window.electron.ipcRenderer.invoke('updateRecords', argsArray);
+    });
   }
 
   return (
@@ -433,138 +502,138 @@ function DragAndDrop() {
     }
   }
 
-  // 引数にあわせて更新する
-  function updateList(area) {
-    // boardの場合、どれを更新するか。
-    const ids = [];
-    if (activeItem.type === 'paper') {
-      ids.push(activeItem?.parentId);
-    }
-    if (overItem.type === 'paper') {
-      ids.push(overItem?.parentId);
-    }
-    switch (area) {
-      case 'page-list':
-        updatePageList(project);
-        break;
-      case 'board-list':
-        updateBoardList(project);
-        break;
-      case 'paper':
-        window.electron.ipcRenderer.sendMessage('updateBoardPapers', ids);
-        break;
-      default:
-    }
-  }
+  // // 引数にあわせて更新する
+  // function updateList(area) {
+  //   // boardの場合、どれを更新するか。
+  //   const ids = [];
+  //   if (activeItem.type === 'paper') {
+  //     ids.push(activeItem?.parentId);
+  //   }
+  //   if (overItem.type === 'paper') {
+  //     ids.push(overItem?.parentId);
+  //   }
+  //   switch (area) {
+  //     case 'page-list':
+  //       updatePageList(project);
+  //       break;
+  //     case 'board-list':
+  //       updateBoardList(project);
+  //       break;
+  //     case 'paper':
+  //       window.electron.ipcRenderer.sendMessage('updateBoardPapers', ids);
+  //       break;
+  //     default:
+  //   }
+  // }
 
-  // ドロップ後の処理分け
-  function caseUpdate() {
-    updateList(activeItem.area);
-    if (activeItem.area !== overItem.area) {
-      updateList(overItem.area);
-    }
-  }
+  // // ドロップ後の処理分け
+  // function caseUpdate() {
+  //   updateList(activeItem.area);
+  //   if (activeItem.area !== overItem.area) {
+  //     updateList(overItem.area);
+  //   }
+  // }
 
-  // 新規に登録する場合
-  function createNewArg() {
-    // ボードリストにフォルダを移動した場合
-    if (overItem.id === 'board-list') {
-      const arg = {
-        table: 'folder',
-        id: activeItem?.itemId,
-        position: -1,
-        type: 'board',
-      };
-      return arg;
-    }
-    if (overItem.id === 'page-list') {
-      const arg = {
-        table: adjustTableName(activeItem.type),
-        id: activeItem?.itemId,
-        position: -1,
-      };
-      if (activeItem.type === 'board') {
-        arg.type = 'folder';
-      }
-      return arg;
-    }
-    if (overItem.id === 'paper-list') {
-      const arg = {
-        position: -1,
-        page_id: activeItem?.itemId,
-        folder_id: overItem?.parentId,
-      };
-      return arg;
-    }
-  }
+  // // 新規に登録する場合
+  // function createNewArg() {
+  //   // ボードリストにフォルダを移動した場合
+  //   if (overItem.id === 'board-list') {
+  //     const arg = {
+  //       table: 'folder',
+  //       id: activeItem?.itemId,
+  //       position: -1,
+  //       type: 'board',
+  //     };
+  //     return arg;
+  //   }
+  //   if (overItem.id === 'page-list') {
+  //     const arg = {
+  //       table: adjustTableName(activeItem.type),
+  //       id: activeItem?.itemId,
+  //       position: -1,
+  //     };
+  //     if (activeItem.type === 'board') {
+  //       arg.type = 'folder';
+  //     }
+  //     return arg;
+  //   }
+  //   if (overItem.id === 'paper-list') {
+  //     const arg = {
+  //       position: -1,
+  //       page_id: activeItem?.itemId,
+  //       folder_id: overItem?.parentId,
+  //     };
+  //     return arg;
+  //   }
+  // }
 
-  function updatePaperIndex(index) {
-    const ary = [];
-    index.forEach((item, index) => {
-      const element = item.split('-');
-      if (element[0] === 'page') {
-        const arg = {
-          folder_id: overItem?.parentId,
-          page_id: parseInt(element[1]),
-          position: index,
-        };
-        ary.push(arg);
-      }
-      if (element[0] === 'paper') {
-        const arg = {
-          folder_id: overItem?.parentId,
-          page_id: parseInt(element[1]),
-          position: index,
-        };
-        ary.push(arg);
-      }
-    });
-    const values = [overItem?.parentId, ary];
-    return values;
-  }
+  // function updatePaperIndex(index) {
+  //   const ary = [];
+  //   index.forEach((item, index) => {
+  //     const element = item.split('-');
+  //     if (element[0] === 'page') {
+  //       const arg = {
+  //         folder_id: overItem?.parentId,
+  //         page_id: parseInt(element[1]),
+  //         position: index,
+  //       };
+  //       ary.push(arg);
+  //     }
+  //     if (element[0] === 'paper') {
+  //       const arg = {
+  //         folder_id: overItem?.parentId,
+  //         page_id: parseInt(element[1]),
+  //         position: index,
+  //       };
+  //       ary.push(arg);
+  //     }
+  //   });
+  //   const values = [overItem?.parentId, ary];
+  //   return values;
+  // }
 
-  function adjustTableName(name: string) {
-    switch (name) {
-      case 'board':
-        return 'folder';
-      case 'paper':
-        return 'page';
-      default:
-        return name;
-    }
-  }
+  // function adjustTableName(name: string) {
+  //   switch (name) {
+  //     case 'board':
+  //       return 'folder';
+  //     case 'paper':
+  //       return 'page';
+  //     default:
+  //       return name;
+  //   }
+  // }
 
-  function translateItem(params: [string, string], index: number) {
-    const table = adjustTableName(params[0]);
-    const arg = {
-      table,
-      id: parseInt(params[1]),
-      position: index,
-    };
-    // ページリスト→ボードリストの場合
-    if (table === 'folder' && activeItem.area !== overItem.area) {
-      arg.type = overItem.area === 'board-list' ? 'board' : 'folder';
-    }
-    return arg;
-  }
+  // function translateItem(params: [string, string], index: number) {
+  //   const table = adjustTableName(params[0]);
+  //   const arg = {
+  //     table,
+  //     id: parseInt(params[1]),
+  //     position: index,
+  //   };
+  //   // ページリスト→ボードリストの場合
+  //   if (table === 'folder' && activeItem.area !== overItem.area) {
+  //     arg.type = overItem.area === 'board-list' ? 'board' : 'folder';
+  //   }
+  //   return arg;
+  // }
 
-  function translateForSidebar(pageIndex) {
-    const ary = [];
-    pageIndex.forEach((item, index) => {
-      const element = item.split('-');
-      if (element[0] === 'paper') {
-        // 紐づけを取得して削除
-        const value = {
-          page_id: parseInt(element[1]),
-          folder_id: activeItem?.parentId,
-        };
-        window.electron.ipcRenderer.sendMessage('destroyStore', value);
-      }
-      const arg = translateItem(element, index);
-      ary.push(arg);
-    });
-    return ary;
-  }
+  // function translateForSidebar(pageIndex) {
+  //   const ary = [];
+  //   pageIndex.forEach((item, index) => {
+  //     const element = item.split('-');
+  //     if (element[0] === 'paper') {
+  //       // 紐づけを取得して削除
+  //       const value = {
+  //         page_id: parseInt(element[1]),
+  //         folder_id: activeItem?.parentId,
+  //       };
+  //       window.electron.ipcRenderer.sendMessage('destroyStore', value);
+  //     }
+  //     const arg = translateItem(element, index);
+  //     ary.push(arg);
+  //   });
+  //   return ary;
+  // }
 }
 
 export default DragAndDrop;

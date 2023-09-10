@@ -61,8 +61,8 @@ function BoadItem({ board, orderArray, bookmark }) {
         id: board.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
   };
 
   const softDelete = async () => {

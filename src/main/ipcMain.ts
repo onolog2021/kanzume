@@ -428,7 +428,6 @@ function updateRecord(args) {
 
 // 複数データの更新
 function updateRecords(argsArray) {
-  console.log(argsArray)
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       let errorOccurred = null;

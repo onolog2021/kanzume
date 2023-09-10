@@ -82,18 +82,19 @@ function BoardList({ boards }) {
         />
       )}
       {orderArray && (
-        <SortableContext items={orderArray}>
-          <List ref={setNodeRef}>
-            {boards &&
+        <List ref={setNodeRef}>
+          <SortableContext items={orderArray}>
+            {orderArray &&
               boards.map((board) => (
                 <BoardItem
                   key={board.id}
                   board={board}
                   orderArray={orderArray}
+                  bookmark={false}
                 />
               ))}
-          </List>
-        </SortableContext>
+          </SortableContext>
+        </List>
       )}
     </>
   );

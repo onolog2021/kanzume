@@ -5,6 +5,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { DndContext } from '@dnd-kit/core';
 import TabItem from './TabItem';
 import { ReactComponent as TrackButton } from '../../../../assets/expand.svg';
 
