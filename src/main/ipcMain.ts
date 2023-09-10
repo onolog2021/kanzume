@@ -46,10 +46,7 @@ ipcMain.handle('findChildPage', (_e, folderId) => {
 });
 
 ipcMain.on('eventReply', (event, channel) => {
-  console.log('/////////')
-  console.log(channel);
   event.reply(channel);
-  console.log('/////////')
 });
 
 ipcMain.on('bookmarking', (_e, ary) => {

@@ -1,16 +1,8 @@
-import {
-  IconButton,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  Typography,
-} from '@mui/material';
+import { IconButton, ListItemButton, Typography } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { ReactComponent as MenuIcon } from '../../../../assets/dots.svg';
 import ContextMenu from '../ContextMenu';
-import { CurrentPageContext } from '../Context';
 
 interface contextMenu {
   mouseX: number;
@@ -18,18 +10,31 @@ interface contextMenu {
 }
 
 function SidebarItem({ icon, text, functions, dndTag }) {
-  // const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const { click, contextMenu } = functions;
   const [contextMenuStatus, setContextMenuStatus] =
     useState<contextMenu | null>(null);
 
   // dnd
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable(dndTag);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    isOver,
+    active,
+    over,
+    transform,
+    transition,
+    isDragging,
+    index,
+  } = useSortable(dndTag);
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transition: 'none',
+  };
+
+  const overStyle = {
+    transition: 'none',
+    borderBottom: '0.1px solid blue',
   };
 
   const contextMenuOpen = (event) => {
@@ -71,7 +76,7 @@ function SidebarItem({ icon, text, functions, dndTag }) {
           },
         }}
         ref={setNodeRef}
-        style={style}
+        style={isOver ? overStyle : style}
         {...listeners}
         {...attributes}
       >

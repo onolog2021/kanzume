@@ -6,6 +6,7 @@ import {
   useSensor,
   MouseSensor,
   DragOverlay,
+  closestCenter,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import WorkSpace from './components/workspace/WorkSpace';
@@ -15,6 +16,7 @@ import BoardList from './components/sidebar/Board/BoardList';
 import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
 import QuickAccessArea from './components/sidebar/QuickAccess/QuickAccessArea';
+import DragOverlayItem from './DragOverlayItem';
 
 interface itemData {
   dndId: string;
@@ -470,6 +472,7 @@ function DragAndDrop() {
   return (
     <DndContext
       sensors={sensors}
+      collisionDetection={closestCenter}
       onDragStart={DragStart}
       onDragOver={DragOver}
       onDragEnd={DragEnd}
@@ -483,9 +486,7 @@ function DragAndDrop() {
         />
         <WorkSpace />
       </div>
-      <DragOverlay style={{ zIndex: 1200 }}>
-        {droppable ? <p>OK</p> : <p>NO</p>}
-      </DragOverlay>
+      <DragOverlayItem droppable={droppable} />
     </DndContext>
   );
 

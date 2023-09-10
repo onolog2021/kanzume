@@ -12,7 +12,7 @@ function CurrentProjects({ handleClick }) {
   useEffect(() => {
     const queryJson = {
       table: 'project',
-      order: ['updated_at', 'DESC'],
+      order: ['updated_at', 'ASC'],
       limit: 5,
     };
 
@@ -20,6 +20,7 @@ function CurrentProjects({ handleClick }) {
       .invoke('fetchRecords', queryJson)
       .then((result) => {
         setProjectList(result);
+        console.log(result)
       })
       .catch((error) => console.warn(error));
   }, []);
