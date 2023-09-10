@@ -8,15 +8,12 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Box } from '@mui/material';
 import WorkSpace from './components/workspace/WorkSpace';
 import SideBar from './components/sidebar/Sidebar';
-import { ProjectContext, TabListContext } from './components/Context';
+import { ProjectContext } from './components/Context';
 import BoardList from './components/sidebar/Board/BoardList';
 import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
-import { collectNames } from './components/GlobalMethods';
-import TabList from './components/workspace/TabList';
 import QuickAccessArea from './components/sidebar/QuickAccess/QuickAccessArea';
 
 interface itemData {
@@ -31,11 +28,8 @@ interface itemData {
 function DragAndDrop() {
   const projectId = useLocation().state?.project_id;
   const [project, setProject] = useContext(ProjectContext);
-  const [tabList, setTabList] = useContext(TabListContext);
   const [activeItem, setActiveItem] = useState<itemData>();
   const [overItem, setOverItem] = useState<itemData>();
-  const [boardIndex, setBoardIndex] = useState([]);
-  const [pageIndex, setPageIndex] = useState();
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
   const [droppable, setDroppable] = useState<Boolean>(true);
@@ -100,12 +94,6 @@ function DragAndDrop() {
   async function updatePageList(thisProject: Project) {
     const tree: Node = await thisProject.createTree();
     setPageRoot(tree);
-    const itemsData = collectNames(tree);
-    const newary = itemsData.map(
-      (nodeItem) => `${nodeItem.type}-${nodeItem.id}`
-    );
-    const newIndex = newary.filter((item) => !item.startsWith('project'));
-    setPageIndex(newIndex);
   }
 
   async function updateBoardList(params: Project) {
@@ -126,6 +114,7 @@ function DragAndDrop() {
       boardList: ['board', 'folder'],
       boardBody: ['page', 'paper'],
       tab: ['editor', 'board-tab', 'trash'],
+      trash: ['page', 'folder', 'board', 'paper'],
     };
     if (activeItem.area === over) {
       return true;
@@ -180,7 +169,6 @@ function DragAndDrop() {
     folder: handleDataDroppedInFolder,
     boardList: handleDataDroppedInBoardList,
     boardBody: handleDataDroppedInBoardBody,
-    tab: ['editor', 'board-tab', 'trash'],
   };
 
   const DragEnd = () => {
@@ -501,139 +489,6 @@ function DragAndDrop() {
       return arrayMove(addedArray, oldIndex, newIndex);
     }
   }
-
-  // // 引数にあわせて更新する
-  // function updateList(area) {
-  //   // boardの場合、どれを更新するか。
-  //   const ids = [];
-  //   if (activeItem.type === 'paper') {
-  //     ids.push(activeItem?.parentId);
-  //   }
-  //   if (overItem.type === 'paper') {
-  //     ids.push(overItem?.parentId);
-  //   }
-  //   switch (area) {
-  //     case 'page-list':
-  //       updatePageList(project);
-  //       break;
-  //     case 'board-list':
-  //       updateBoardList(project);
-  //       break;
-  //     case 'paper':
-  //       window.electron.ipcRenderer.sendMessage('updateBoardPapers', ids);
-  //       break;
-  //     default:
-  //   }
-  // }
-
-  // // ドロップ後の処理分け
-  // function caseUpdate() {
-  //   updateList(activeItem.area);
-  //   if (activeItem.area !== overItem.area) {
-  //     updateList(overItem.area);
-  //   }
-  // }
-
-  // // 新規に登録する場合
-  // function createNewArg() {
-  //   // ボードリストにフォルダを移動した場合
-  //   if (overItem.id === 'board-list') {
-  //     const arg = {
-  //       table: 'folder',
-  //       id: activeItem?.itemId,
-  //       position: -1,
-  //       type: 'board',
-  //     };
-  //     return arg;
-  //   }
-  //   if (overItem.id === 'page-list') {
-  //     const arg = {
-  //       table: adjustTableName(activeItem.type),
-  //       id: activeItem?.itemId,
-  //       position: -1,
-  //     };
-  //     if (activeItem.type === 'board') {
-  //       arg.type = 'folder';
-  //     }
-  //     return arg;
-  //   }
-  //   if (overItem.id === 'paper-list') {
-  //     const arg = {
-  //       position: -1,
-  //       page_id: activeItem?.itemId,
-  //       folder_id: overItem?.parentId,
-  //     };
-  //     return arg;
-  //   }
-  // }
-
-  // function updatePaperIndex(index) {
-  //   const ary = [];
-  //   index.forEach((item, index) => {
-  //     const element = item.split('-');
-  //     if (element[0] === 'page') {
-  //       const arg = {
-  //         folder_id: overItem?.parentId,
-  //         page_id: parseInt(element[1]),
-  //         position: index,
-  //       };
-  //       ary.push(arg);
-  //     }
-  //     if (element[0] === 'paper') {
-  //       const arg = {
-  //         folder_id: overItem?.parentId,
-  //         page_id: parseInt(element[1]),
-  //         position: index,
-  //       };
-  //       ary.push(arg);
-  //     }
-  //   });
-  //   const values = [overItem?.parentId, ary];
-  //   return values;
-  // }
-
-  // function adjustTableName(name: string) {
-  //   switch (name) {
-  //     case 'board':
-  //       return 'folder';
-  //     case 'paper':
-  //       return 'page';
-  //     default:
-  //       return name;
-  //   }
-  // }
-
-  // function translateItem(params: [string, string], index: number) {
-  //   const table = adjustTableName(params[0]);
-  //   const arg = {
-  //     table,
-  //     id: parseInt(params[1]),
-  //     position: index,
-  //   };
-  //   // ページリスト→ボードリストの場合
-  //   if (table === 'folder' && activeItem.area !== overItem.area) {
-  //     arg.type = overItem.area === 'board-list' ? 'board' : 'folder';
-  //   }
-  //   return arg;
-  // }
-
-  // function translateForSidebar(pageIndex) {
-  //   const ary = [];
-  //   pageIndex.forEach((item, index) => {
-  //     const element = item.split('-');
-  //     if (element[0] === 'paper') {
-  //       // 紐づけを取得して削除
-  //       const value = {
-  //         page_id: parseInt(element[1]),
-  //         folder_id: activeItem?.parentId,
-  //       };
-  //       window.electron.ipcRenderer.sendMessage('destroyStore', value);
-  //     }
-  //     const arg = translateItem(element, index);
-  //     ary.push(arg);
-  //   });
-  //   return ary;
-  // }
 }
 
 export default DragAndDrop;
