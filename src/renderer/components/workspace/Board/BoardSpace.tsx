@@ -92,7 +92,7 @@ export default function BoardSpace({ boardData }) {
     window.electron.ipcRenderer.sendMessage('updateRecord', query);
   };
 
-  const changeBookmark = () => {
+  const changeBookmark = async () => {
     if (bookmark) {
       const query = {
         table: 'bookmark',
@@ -113,9 +113,10 @@ export default function BoardSpace({ boardData }) {
           project_id: project.id,
         },
       };
-      window.electron.ipcRenderer.invoke('insertRecord', query);
+      await window.electron.ipcRenderer.invoke('insertRecord', query);
       setBookmark(true);
     }
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
   return (

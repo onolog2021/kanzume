@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as PlusSvg } from '../../../../assets/new.svg';
+import ConfirmDialog from '../ConfirmDialog';
 
 export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const createNewPage = async () => {
     const titleValue = projectTitleRef.current.value;
@@ -30,7 +32,7 @@ export default function CreateProjectForm({ handleClick }) {
         <TextField
           fullWidth
           size="small"
-          label="プロジェクト名"
+          label="無題"
           inputRef={projectTitleRef}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -43,6 +45,12 @@ export default function CreateProjectForm({ handleClick }) {
           新規作成
         </Button>
       </Box>
+      <ConfirmDialog
+        open={isDialogOpen}
+        agree={() => {
+          console.log('agree');
+        }}
+      />
     </>
   );
 }

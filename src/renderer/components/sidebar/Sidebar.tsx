@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Drawer, Box } from '@mui/material';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
@@ -6,6 +6,7 @@ import SidebarItem from './SidebarItem';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
+  const [isHidden, setIsHidden] = useState<Boolean>(false);
 
   if (!project) {
     return <h1>loading...</h1>;

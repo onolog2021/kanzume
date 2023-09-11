@@ -32,7 +32,7 @@ function BookmarkButton({ page }) {
     }
   };
 
-  const addBookmark = () => {
+  const addBookmark = async () => {
     const query = {
       table: 'bookmark',
       columns: {
@@ -42,8 +42,9 @@ function BookmarkButton({ page }) {
         project_id: page.project_id,
       },
     };
-    window.electron.ipcRenderer.invoke('insertRecord', query);
+    await window.electron.ipcRenderer.invoke('insertRecord', query);
     setBookmark(true);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
   const removeBookmark = () => {

@@ -17,6 +17,7 @@ import PageList from './components/sidebar/PageList/PageList';
 import Project from './Classes/Project';
 import QuickAccessArea from './components/sidebar/QuickAccess/QuickAccessArea';
 import DragOverlayItem from './DragOverlayItem';
+import { getCurrentTime } from './components/GlobalMethods';
 
 interface itemData {
   dndId: string;
@@ -82,9 +83,9 @@ function DragAndDrop() {
       );
       const currentProject = new Project(projectData);
       setProject(currentProject);
-      const currentTime = new Date();
+      const currentTime = getCurrentTime();
       query.columns = {
-        updated_at: currentTime.toString(),
+        updated_at: currentTime,
       };
       window.electron.ipcRenderer.sendMessage('updateRecord', query);
       return currentProject;
@@ -188,9 +189,8 @@ function DragAndDrop() {
     if (activeItem?.dndId === overItem?.dndId && overItem.type !== 'folder') {
       return;
     }
-
     // 新しい順番の作成
-    const newOrder = createNewOrderArray();
+    const newOrder = overItem.type === 'area' ? [] : createNewOrderArray();
 
     // データの処理
     const areaFunction = dataFlowAfterDrop[overItem?.area];
@@ -260,6 +260,7 @@ function DragAndDrop() {
       window.electron.ipcRenderer.sendMessage('deleteRecord', deleteStoreQuery);
 
       const position = order.indexOf(activeItem?.dndId);
+      console.log(position);
       const updatePaperQuery = {
         table: 'page',
         columns: {
@@ -274,6 +275,7 @@ function DragAndDrop() {
 
     if (activeItem.type === 'board') {
       const position = order.indexOf(activeItem?.dndId);
+      console.log(position);
       const updateFolderQuery = {
         table: 'folder',
         columns: {
@@ -472,7 +474,6 @@ function DragAndDrop() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
       onDragStart={DragStart}
       onDragOver={DragOver}
       onDragEnd={DragEnd}

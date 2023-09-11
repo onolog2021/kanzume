@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  List,
-} from '@mui/material';
+import { List } from '@mui/material';
 import ProjectItem from './ProjectItem';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as DocumentsSvg } from '../../../../assets/documents.svg';
@@ -10,19 +8,22 @@ function CurrentProjects({ handleClick }) {
   const [projectlist, setProjectList] = useState<unknown[]>([]);
 
   useEffect(() => {
-    const queryJson = {
-      table: 'project',
-      order: ['updated_at', 'ASC'],
-      limit: 5,
-    };
+    async function fetchProjects() {
+      const queryJson = {
+        table: 'project',
+        order: ['updated_at', 'DESC'],
+        limit: 5,
+      };
 
-    window.electron.ipcRenderer
-      .invoke('fetchRecords', queryJson)
-      .then((result) => {
-        setProjectList(result);
-        console.log(result)
-      })
-      .catch((error) => console.warn(error));
+      const currentProjects = await window.electron.ipcRenderer.invoke(
+        'fetchRecords',
+        queryJson
+      );
+
+      setProjectList(currentProjects);
+    }
+
+    fetchProjects();
   }, []);
 
   return (

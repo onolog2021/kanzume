@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Box } from '@mui/material';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
@@ -13,16 +14,27 @@ function StartMenu() {
   };
 
   return (
-    <div className="startMenuWrapper">
+    <Box className="startMenuWrapper">
       <img src={LogoImage} alt="logo" className="logo" />
-      <div className="startMenu">
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat( 2, 1fr )',
+          gap: 10,
+          width: '50%',
+          mx: 'auto',
+          '@media (max-width: 960px)': {
+            width: '80%',
+          },
+        }}
+      >
         <CurrentProjects handleClick={openProject} />
-        <div>
+        <Box>
           <CreateProjectForm handleClick={openProject} />
           <SearchProjectForm handleClick={openProject} />
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

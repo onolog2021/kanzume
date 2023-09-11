@@ -19,3 +19,13 @@ export function gitDiffParse(diff: string) {
   // console.log(minus,plus)
   return diff;
 }
+
+export function getCurrentTime() {
+  const currentDate = new Date();
+  const offset = currentDate.getTimezoneOffset() * 60000;
+  const localISOTime = new Date(currentDate - offset)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
+  return localISOTime;
+}

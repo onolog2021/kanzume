@@ -24,7 +24,7 @@ function PageList({ root }) {
 
   const { setNodeRef } = useDroppable({
     id: 'page-list',
-    data: { area: 'pageList' },
+    data: { area: 'pageList', type: 'area' },
   });
 
   const switchNewForm = (status: string) => {
@@ -98,7 +98,7 @@ function PageList({ root }) {
           label="フォルダタイトル"
         />
       )}
-      <List ref={setNodeRef}>{root && <TreeBranch parentNode={root} />}</List>
+      <List ref={setNodeRef} sx={{background: 'tomato', py: 10}}>{root && <TreeBranch parentNode={root} />}</List>
     </>
   );
 }
