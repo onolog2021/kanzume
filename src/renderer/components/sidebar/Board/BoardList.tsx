@@ -1,4 +1,4 @@
-import { Button, List, IconButton } from '@mui/material';
+import { Button, List, IconButton, Box } from '@mui/material';
 import { useEffect, useState, useContext } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
@@ -20,7 +20,7 @@ function BoardList({ boards }) {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
   const [orderArray, setOrderArray] = useState();
-  const svg = <BoardIcon />;
+  const svg = <BoardIcon style={{ fill: '#999' }} />;
 
   const switchFormDisplay = (status: string) => {
     setFormDisplay(status);
@@ -28,13 +28,13 @@ function BoardList({ boards }) {
 
   const { setNodeRef } = useDroppable({
     id: 'board-list',
-    data: { area: 'boardList' },
+    data: { area: 'boardList', type: 'area' },
   });
 
   useEffect(() => {
     const boardOrderArray = boards.map((board) => `b-${board.id}`);
     setOrderArray(boardOrderArray);
-  }, []);
+  }, [boards]);
 
   const createNewBoard = async (title: string) => {
     const newBoard = new Folder({
@@ -82,7 +82,7 @@ function BoardList({ boards }) {
         />
       )}
       {orderArray && (
-        <List ref={setNodeRef}>
+        <List ref={setNodeRef} sx={{ py: 1 }}>
           <SortableContext items={orderArray}>
             {orderArray &&
               boards.map((board) => (

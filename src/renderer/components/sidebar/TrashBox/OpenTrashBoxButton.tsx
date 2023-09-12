@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, Box } from '@mui/material';
+import { useDroppable } from '@dnd-kit/core';
 import {
   CurrentPageContext,
   TabListContext,
@@ -9,6 +10,11 @@ import { ReactComponent as TraxhBoxIcon } from '../../../../../assets/trash.svg'
 function OpenTrashBoxButton() {
   const [tabList, setTabList] = useContext(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+
+  const { setNodeRef } = useDroppable({
+    id: 'sidebar-trashbox',
+    data: { area: 'trash', type: 'area' },
+  });
 
   const addTabList = () => {
     const value = {
@@ -24,13 +30,14 @@ function OpenTrashBoxButton() {
   };
 
   return (
-    <IconButton
-      onClick={addTabList}
-      aria-label="削除"
+    <Box
+      ref={setNodeRef}
       sx={{ width: 'fit-content', display: 'block', mt: 'auto' }}
     >
-      <TraxhBoxIcon />
-    </IconButton>
+      <IconButton onClick={addTabList} aria-label="削除">
+        <TraxhBoxIcon />
+      </IconButton>
+    </Box>
   );
 }
 

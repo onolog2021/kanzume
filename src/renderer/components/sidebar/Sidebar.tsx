@@ -1,8 +1,7 @@
 import { useState, useContext } from 'react';
-import { Drawer, Box } from '@mui/material';
+import { Drawer, Box, Typography, Hidden } from '@mui/material';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
-import SidebarItem from './SidebarItem';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
@@ -33,7 +32,18 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
       }}
     >
       <Box sx={{ mb: '40px' }}>
-        <h1>{project.title}</h1>
+        <Typography
+          sx={{
+            display: '-webkit-box',
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            fontSize: 13,
+            height: 18,
+            lineHeight: '18px',
+            my: 2,
+          }}
+        >{project.title}</Typography>
         {quickAccessArea}
         {pageList}
         {boardList}

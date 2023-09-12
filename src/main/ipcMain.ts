@@ -234,6 +234,7 @@ function createRecord(args) {
 
     db.run(sql, values, function (error) {
       if (error) {
+        console.log(error);
         reject(error);
       } else {
         resolve(this.lastID);
@@ -743,4 +744,8 @@ ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
     }
     return true;
   });
+});
+
+ipcMain.on('openFolder', (event, folderId) => {
+  event.reply('openFolder', folderId);
 });

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
+import { List } from '@mui/material';
 import QuickAccesItem from './QuickAccessItem';
 import { ReactComponent as QuickLogo } from '../../../../../assets/bookmark.svg';
 import CategoryTitle from '../CategoryTitle';
@@ -10,11 +11,11 @@ function QuickAccessArea() {
   const [project, setProject] = useContext(ProjectContext);
   const [bookmarks, setBookmarks] = useState([]);
   const [items, setItems] = useState([]);
-  const svg = <QuickLogo />;
+  const svg = <QuickLogo style={{fill: '#999'}}/>;
 
   const { setNodeRef } = useDroppable({
     id: 'quickAccess',
-    data: { area: 'quickAccess' },
+    data: { area: 'quickAccess', type: 'area' },
   });
 
   useEffect(() => {
@@ -51,18 +52,23 @@ function QuickAccessArea() {
       <div className="sidebarSectionName">
         <CategoryTitle svg={svg} categoryName="クイックアクセス" />
       </div>
-      {items && (
-        <SortableContext items={items}>
-          {bookmarks &&
-            bookmarks.map((item) => (
-              <QuickAccesItem
-                key={item.target + item.id}
-                item={item}
-                orderArray={items}
-              />
-            ))}
-        </SortableContext>
-      )}
+      <List
+        ref={setNodeRef}
+        sx={{ width: '100%', py: 1 }}
+      >
+        {items && (
+          <SortableContext items={items}>
+            {bookmarks &&
+              bookmarks.map((item) => (
+                <QuickAccesItem
+                  key={item.target + item.id}
+                  item={item}
+                  orderArray={items}
+                />
+              ))}
+          </SortableContext>
+        )}
+      </List>
     </>
   );
 }

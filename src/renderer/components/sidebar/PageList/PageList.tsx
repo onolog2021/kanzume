@@ -20,9 +20,9 @@ function PageList({ root }) {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [newForm, setNewForm] = useState(null);
-  const svg = <PageIcon />;
+  const svg = <PageIcon style={{ fill: '#999' }} />;
 
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: 'page-list',
     data: { area: 'pageList', type: 'area' },
   });
@@ -98,7 +98,15 @@ function PageList({ root }) {
           label="フォルダタイトル"
         />
       )}
-      <List ref={setNodeRef} sx={{background: 'tomato', py: 10}}>{root && <TreeBranch parentNode={root} />}</List>
+      <List
+        ref={setNodeRef}
+        sx={{
+          py: 1,
+          transition: 'background-color 1s ease',
+        }}
+      >
+        {root && <TreeBranch parentNode={root} />}
+      </List>
     </>
   );
 }

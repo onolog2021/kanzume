@@ -20,6 +20,9 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
         type: 'page',
         id: pageData.id,
         orderArray,
+        itemType: 'item',
+        bookmark: true,
+        content: pageData.title,
       },
     };
   } else {
@@ -31,6 +34,8 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
         id: pageData.id,
         parentId,
         orderArray,
+        itemType: 'item',
+        content: pageData.title,
       },
     };
   }
@@ -61,6 +66,18 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
     await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
+  const removeBookmark = () => {
+    const query = {
+      table: 'bookmark',
+      conditions: {
+        target: 'page',
+        target_id: pageData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('deleteRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
+  };
+
   const showInput = () => {
     setIsShowInput(true);
   };
@@ -89,11 +106,17 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
       menuName: '名前の変更',
       method: showInput,
     },
-    {
-      id: 'delete',
-      menuName: '削除',
-      method: softDelete,
-    },
+    bookmark
+      ? {
+          id: 'removeBookmark',
+          menuName: 'クイックアクセスから外す',
+          method: removeBookmark,
+        }
+      : {
+          id: 'delete',
+          menuName: '削除',
+          method: softDelete,
+        },
   ];
 
   const functions = {

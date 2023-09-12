@@ -8,7 +8,6 @@ import SidebarItem from '../SidebarItem';
 import CreateForm from '../PageList/CreateForm';
 
 function BoadItem({ board, orderArray, bookmark }) {
-  // const thisFolder = new Folder(folder);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [isShowInput, setIsShowInput] = useState(false);
@@ -17,15 +16,29 @@ function BoadItem({ board, orderArray, bookmark }) {
   if (bookmark) {
     dndTag = {
       id: `qb-${board.id}`,
-      data: { area: 'quickAccess', type: 'board', id: board.id, orderArray },
+      data: {
+        area: 'quickAccess',
+        type: 'board',
+        id: board.id,
+        orderArray,
+        itemType: 'item',
+        bookmark: true,
+        content: board.title,
+      },
     };
   } else {
     dndTag = {
       id: `b-${board.id}`,
-      data: { area: 'boardList', type: 'board', id: board.id, orderArray },
+      data: {
+        area: 'boardList',
+        type: 'board',
+        id: board.id,
+        orderArray,
+        itemType: 'item',
+        content: board.title,
+      },
     };
   }
-
 
   async function handleClick() {
     await setCurrentPage({ id: board.id, type: 'board' });
@@ -77,6 +90,18 @@ function BoadItem({ board, orderArray, bookmark }) {
     await window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
   };
 
+  const removeBookmark = () => {
+    const query = {
+      table: 'bookmark',
+      conditions: {
+        target: 'folder',
+        target_id: board.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('deleteRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
+  };
+
   const icon = <BoardLogo />;
 
   const menues = [
@@ -85,11 +110,17 @@ function BoadItem({ board, orderArray, bookmark }) {
       menuName: '名前の変更',
       method: showInput,
     },
-    {
-      id: 'delete',
-      menuName: '削除',
-      method: softDelete,
-    },
+    bookmark
+      ? {
+          id: 'removeBookmark',
+          menuName: 'クイックアクセスから外す',
+          method: removeBookmark,
+        }
+      : {
+          id: 'delete',
+          menuName: '削除',
+          method: softDelete,
+        },
   ];
 
   const functions = {

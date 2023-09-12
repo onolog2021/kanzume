@@ -31,8 +31,18 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
       id: folderData.id,
       parentId,
       orderArray,
+      itemType: 'item',
+      content: folderData.title,
     },
   };
+
+  const collapse = (
+    <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
+      {children && children.length > 0 && (
+        <TreeBranch parentNode={folderData} />
+      )}
+    </Collapse>
+  );
 
   const handleClick = () => {
     setOpen(!open);
@@ -40,6 +50,14 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
 
   useEffect(() => {
     getPages();
+
+    const handleOpenFolder = (folderId) => {
+      if (folderId === folderData.id) {
+        setOpen(true);
+      }
+    };
+
+    window.electron.ipcRenderer.on('openFolder', handleOpenFolder);
   }, []);
 
   async function getPages() {
@@ -128,19 +146,13 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
   }
 
   return (
-    <>
-      <SidebarItem
-        icon={icon}
-        text={folderData.title}
-        functions={functions}
-        dndTag={dndTag}
-      />
-      <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
-        {children && children.length > 0 && (
-          <TreeBranch parentNode={folderData} />
-        )}
-      </Collapse>
-    </>
+    <SidebarItem
+      icon={icon}
+      text={folderData.title}
+      functions={functions}
+      dndTag={dndTag}
+      collapse={collapse}
+    />
   );
 }
 
