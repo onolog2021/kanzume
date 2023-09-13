@@ -85,16 +85,16 @@ function EditorBody({ targetId, page_id, title }) {
     await window.electron.ipcRenderer.invoke('commitPage', page.id);
   };
 
-  const togglePageStatus = () => {
-    setPageStatus('history');
-  };
+  function togglePageStatus(param) {
+    setPageStatus(param);
+  }
 
   if (!project) {
     return <h1>Loading...</h1>;
   }
 
   if (pageStatus === 'history') {
-    return <HistorySpace pageId={page.id} />;
+    return <HistorySpace pageId={page.id} changeStatus={togglePageStatus} />;
   }
 
   return (
@@ -106,7 +106,7 @@ function EditorBody({ targetId, page_id, title }) {
           <BookmarkButton page={page} />
           <TextSetting changeFontFunc={changeFontStyle} />
           <Button onClick={commitPage}>JSON出力</Button>
-          <Button onClick={togglePageStatus}>切り替え</Button>
+          <Button onClick={() => togglePageStatus('history')}>切り替え</Button>
         </div>
       </Box>
     </div>

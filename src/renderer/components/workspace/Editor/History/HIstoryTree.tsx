@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import HistoryItem from './HistoryItem';
 
-export default function HistoryTree({ pageId, selectFunc }) {
+export default function HistoryTree({ pageId, selectFunc, selected }) {
   const [project] = useContext(ProjectContext);
   const [logs, setLogs] = useState([]);
 
@@ -14,7 +14,7 @@ export default function HistoryTree({ pageId, selectFunc }) {
         project_id: project.id,
       };
       const result = await window.electron.ipcRenderer.invoke('gitLog', query);
-      if(result){
+      if (result) {
         setLogs(result.all);
       }
     }
@@ -24,25 +24,36 @@ export default function HistoryTree({ pageId, selectFunc }) {
     }
   }, [project]);
 
+  const selectedFunc = (paramHash: string) => {
+    setSelected(paramHash);
+  };
+
   return (
     <Box
       sx={{
+        my: 4,
+        mx: 12,
         position: 'relative',
         minHeight: 400,
         ':before': {
           content: '""',
           position: 'absolute',
-          width: '2px',
+          width: '4px',
           height: '100%',
           top: '24px',
           left: -2,
-          backgroundColor: 'gray',
+          backgroundColor: '#D9D9D9',
         },
       }}
     >
       {logs &&
         logs.map((log) => (
-          <HistoryItem key={log.hash} log={log} selectFunc={selectFunc} />
+          <HistoryItem
+            key={log.hash}
+            log={log}
+            selectFunc={selectFunc}
+            selected={selected}
+          />
         ))}
     </Box>
   );

@@ -1,3 +1,5 @@
+import { DiffMatchPatch } from "diff-match-patch-typescript";
+
 export function dateTranslateForYYMMDD(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -13,11 +15,13 @@ export function editorTextToPlaneText(json) {
 }
 
 export function gitDiffParse(diff: string) {
-  // const lines = diff.split('\n');
-  // const minus = lines.filter((item) => item.startsWith('-{'));
-  // const plus = lines.filter((item) => item.startsWith('+{'));
-  // console.log(minus,plus)
-  return diff;
+  const hunkPattern = /@@.*?@@[\s\S]*?(?=@@|$)/g;
+  const hanks = diff.match(hunkPattern);
+  if (hanks?.length > 1) {
+    const objectPattern = /{[^}]+}/g;
+    const textpart = hanks?.slice(1);
+    return textpart;
+  }
 }
 
 export function getCurrentTime() {
@@ -28,4 +32,11 @@ export function getCurrentTime() {
     .slice(0, 19)
     .replace('T', ' ');
   return localISOTime;
+}
+
+export function getDiff(textA: string, textB: string){
+  const dmp = new DiffMatchPatch();
+  const diff = dmp.diff_main(textA, textB);
+  dmp.diff_cleanupSemantic(diff);
+  return diff;
 }
