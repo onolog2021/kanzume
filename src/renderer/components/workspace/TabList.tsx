@@ -5,24 +5,21 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { DndContext } from '@dnd-kit/core';
 import TabItem from './TabItem';
 import { ReactComponent as TrackButton } from '../../../../assets/expand.svg';
 
 function TabList() {
   const [orderArray, setOrderArray] = useState();
   const [tabList, setTabList] = useContext(TabListContext);
-  const tabListRef = useRef();
+  const tabListRef = useRef(null);
 
   useEffect(() => {
     const tabOrderArray = tabList.map((tab) => {
       let dndtagId;
-      if (tab.type === 'editor') {
-        dndtagId = `te-${tab.id}`;
-      } else if (tab.type === 'board') {
-        dndtagId = `tb-${tab.id}`;
+      if (tab.type === 'trash') {
+        dndtagId = 'tab-trash';
       } else {
-        dndtagId = 'trash';
+        dndtagId = `tab-${tab.type}-${tab.id}`;
       }
       return dndtagId;
     });

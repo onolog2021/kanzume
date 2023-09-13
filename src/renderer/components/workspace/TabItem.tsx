@@ -2,47 +2,38 @@ import { useContext, useState, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import {
   CurrentPageContext,
-  ProjectContext,
   TabListContext,
 } from 'renderer/components/Context';
 import { CSS } from '@dnd-kit/utilities';
-import { Button, IconButton, Tab } from '@mui/material';
+import {
+  IconButton,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+} from '@mui/material';
 import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
+import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
+import { ReactComponent as BoardIcon } from '../../../../assets/board.svg';
 
 function TabItem({ tab, orderArray }) {
-  const [project] = useContext(ProjectContext);
+  const { id, tabId } = tab;
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
-  const [title, setTitle] = useState<string>(tab.title);
-  const { id } = tab;
-  const [input, setInput] = useState(false);
 
-  // dndTag
-  let dndTag;
-  if (tab.type === 'editor') {
-    dndTag = {
-      id: `te-${tab.id}`,
-      data: { area: 'tab', type: 'editor', id: tab.id, orderArray },
-    };
-  } else if (tab.type === 'board') {
-    dndTag = {
-      id: `tb-${tab.id}`,
-      data: { area: 'tab', type: 'board-tab', id: tab.id, orderArray },
-    };
-  } else {
-    dndTag = {
-      id: `trash`,
-      data: { area: 'tab', type: 'trash', id: tab.id, orderArray },
-    };
-  }
+  const svg = tab.type === 'editor' ? <PageIcon /> : <BoardIcon />;
 
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable(dndTag);
+  const { attributes, listeners, setNodeRef } = useSortable({
+    id: tabId,
+    data: {
+      area: 'tab',
+      type: 'trash',
+      id: tab.id,
+      orderArray,
+      content: tab.title,
+    },
+  });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = {};
 
   const handleActiveTab = (id: number) => {
     const value = { id, type: tab.type };
@@ -60,15 +51,44 @@ function TabItem({ tab, orderArray }) {
   };
 
   return (
-    <div
+    <ListItemButton
       className={currentPage.id === id ? 'tab selected' : 'tab'}
       onClick={() => handleActiveTab(id)}
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
+      style={style}
+      sx={{
+        background: '#E9E9E9;',
+        minWidth: 200,
+        height: 48,
+        lineHeight: '48px',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        mr: 0.5,
+        button: {
+          display: 'none',
+        },
+        ':hover': {
+          button: {
+            display: 'block',
+          },
+        },
+      }}
     >
-      <p>{title}</p>
+      <ListItemIcon>{svg}</ListItemIcon>
+      <ListItemText
+        primary={tab.title}
+        primaryTypographyProps={{ fontSize: 12 }}
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          webkitBoxOrient: 'vertical',
+          webkitLineClamp: 1,
+        }}
+      />
       <IconButton
         onClick={closeTab}
         sx={{
@@ -83,7 +103,7 @@ function TabItem({ tab, orderArray }) {
       >
         <CloseButton style={{ fill: 'gray', width: 12, height: 12 }} />
       </IconButton>
-    </div>
+    </ListItemButton>
   );
 }
 

@@ -215,7 +215,7 @@ function DragAndDrop() {
     boardBody: 'updateBoardBody',
   };
 
-  const DragEnd = () => {
+  const DragEnd = ({ over }) => {
     // dropした場所は？
     const droppedPlace = overItem?.itemType;
 
@@ -227,6 +227,21 @@ function DragAndDrop() {
     }
 
     // ソート
+    if (overItem?.area === 'tab') {
+      const parentArray = overItem.orderArray;
+      const oldIndex = parentArray.indexOf(activeItem?.dndId);
+      const newIndex = parentArray.indexOf(overItem?.dndId);
+      console.log(oldIndex, newIndex);
+
+      const newOrder = arrayMove(overItem.orderArray, oldIndex, newIndex);
+      const tmpArray = [];
+      newOrder.forEach((element) => {
+        const matchTab = tabList.find((tab) => tab.tabId === element);
+        tmpArray.push(matchTab);
+      });
+      setTablist(tmpArray);
+    }
+
     if (droppedPlace === 'border' || overItem.area === 'trash') {
       const newOrder = overItem.type === 'area' ? [] : createNewOrderArray();
       // データの処理
@@ -303,7 +318,6 @@ function DragAndDrop() {
       page: 'editor',
       board: 'board',
     };
-
     const newTabList = [
       ...tabList.filter(
         (item) =>
@@ -331,7 +345,9 @@ function DragAndDrop() {
         />
         <WorkSpace />
       </div>
-      <DragOverlayItem droppable={droppable} content={activeItem.content} />
+      {activeItem && (
+        <DragOverlayItem droppable={droppable} content={activeItem?.content} />
+      )}
     </DndContext>
   );
 

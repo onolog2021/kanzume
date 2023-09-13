@@ -20,7 +20,7 @@ export default function DragOverlayItem({ droppable, content }) {
           whiteSpace: 'nowrap',
           px: 2,
         }}
-      >{content}</Box>
+      >{content && content}</Box>
     </DragOverlay>
   );
 }
