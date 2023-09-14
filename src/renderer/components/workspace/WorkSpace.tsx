@@ -22,7 +22,7 @@ function WorkSpace() {
         content = (
           <div style={isCurrent(tab)} key={`page-${tab.id}`} className="panel">
             <EditorBody
-              targetId={`tab-${tab.id}`}
+              targetId={tab.tabId}
               page_id={tab.id}
               title={tab.title}
             />

@@ -15,6 +15,7 @@ import HistorySpace from './History/HistorySpace';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
+  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [page, setPage] = useState();
   const [editor, setEditor] = useState(null);
   const [fontStyle, setFontStyle] = useState('Meiryo');
@@ -52,6 +53,12 @@ function EditorBody({ targetId, page_id, title }) {
     }, 100);
     return () => clearInterval(timer);
   }, []);
+
+  // useEffect(() => {
+  //   if (page_id === currentPage.id && editor) {
+  //     editor.setFirst();
+  //   }
+  // }, [currentPage]);
 
   const softDelete = () => {
     const query = {

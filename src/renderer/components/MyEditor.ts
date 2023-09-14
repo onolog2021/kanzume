@@ -17,7 +17,7 @@ function debounce(func, wait) {
 export default class MyEditor {
   private editor: EditorJS;
 
-  constructor(targetId: string, pageId: number) {
+  constructor(targetId: string, pageId: number, minHeight = 0) {
     if (pageId) {
       const getPageData = async () => {
         const query = {
@@ -31,21 +31,23 @@ export default class MyEditor {
 
         const textData = !pageData ? {} : JSON.parse(pageData.content);
 
-        this.initializeEditor(textData, targetId, pageId); // getPageData 完了後にエディタを初期化
+        this.initializeEditor(textData, targetId, pageId, minHeight); // getPageData 完了後にエディタを初期化
       };
       getPageData();
     } else {
-      this.initializeEditor({}, targetId); // pageId がない場合もエディタを初期化
+      this.initializeEditor({}, targetId, null, minHeight); // pageId がない場合もエディタを初期化
     }
   }
 
   private initializeEditor(
     textData: any,
     targetId: string,
-    pageId: number | null
+    pageId: number | null,
+    minHeight: number | null
   ) {
     this.editor = new EditorJS({
       holder: targetId,
+      minHeight,
       tools: {
         // header: {
         //   class: Header,
@@ -59,7 +61,10 @@ export default class MyEditor {
       data: textData,
       inlineToolbar: true,
       onReady: () => {
-        new Undo({ editor: this.editor });
+        const { caret } = this.editor;
+        caret.setToLastBlock('end', 0);
+
+        // const undo = new Undo({ editor: this.editor });
       },
       onChange: debounce(async (api, event) => {
         const data = await api.saver.save();
