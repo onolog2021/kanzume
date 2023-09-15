@@ -12,6 +12,7 @@ import BookmarkButton from './BookmarkButton';
 import TextSetting from './TextSetting';
 import PageTitleForm from '../PageTitleForm';
 import HistorySpace from './History/HistorySpace';
+import EditorItem from './EditorItem';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
@@ -21,9 +22,9 @@ function EditorBody({ targetId, page_id, title }) {
   const [fontStyle, setFontStyle] = useState('Meiryo');
   const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
 
-  const style = {
-    fontFamily: fontStyle,
-  };
+  // const style = {
+  //   fontFamily: fontStyle,
+  // };
 
   useEffect(() => {
     async function setPageData() {
@@ -40,39 +41,27 @@ function EditorBody({ targetId, page_id, title }) {
       setPage(pageData);
     }
     setPageData();
-
-    if (editor) {
-      editor.destroy();
-    }
-    const timer = setInterval(() => {
-      if (document.getElementById(targetId)) {
-        clearInterval(timer);
-        const editorInstance = new MyEditor(targetId, page_id);
-        setEditor(editorInstance);
-      }
-    }, 100);
-    return () => clearInterval(timer);
   }, []);
 
-  // useEffect(() => {
-  //   if (page_id === currentPage.id && editor) {
-  //     editor.setFirst();
-  //   }
-  // }, [currentPage]);
+  // // useEffect(() => {
+  // //   if (page_id === currentPage.id && editor) {
+  // //     editor.setFirst();
+  // //   }
+  // // }, [currentPage]);
 
-  const softDelete = () => {
-    const query = {
-      table: 'page',
-      conditions: {
-        id: page_id,
-      },
-    };
-    window.electron.ipcRenderer.sendMessage('softDelete', query);
-  };
+  // const softDelete = () => {
+  //   const query = {
+  //     table: 'page',
+  //     conditions: {
+  //       id: page_id,
+  //     },
+  //   };
+  //   window.electron.ipcRenderer.sendMessage('softDelete', query);
+  // };
 
-  const changeFontStyle = (font: string) => {
-    setFontStyle(font);
-  };
+  // const changeFontStyle = (font: string) => {
+  //   setFontStyle(font);
+  // };
 
   const saveTitle = (title: string) => {
     const query = {
@@ -87,14 +76,14 @@ function EditorBody({ targetId, page_id, title }) {
     window.electron.ipcRenderer.sendMessage('updateRecord', query);
   };
 
-  const commitPage = async () => {
-    // await editor.save();
-    await window.electron.ipcRenderer.invoke('commitPage', page.id);
-  };
+  // const commitPage = async () => {
+  //   // await editor.save();
+  //   await window.electron.ipcRenderer.invoke('commitPage', page.id);
+  // };
 
-  function togglePageStatus(param) {
-    setPageStatus(param);
-  }
+  // function togglePageStatus(param) {
+  //   setPageStatus(param);
+  // }
 
   if (!project) {
     return <h1>Loading...</h1>;
@@ -106,8 +95,13 @@ function EditorBody({ targetId, page_id, title }) {
 
   return (
     <div className="editorBody">
-      {page && <PageTitleForm onBlur={saveTitle} defaultValue={page.title} />}
-      <Box display="grid" gridTemplateColumns="1fr 24px" position="relative">
+      {page && (
+        <>
+          <PageTitleForm onBlur={saveTitle} defaultValue={page.title} />
+          <EditorItem page={page} />
+        </>
+      )}
+      {/* <Box display="grid" gridTemplateColumns="1fr 24px" position="relative">
         <div id={targetId} className="editorJS" style={style} />
         <div className="editorTools">
           <BookmarkButton page={page} />
@@ -115,7 +109,7 @@ function EditorBody({ targetId, page_id, title }) {
           <Button onClick={commitPage}>JSON出力</Button>
           <Button onClick={() => togglePageStatus('history')}>切り替え</Button>
         </div>
-      </Box>
+      </Box> */}
     </div>
   );
 }

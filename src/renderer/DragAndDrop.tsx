@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { DndContext, useSensors, useSensor, MouseSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
@@ -39,7 +39,7 @@ function DragAndDrop() {
   const [pageRoot, setPageRoot] = useState();
   const [boards, setBoards] = useState([]);
   const [droppable, setDroppable] = useState<Boolean>(true);
-  const [timeId, setTimeId] = useState(null);
+  const timeId = useRef(null);
   const [tabList, setTablist] = useContext(TabListContext);
 
   const mouseSensor = useSensor(MouseSensor, {
@@ -161,8 +161,8 @@ function DragAndDrop() {
   };
 
   const DragOver = ({ over }) => {
-    if (timeId !== null) {
-      clearTimeout(timeId);
+    if (timeId.current !== null) {
+      clearTimeout(timeId.current);
     }
 
     if (!over) {
@@ -191,10 +191,10 @@ function DragAndDrop() {
 
     if (type === 'folder') {
       const timeoutId = setTimeout(() => {
-        setTimeId(null);
+        timeId.current = null;
         window.electron.ipcRenderer.sendMessage('openFolder', overItemData.id);
       }, 1500);
-      setTimeId(timeoutId);
+      timeId.current = timeoutId;
     }
   };
 
@@ -231,7 +231,6 @@ function DragAndDrop() {
       const parentArray = overItem.orderArray;
       const oldIndex = parentArray.indexOf(activeItem?.dndId);
       const newIndex = parentArray.indexOf(overItem?.dndId);
-      console.log(oldIndex, newIndex);
 
       const newOrder = arrayMove(overItem.orderArray, oldIndex, newIndex);
       const tmpArray = [];

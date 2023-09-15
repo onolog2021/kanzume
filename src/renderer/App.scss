@@ -254,7 +254,9 @@ body {
 }
 
 // editorJs関連
-.ce-toolbar{
-  display: none;
-  // opacity: 0;
+$workspace-width: calc(100vw - 240px);
+
+.tiptap{
+  padding-left: calc(($workspace-width - 600px)/2);
+  padding-right: calc(($workspace-width - 600px)/2);
 }
