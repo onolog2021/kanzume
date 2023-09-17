@@ -5,9 +5,9 @@ function PageTitleForm({ onBlur, defaultValue }) {
   const titleRef = useRef();
 
   const runOnBlurFunc = () => {
-    const title = titleRef.current.value
+    const title = titleRef.current.value;
     onBlur(title);
-  }
+  };
 
   return (
     <TextField
@@ -15,8 +15,10 @@ function PageTitleForm({ onBlur, defaultValue }) {
       defaultValue={defaultValue}
       variant="standard"
       aria-label="title"
-      onBlur={runOnBlurFunc}
       sx={{
+        display: 'block',
+        width: 600,
+        mx: 'auto',
         '& input': {
           fontWeight: '700',
         },
