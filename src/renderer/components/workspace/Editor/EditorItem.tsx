@@ -7,14 +7,41 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 import CharacterCount from '@tiptap/extension-character-count';
 import History from '@tiptap/extension-history';
+import TextStyle from '@tiptap/extension-text-style';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
-import { Ruby, RubyReading } from './Ruby';
 
 function MyEditor({ page }) {
   const editor = useRef();
   const timeoutId = useRef(null);
   const [editorStatus, setEditorStatus] = useState(false);
   const [textCount, setTextCount] = useState(0);
+
+  const Ruby = TextStyle.extend({
+    addAttributes() {
+      return {
+        class: {
+          default: 'ruby',
+        },
+        ruby: {
+          default: '',
+        },
+      };
+    },
+    addCommands() {
+      return {
+        setRubyReading:
+          (rubyReading: string = 'test') =>
+          ({ commands }) => {
+            commands.updateAttributes('textStyle', { ruby: rubyReading });
+          },
+        toggleRuby:
+          () =>
+          ({ commands }) => {
+            commands.toggleMark('textStyle');
+          },
+      };
+    },
+  });
 
   useEffect(() => {
     async function initialSetUp() {
@@ -27,7 +54,6 @@ function MyEditor({ page }) {
           CharacterCount,
           History,
           Ruby,
-          RubyReading
         ],
         content: page.content ? JSON.parse(page.content) : '',
         onUpdate: () => {

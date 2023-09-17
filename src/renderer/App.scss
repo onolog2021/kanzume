@@ -10,7 +10,7 @@ $editor-body-height: calc(100vh - #{$tab-list-height + $editor-title-height});
 
 $editor-height: (
   'tab-list': $tab-list-height,
-  'editor-title': $editor-title-height,
+  'editor-title': $editor-title-height
 );
 
 * {
@@ -108,7 +108,7 @@ body {
 }
 
 // workSpace
-.panel{
+.panel {
   padding-top: 80px;
   min-height: 100vh;
 }
@@ -126,7 +126,7 @@ body {
   }
 }
 
-.editorBody{
+.editorBody {
   min-height: calc(100vh - 48px);
 }
 
@@ -236,15 +236,15 @@ body {
   -webkit-box-orient: vertical;
   cursor: pointer;
   text-align: left;
-  border-right: .1px solid #d5d5d5;
+  border-right: 0.1px solid #d5d5d5;
   max-width: 120px;
-  p{
-  display: -webkit-box;
-  white-space: nowrap;
-  word-break: break-all;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 48px;
+  p {
+    display: -webkit-box;
+    white-space: nowrap;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 48px;
   }
   &.selected {
     font-size: 1.6rem;
@@ -256,7 +256,28 @@ body {
 // editorJs関連
 $workspace-width: calc(100vw - 240px);
 
-.tiptap{
-  padding-left: calc(($workspace-width - 600px)/2);
-  padding-right: calc(($workspace-width - 600px)/2);
+.ProseMirror:focus {
+  outline: none;
+}
+
+.tiptap {
+  height: calc(100vh - 80px);
+  padding-left: calc(($workspace-width - 600px) / 2);
+  padding-right: calc(($workspace-width - 600px) / 2);
+  .ruby{
+    position: relative;
+    &:hover {
+      color: $main-color;
+      font-weight: bold;
+    }
+    &::before{
+      width: 100%;
+      content: attr(ruby);
+      position: absolute;
+      font-size: 1rem;
+      white-space: nowrap;
+      text-align: center;
+      top: -10px;
+    }
+  }
 }

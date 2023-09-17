@@ -1,46 +1,68 @@
 import { useState, useRef } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  ClickAwayListener,
+  IconButton,
+} from '@mui/material';
+import RubyForm from './RubyForm';
+import { ReactComponent as BoldIcon } from '../../../../../assets/bold.svg';
+import { ReactComponent as RubyIcon } from '../../../../../assets/ruby.svg';
 
 export default function KanzumeBubbleMenu({ editor }) {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState();
-  const rubiValueRef = useRef();
+  const [onMenu, setOnMenu] = useState<'ruby' | 'search' | null>(null);
+  const { selection } = editor;
 
-  const addRubi = () => {
-    const { selection } = editor.state;
-    const selectedText = editor.state.doc.textBetween(
-      selection.from,
-      selection.to
-    );
-    if (selectedText) {
-      // const rubyTaggedText = `<ruby>${selectedText}</ruby>`;
-      // editor.chain().focus().setRuby().run();
-      editor.chain().wrapRuby().run();
-    }
-    setSelected(selectedText);
-    setOpen(true);
+  const buttonStyle = {
+    p: 1,
+    background: 'white',
+    borderRadius: 4,
+    border: '.2px solid gray',
   };
 
-  const rubiForm = (
-    <Box
-      sx={{
-        display: open ? 'block' : 'none',
-      }}
-    >
-      <p>{selected}</p>
-      <TextField inputRef={rubiValueRef} />
-      {/* <Button onClick={}>決定</Button> */}
-    </Box>
-  );
+  const menuMap = {
+    ruby: <RubyForm editor={editor} closeMenu={closeMenu} />,
+  };
+
+  function menuToggle(menu: 'ruby' | 'search' | null) {
+    setOnMenu(menu);
+    editor.commands.focus();
+  }
+  function closeMenu() {
+    setOnMenu(null);
+  }
 
   return (
-    <Box sx={{ background: 'white' }}>
-      {rubiForm}
-
-      <button onClick={() => editor.chain().toggleBold().focus().run()}>
-        Bold
-      </button>
-      <button onClick={addRubi}>Ruby</button>
+    <Box
+      sx={{
+        py: 1,
+        px: 2,
+        zIndex: 200,
+        background: 'white',
+        border: '.2px solid gray',
+        boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.25)',
+        borderRadius: 1,
+      }}
+    >
+      {onMenu && menuMap[onMenu]}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          width: 'fit-content',
+        }}
+      >
+        <IconButton
+          style={buttonStyle}
+          onClick={() => editor.chain().toggleBold().focus().run()}
+        >
+          <BoldIcon style={{ width: 16, height: 16, fill: '#555' }} />
+        </IconButton>
+        <IconButton style={buttonStyle} onClick={() => menuToggle('ruby')}>
+          <RubyIcon style={{ width: 16, height: 16, fill: '#555' }} />
+        </IconButton>
+      </Box>
     </Box>
   );
 }

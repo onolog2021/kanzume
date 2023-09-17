@@ -55,7 +55,6 @@ export default function BoardSpace({ boardData }) {
         title: '無題',
         position: -1,
         project_id: project.id,
-        content: '{}',
       },
     };
     const page_id = await window.electron.ipcRenderer.invoke(

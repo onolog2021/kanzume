@@ -33,7 +33,6 @@ function TabItem({ tab, orderArray }) {
     },
   });
 
-  const style = {};
 
   const handleActiveTab = (id: number) => {
     const value = { id, type: tab.type };
@@ -57,7 +56,6 @@ function TabItem({ tab, orderArray }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      style={style}
       sx={{
         background: '#E9E9E9;',
         minWidth: 200,

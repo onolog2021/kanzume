@@ -1,63 +1,57 @@
 import { mergeAttributes, Mark } from '@tiptap/core';
 
-// Define the RubyReading mark
-export const RubyReading = Mark.create({
-  name: 'rt',
-  // defaultOptions: {
-  //   HTMLAttributes: {},
-  // },
-  parseHTML() {
-    return [{ tag: 'rt' }];
-  },
-  renderHTML({ HTMLAttributes }) {
-    return [
-      'rt',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
-  },
-});
-
 // Define the Ruby mark
-export const Ruby = Mark.create({
+const Ruby = Mark.create({
   name: 'ruby',
-  // defaultOptions: {
-  //   HTMLAttributes: {},
-  // },
+
   content: 'text*',
+
+  addAttributes() {
+    return {
+      class: {
+        default: 'ruby',
+      },
+      ruby: {
+        default: 'ruby',
+      },
+    };
+  },
+
   parseHTML() {
     return [
       {
-        tag: 'ruby',
+        tag: 'span',
       },
     ];
   },
   renderHTML({ HTMLAttributes }) {
-    return ['ruby', HTMLAttributes, 0];
+    return ['span', HTMLAttributes, 0];
   },
-  // addKeyboardShortcuts() {
-  //   return {
-  //     'Mod-u': () => this.editor.commands.addRuby(),
-  //   };
-  // },
   addCommands() {
     return {
-      addRuby:
-        () =>
+      toggleRuby:
+        (selection) =>
         ({ commands, editor }) => {
-          const { from, to } = editor.state.selection;
-          const text = editor.state.doc.textBetween(from, to, ' ');
-          const placeholder = '???';
-          const replacement = `<ruby>${text}<rt>${placeholder}</rt></ruby>`;
+        },
+      addRuby:
+        (rubi = 'rubi', selection) =>
+        ({ commands, editor }) => {
+          if (!selection) return false;
+          const text = editor.state.doc.textBetween(
+            selection.from,
+            selection.to,
+            ' '
+          );
+          const replacement = `<span>${text}</span>`;
           commands.insertContent(replacement);
 
-          // set selection on new furigana (which follows the text)
           return commands.setTextSelection({
-            from: to,
-            to: to + placeholder.length,
+            from: selection.from,
+            to: selection.to,
           });
         },
     };
   },
 });
 
+export default Ruby;

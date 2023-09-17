@@ -37,7 +37,6 @@ function PageList({ root }) {
       columns: {
         title,
         project_id: project.id,
-        content: '{}',
         position: -1,
       },
     };
