@@ -58,6 +58,10 @@ function EditorBody({ targetId, page_id, title }) {
   //   window.electron.ipcRenderer.sendMessage('softDelete', query);
   // };
 
+  const toggleStatus = (status) => {
+    setPageStatus(status);
+  };
+
   const saveTitle = (title: string) => {
     const query = {
       table: 'page',
@@ -76,21 +80,20 @@ function EditorBody({ targetId, page_id, title }) {
   }
 
   if (pageStatus === 'history') {
-    return <HistorySpace pageId={page.id} changeStatus={togglePageStatus} />;
+    return <HistorySpace pageId={page.id} toggleStatus={toggleStatus} />;
   }
-
 
   return (
     <div className="editorBody">
-      <Box display="grid" gridTemplateColumns="1fr 24px" position="relative">
+      <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
           <Box>
             <PageTitleForm onBlur={saveTitle} defaultValue={page.title} />
             <EditorItem page={page} />
           </Box>
         )}
+        <EditorTools page={page} toggleStatus={toggleStatus} />
       </Box>
-      <EditorTools page={page} />
     </div>
   );
 }

@@ -100,7 +100,6 @@
     "@editorjs/editorjs": "^2.27.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.14.1",
     "@mui/material": "^5.14.2",
     "@tiptap/extension-character-count": "^2.1.8",
     "@tiptap/extension-text-style": "^2.1.10",

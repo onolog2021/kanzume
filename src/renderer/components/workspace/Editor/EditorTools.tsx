@@ -4,7 +4,7 @@ import TextSetting from './TextSetting';
 import { ReactComponent as HistoryIcon } from '../../../../../assets/history.svg';
 import { ReactComponent as MarkerIcon } from '../../../../../assets/marker.svg';
 
-export default function EditorTools({ page }) {
+export default function EditorTools({ page, toggleStatus }) {
   const changeFontStyle = (font: string) => {
     setFontStyle(font);
   };
@@ -14,19 +14,18 @@ export default function EditorTools({ page }) {
     await window.electron.ipcRenderer.invoke('commitPage', page.id);
   };
 
-  function togglePageStatus(param) {
-    alert('change!');
+  function togglePageStatus() {
+    toggleStatus('history');
   }
 
   return (
     <Box className="editorTools">
       <BookmarkButton page={page} />
       <TextSetting changeFontFunc={changeFontStyle} />
-      {/* <Button onClick={commitPage}>JSON出力</Button> */}
-      <IconButton>
+      <IconButton onClick={commitPage}>
         <MarkerIcon />
       </IconButton>
-      <IconButton onClick={() => togglePageStatus('history')}>
+      <IconButton onClick={() => togglePageStatus()}>
         <HistoryIcon />
       </IconButton>
     </Box>

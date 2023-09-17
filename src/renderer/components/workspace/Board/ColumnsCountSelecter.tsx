@@ -14,7 +14,7 @@ function ColumnsCountSelector({ changeColumnsCount }) {
     <Box display="flex" gap={2}>
       <Rating
         name="columns-selecter"
-        defaultValue={2}
+        defaultValue={3}
         icon={<Rectangle style={{ height: 30, fill: 'tomato' }} />}
         emptyIcon={<Rectangle style={{ height: 30, fill: 'white' }} />}
         onChange={runChangeColumnsCount}

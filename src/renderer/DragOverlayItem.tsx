@@ -7,10 +7,12 @@ export default function DragOverlayItem({ droppable, content }) {
     backgroundColor: droppable ? '#f2efe6' : 'gray',
   };
 
-  const forbidden = <ForbiddenMark style={{position: 'absolute', top: -10, fill: 'tomato'}}/>;
+  const forbidden = (
+    <ForbiddenMark style={{ position: 'absolute', top: -10, fill: 'tomato' }} />
+  );
 
   return (
-    <DragOverlay dropAnimation={null} style={{ zIndex: 1200,}}>
+    <DragOverlay dropAnimation={null} style={{ zIndex: 1200 }}>
       {droppable ? null : forbidden}
       <Box
         sx={{
@@ -20,7 +22,9 @@ export default function DragOverlayItem({ droppable, content }) {
           whiteSpace: 'nowrap',
           px: 2,
         }}
-      >{content && content}</Box>
+      >
+        {content && content}
+      </Box>
     </DragOverlay>
   );
 }

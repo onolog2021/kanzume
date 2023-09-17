@@ -3,7 +3,7 @@ import { useState } from 'react';
 import HIstoryTree from './HIstoryTree';
 import HistoryPreviewWindow from './HistoryPreviewWindow';
 
-export default function HistorySpace({ pageId, changeStatus }) {
+export default function HistorySpace({ pageId, toggleStatus }) {
   const [selected, setSelected] = useState<string>('');
 
   const selectFunc = (hash: string) => {
@@ -12,7 +12,7 @@ export default function HistorySpace({ pageId, changeStatus }) {
 
   return (
     <>
-      <Button onClick={() => changeStatus(null)}>Editorに戻る</Button>
+      <Button onClick={() => toggleStatus(null)}>Editorに戻る</Button>
       <Box
         sx={{
           display: 'grid',

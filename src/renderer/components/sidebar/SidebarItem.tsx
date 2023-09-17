@@ -19,18 +19,8 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     useState<contextMenu | null>(null);
   const [currentPage] = useContext(CurrentPageContext);
   // dnd
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    isOver,
-    active,
-    over,
-    transform,
-    transition,
-    isDragging,
-    index,
-  } = useSortable(dndTag);
+  const { attributes, listeners, setNodeRef, isOver, index } =
+    useSortable(dndTag);
 
   useEffect(() => {
     if (currentPage) {
