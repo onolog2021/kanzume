@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Board from 'renderer/Classes/Board';
 import { Box, Paper, Button, IconButton } from '@mui/material';
 import { ProjectContext } from 'renderer/components/Context';
 import Page from 'renderer/Classes/Page';
+import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
-import PageTitleForm from '../PageTitleForm';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 
 export default function BoardSpace({ boardData }) {
@@ -14,6 +14,7 @@ export default function BoardSpace({ boardData }) {
   const [pages, setPages] = useState();
   const [columnsCount, setColumnsCount] = useState<number>(3);
   const [bookmark, setBookmark] = useState<Boolean>(false);
+  const titleRef = useRef();
 
   useEffect(() => {
     async function initialBoard() {
@@ -78,7 +79,8 @@ export default function BoardSpace({ boardData }) {
     setColumnsCount(count);
   };
 
-  const changeBoardTitle = (title: string) => {
+  const changeBoardTitle = () => {
+    const title = titleRef.current.value;
     const query = {
       table: 'folder',
       columns: {
@@ -121,7 +123,11 @@ export default function BoardSpace({ boardData }) {
   return (
     <>
       {board && (
-        <PageTitleForm defaultValue={board.title} onBlur={changeBoardTitle} />
+        <PlaneTextField
+          defaultValue={board.title}
+          onBlur={changeBoardTitle}
+          inputRef={titleRef}
+        />
       )}
       <ColumnsCountSelector changeColumnsCount={changeColumnsCount} />
       <Button onClick={addText}>テキストの追加</Button>

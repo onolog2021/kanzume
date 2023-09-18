@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Resizable } from 're-resizable';
 import { useDraggable } from '@dnd-kit/core';
+import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
@@ -114,12 +115,8 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth }) {
                 top: 4,
               }}
             />
-            <TextField
-              size="small"
-              inputRef={titleRef}
-              onBlur={changeName}
-              defaultValue={pageData.title || null}
-            />
+            <PlaneTextField defaultValue={pageData.title} />
+
             <EditorItem page={pageData} />
           </Paper>
         </Resizable>

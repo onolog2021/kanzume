@@ -1,6 +1,7 @@
 import { useEffect, useRef, useContext, useState } from 'react';
 import { Button, Box, InputLabe, Select, MenuItem } from '@mui/material';
 import Page from 'renderer/Classes/Page';
+import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import MyEditor from '../../MyEditor';
 import {
   CurrentPageContext,
@@ -8,7 +9,6 @@ import {
   PageListContext,
 } from '../../Context';
 import EditorPageTitle from './EditorPageTitle';
-import PageTitleForm from '../PageTitleForm';
 import HistorySpace from './History/HistorySpace';
 import EditorItem from './EditorItem';
 import EditorTools from './EditorTools';
@@ -20,6 +20,7 @@ function EditorBody({ targetId, page_id, title }) {
   const [editor, setEditor] = useState(null);
   const [fontStyle, setFontStyle] = useState('Meiryo');
   const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
+  const titleRef = useRef();
 
   // const style = {
   //   fontFamily: fontStyle,
@@ -62,7 +63,8 @@ function EditorBody({ targetId, page_id, title }) {
     setPageStatus(status);
   };
 
-  const saveTitle = (title: string) => {
+  const saveTitle = () => {
+    const title = titleRef.current.value;
     const query = {
       table: 'page',
       columns: {
@@ -88,7 +90,12 @@ function EditorBody({ targetId, page_id, title }) {
       <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
           <Box>
-            <PageTitleForm onBlur={saveTitle} defaultValue={page.title} />
+            <PlaneTextField
+              onBlur={saveTitle}
+              placeholder="タイトル"
+              defaultValue={page.title}
+              inputRef={titleRef}
+            />
             <EditorItem page={page} />
           </Box>
         )}

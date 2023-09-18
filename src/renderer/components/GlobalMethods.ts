@@ -1,4 +1,5 @@
-import { DiffMatchPatch } from "diff-match-patch-typescript";
+import { DiffMatchPatch } from 'diff-match-patch-typescript';
+import { text } from 'stream/consumers';
 
 export function dateTranslateForYYMMDD(date: Date) {
   const year = date.getFullYear();
@@ -9,9 +10,38 @@ export function dateTranslateForYYMMDD(date: Date) {
 }
 
 export function editorTextToPlaneText(json) {
-  const textArray = json.blocks;
-  const planeText = textArray.map((block) => block.data.text);
-  return planeText;
+  function extractText(node) {
+    if (node.content) {
+      return node.content.map(extractText).join('');
+    }
+    if (node.type === 'text') {
+      return node.text;
+    }
+    return '';
+  }
+
+  function convertToPlainText(data) {
+    return data.content.map(extractText).join('\n').trim();
+  }
+
+  const plainText = convertToPlainText(json);
+  return plainText
+
+  console.log(json);
+  const textArray = [];
+  json.content?.forEach((element) => {
+    const textContent = element.content?.map((item) => item.text);
+    if (textContent) {
+      textArray.push(textContent[0]);
+    } else {
+      textArray.push('');
+    }
+  });
+
+  return textArray.join('\n');
+  // const textArray = json.blocks;
+  // const planeText = textArray.map((block) => block.data.text);
+  // return planeText;
 }
 
 export function gitDiffParse(diff: string) {
@@ -34,7 +64,7 @@ export function getCurrentTime() {
   return localISOTime;
 }
 
-export function getDiff(textA: string, textB: string){
+export function getDiff(textA: string, textB: string) {
   const dmp = new DiffMatchPatch();
   const diff = dmp.diff_main(textA, textB);
   dmp.diff_cleanupSemantic(diff);

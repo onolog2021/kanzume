@@ -30,7 +30,7 @@ export default function HistoryPreviewWindow({ pageId, log }) {
         pageQuery
       );
       const parsedtext = JSON.parse(pageData.content);
-      const currentText = editorTextToPlaneText(parsedtext).join('\n');
+      const currentText = editorTextToPlaneText(parsedtext);
 
       const query = {
         hash: log.hash,
@@ -41,19 +41,13 @@ export default function HistoryPreviewWindow({ pageId, log }) {
         'gitShow',
         query
       );
-      const diffData = await window.electron.ipcRenderer.invoke(
-        'gitDiff',
-        query
-      );
-      const translatedDiff = gitDiffParse(diffData);
-      setDiff(translatedDiff);
       const json = JSON.parse(profile);
-      const text = editorTextToPlaneText(json);
-      const planeText = text.join('');
-      const diffArray = getDiff(planeText, currentText);
-      setDiffText(diffArray);
-      console.log(diffArray);
-      setLogText(text);
+      const oldText = editorTextToPlaneText(json);
+      const diffArray = getDiff(oldText, currentText);
+      setDiffText(diffArray)
+      // setDiffText(diffArray);
+      // console.log(diffArray);
+      // setLogText(text);
     }
 
     if (log) {
@@ -94,13 +88,7 @@ export default function HistoryPreviewWindow({ pageId, log }) {
       <Button onClick={rollBack}>ここに戻る</Button>
       <Button onClick={() => switchDisplayDiff(true)}>最新との比較</Button>
       {diffText && <PreviewText diffText={diffText} />}
-      {displayDiff && (
-        <DifferenceOverlay
-          log={log}
-          diff={diff}
-          switchDisplsy={switchDisplayDiff}
-        />
-      )}
+
     </Box>
   );
 }
