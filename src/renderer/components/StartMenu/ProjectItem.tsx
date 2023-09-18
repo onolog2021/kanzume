@@ -9,7 +9,7 @@ function ProjectItem({ project, handleClick }) {
     <ListItemButton onClick={() => handleClick(project.id)}>
       <ListItemText
         primary={project.title}
-        secondary={`最終更新：${date}`}
+        secondary={`最終：${date}`}
         secondaryTypographyProps={{ fontSize: 14 }}
       />
     </ListItemButton>

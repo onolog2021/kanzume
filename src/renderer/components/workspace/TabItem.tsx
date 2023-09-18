@@ -22,6 +22,8 @@ function TabItem({ tab, orderArray }) {
 
   const svg = tab.type === 'editor' ? <PageIcon /> : <BoardIcon />;
 
+  const isActive = tab.id === currentPage.id;
+
   const { attributes, listeners, setNodeRef } = useSortable({
     id: tabId,
     data: {
@@ -32,7 +34,6 @@ function TabItem({ tab, orderArray }) {
       content: tab.title,
     },
   });
-
 
   const handleActiveTab = (id: number) => {
     const value = { id, type: tab.type };
@@ -77,7 +78,10 @@ function TabItem({ tab, orderArray }) {
       <ListItemIcon>{svg}</ListItemIcon>
       <ListItemText
         primary={tab.title}
-        primaryTypographyProps={{ fontSize: 12 }}
+        primaryTypographyProps={{
+          fontSize: isActive ? 14 : 12,
+          fontWeight: isActive ? 'bolder' : 'normal',
+        }}
         sx={{
           whiteSpace: 'nowrap',
           overflow: 'hidden',

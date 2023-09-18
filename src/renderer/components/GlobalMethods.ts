@@ -5,8 +5,10 @@ export function dateTranslateForYYMMDD(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  return `${year}/${month}/${day}`;
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
 export function editorTextToPlaneText(json) {
@@ -25,23 +27,7 @@ export function editorTextToPlaneText(json) {
   }
 
   const plainText = convertToPlainText(json);
-  return plainText
-
-  console.log(json);
-  const textArray = [];
-  json.content?.forEach((element) => {
-    const textContent = element.content?.map((item) => item.text);
-    if (textContent) {
-      textArray.push(textContent[0]);
-    } else {
-      textArray.push('');
-    }
-  });
-
-  return textArray.join('\n');
-  // const textArray = json.blocks;
-  // const planeText = textArray.map((block) => block.data.text);
-  // return planeText;
+  return plainText;
 }
 
 export function gitDiffParse(diff: string) {

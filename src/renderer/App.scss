@@ -260,32 +260,44 @@ $workspace-width: calc(100vw - 240px);
   outline: none;
 }
 
-.pageTitle{
+.pageTitle {
   padding-left: calc(($workspace-width - 600px) / 2);
   padding-right: calc(($workspace-width - 600px) / 2);
 }
 
-.tiptap {
-  height: calc(100vh - 80px);
-  padding-top: 40px;
-  padding-left: calc(($workspace-width - 600px) / 2);
-  padding-right: calc(($workspace-width - 600px) / 2);
-  .ruby{
-    position: relative;
-    &:hover {
-      color: $main-color;
-      font-weight: bold;
-    }
-    &::before{
-      width: 100%;
-      content: attr(ruby);
-      position: absolute;
-      font-size: 1rem;
-      white-space: nowrap;
-      text-align: center;
-      top: -10px;
+.tiptap{
+  p{
+    margin-top: 4px;
+  }
+}
+
+.editorBody {
+  .tiptap {
+    height: calc(100vh - 80px);
+    padding-top: 40px;
+    padding-left: calc(($workspace-width - 600px) / 2);
+    padding-right: calc(($workspace-width - 600px) / 2);
+    .ruby {
+      position: relative;
+      &:hover {
+        color: $main-color;
+        font-weight: bold;
+      }
+      &::before {
+        width: 100%;
+        content: attr(ruby);
+        position: absolute;
+        font-size: 1rem;
+        white-space: nowrap;
+        text-align: center;
+        top: -10px;
+      }
     }
   }
 }
 
-
+.boardPaper{
+  .tiptap{
+    min-height: 200px;
+  }
+}

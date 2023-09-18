@@ -32,7 +32,7 @@ export default function CreateProjectForm({ handleClick }) {
         <TextField
           fullWidth
           size="small"
-          label="無題"
+          label="プロジェクト名"
           inputRef={projectTitleRef}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -45,12 +45,6 @@ export default function CreateProjectForm({ handleClick }) {
           新規作成
         </Button>
       </Box>
-      <ConfirmDialog
-        open={isDialogOpen}
-        agree={() => {
-          console.log('agree');
-        }}
-      />
     </>
   );
 }

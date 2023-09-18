@@ -84,6 +84,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth }) {
           bounds="window"
         >
           <Paper
+            className="boardPaper"
             elevation={3}
             ref={setNodeRef}
             sx={{
@@ -115,8 +116,10 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth }) {
                 top: 4,
               }}
             />
-            <PlaneTextField defaultValue={pageData.title} />
-
+            <PlaneTextField
+              defaultValue={pageData.title}
+              sx={{ input: { px: 0 } }}
+            />
             <EditorItem page={pageData} />
           </Paper>
         </Resizable>

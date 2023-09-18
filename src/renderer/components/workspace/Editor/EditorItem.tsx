@@ -120,7 +120,7 @@ function MyEditor({ page }) {
 
   return (
     <>
-      <p
+      {/* <p
         style={{
           textAlign: 'center',
           position: 'fixed',
@@ -131,7 +131,7 @@ function MyEditor({ page }) {
         }}
       >
         文字数：{textCount}
-      </p>
+      </p> */}
       {editorStatus && (
         <>
           <EditorContent editor={editor.current} />
