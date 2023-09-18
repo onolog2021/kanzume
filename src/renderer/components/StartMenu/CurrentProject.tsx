@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { List } from '@mui/material';
+import ReactLoading from 'react-loading';
 import ProjectItem from './ProjectItem';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as DocumentsSvg } from '../../../../assets/documents.svg';
 
 function CurrentProjects({ handleClick }) {
-  const [projectlist, setProjectList] = useState<unknown[]>([]);
+  const [projectlist, setProjectList] = useState<unknown>();
 
   useEffect(() => {
     async function fetchProjects() {
@@ -25,6 +26,10 @@ function CurrentProjects({ handleClick }) {
 
     fetchProjects();
   }, []);
+
+  if (!projectlist) {
+    return <ReactLoading type="spin" color="gray" width={40} height={40} />;
+  }
 
   return (
     <div>

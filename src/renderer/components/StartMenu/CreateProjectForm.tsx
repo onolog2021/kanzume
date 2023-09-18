@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as PlusSvg } from '../../../../assets/new.svg';
-import ConfirmDialog from '../ConfirmDialog';
 
 export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const createNewPage = async () => {
     const titleValue = projectTitleRef.current.value;

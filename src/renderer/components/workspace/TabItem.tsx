@@ -10,6 +10,7 @@ import {
   ListItemButton,
   ListItemText,
   ListItemIcon,
+  Box,
 } from '@mui/material';
 import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
@@ -49,6 +50,14 @@ function TabItem({ tab, orderArray }) {
     newTabList.splice(closedTabIndex, 1);
     setTabList(newTabList);
   };
+
+  function middleClick(event: MouseEvent){
+    event.preventDefault();
+    console.log('fire')
+    if (event.button === 1) {
+      console.log('中央ボタンがクリックされました。');
+    }
+  }
 
   return (
     <ListItemButton
