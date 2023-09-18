@@ -1,11 +1,19 @@
 import { useState, useContext } from 'react';
-import { Drawer, Box, Typography, Hidden } from '@mui/material';
+import  { Drawer, Box, Typography, Tooltip, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
+import { ReactComponent as HomeIcon } from '../../../../assets/home.svg';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
   const [isHidden, setIsHidden] = useState<Boolean>(false);
+  const navigate = useNavigate();
+  const theme = useTheme();
+
+  function returnHome() {
+    navigate('/');
+  }
 
   if (!project) {
     return <h1>loading...</h1>;
@@ -32,18 +40,30 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
       }}
     >
       <Box sx={{ mb: '40px' }}>
-        <Typography
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            fontSize: 13,
-            height: 18,
-            lineHeight: '18px',
-            my: 2,
-          }}
-        >{project.title}</Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title="スタートメニュー" placement="bottom">
+            <HomeIcon
+              width={24}
+              onClick={() => returnHome()}
+              style={{ cursor: 'pointer', fill: theme.palette.primary.main }}
+            />
+          </Tooltip>
+          <Typography
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              fontSize: 13,
+              height: 18,
+              lineHeight: '18px',
+              my: 2,
+            }}
+          >
+            {project.title}
+          </Typography>
+        </Box>
+
         {quickAccessArea}
         {pageList}
         {boardList}

@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import { Box } from '@mui/material';
-import TrashedItem from './TrashedItem';
 import TrashActiveWindow from './TrashActiveWindow';
 import TrashIndex from './TrashIndex';
 

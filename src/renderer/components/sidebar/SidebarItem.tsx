@@ -1,6 +1,7 @@
 import { IconButton, ListItemButton, Typography, Box } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { useState, useContext, useEffect } from 'react';
+import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import { ReactComponent as MenuIcon } from '../../../../assets/dots.svg';
 import ContextMenu from '../ContextMenu';
 import { CurrentPageContext } from '../Context';
@@ -13,13 +14,12 @@ interface contextMenu {
 
 function SidebarItem({ icon, text, functions, dndTag, collapse }) {
   const [selected, setSelected] = useState();
-  const [position, setPosition] = useState();
   const { click, contextMenu } = functions;
   const [contextMenuStatus, setContextMenuStatus] =
     useState<contextMenu | null>(null);
   const [currentPage] = useContext(CurrentPageContext);
   // dnd
-  const { attributes, listeners, setNodeRef, isOver, index } =
+  const { attributes, listeners, setNodeRef, isOver, index, over } =
     useSortable(dndTag);
 
   useEffect(() => {
@@ -44,10 +44,16 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
   const borderDndData = { ...dndTag };
   delete borderDndData.position;
 
+  const isFolder = () => {
+    if (over) {
+      const { type } = over.data.current;
+      return type === 'folder';
+    }
+  };
+
   const overStyle = {
     transition: 'none',
-    // backgroundColor: 'tomato',
-    // borderBottom: '0.1px solid blue',
+    background: isFolder() ? '#F2FDFF' : 'none',
   };
 
   const contextMenuOpen = (event) => {
@@ -109,18 +115,17 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
         >
           {text}
         </Typography>
-        <IconButton
+        <PlaneIconButton
           onClick={contextMenuOpen}
           sx={{
             display: 'none',
             width: 24,
             height: 24,
-            background: 'white',
             p: 0,
           }}
         >
           <MenuIcon />
-        </IconButton>
+        </PlaneIconButton>
       </ListItemButton>
       {collapse && collapse}
       <SortableBorder tag={borderDndData} index={index + 1} />

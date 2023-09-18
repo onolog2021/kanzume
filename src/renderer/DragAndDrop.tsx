@@ -241,7 +241,11 @@ function DragAndDrop() {
       setTablist(tmpArray);
     }
 
-    if (droppedPlace === 'border' || overItem.area === 'trash') {
+    if (
+      droppedPlace === 'border' ||
+      overItem.area === 'trash' ||
+      overItem?.type === 'area'
+    ) {
       const newOrder = overItem.type === 'area' ? [] : createNewOrderArray();
       // データの処理
       const areaFunction = dataFlowAfterDrop[overItem?.area];

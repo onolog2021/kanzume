@@ -361,21 +361,18 @@ ipcMain.on('mergeTextData', (event, args) => {
       console.log(error);
     } else {
       // テキストの結合
-      let combinedBlocks = [];
-      let version;
+      let mergedText = [];
       rows.forEach((row) => {
-        const textFragment = JSON.parse(row.content);
-        combinedBlocks = combinedBlocks.concat(textFragment.blocks);
-        version = textFragment.version;
+        const pageData = JSON.parse(row.content);
+        const textFragment = pageData.content;
+        mergedText = [...mergedText, ...textFragment]
       });
 
-      const mergedText = {
-        time: Date.now(),
-        blocks: combinedBlocks,
-        version,
-      };
-
-      const stringriedText = JSON.stringify(mergedText);
+      const newText = {
+        type: 'doc',
+        content: mergedText,
+      }
+      const stringriedText = JSON.stringify(newText);
 
       const query = {
         table: 'page',

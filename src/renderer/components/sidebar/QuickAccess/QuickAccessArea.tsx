@@ -11,9 +11,9 @@ function QuickAccessArea() {
   const [project, setProject] = useContext(ProjectContext);
   const [bookmarks, setBookmarks] = useState([]);
   const [items, setItems] = useState([]);
-  const svg = <QuickLogo style={{fill: '#999'}}/>;
+  const svg = <QuickLogo style={{ fill: '#999' }} />;
 
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: 'quickAccess',
     data: { area: 'quickAccess', type: 'area' },
   });
@@ -54,7 +54,12 @@ function QuickAccessArea() {
       </div>
       <List
         ref={setNodeRef}
-        sx={{ width: '100%', py: 1 }}
+        sx={{
+          width: '100%',
+          py: 1,
+          minHeight: 80,
+          background: isOver ? '#F2FDFF' : 'none',
+        }}
       >
         {items && (
           <SortableContext items={items}>

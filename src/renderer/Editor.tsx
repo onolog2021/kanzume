@@ -2,7 +2,6 @@ import DragAndDrop from './DragAndDrop';
 import {
   ProjectProvider,
   CurrentPageProvider,
-  PageListProvider,
   TabListProvider,
 } from './components/Context';
 

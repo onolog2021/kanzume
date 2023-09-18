@@ -1,4 +1,4 @@
-import { Button, List, IconButton, Box } from '@mui/material';
+import { Button, List, IconButton, Box, Tooltip } from '@mui/material';
 import { useEffect, useState, useContext } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
@@ -26,7 +26,7 @@ function BoardList({ boards }) {
     setFormDisplay(status);
   };
 
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: 'board-list',
     data: { area: 'boardList', type: 'area' },
   });
@@ -69,9 +69,11 @@ function BoardList({ boards }) {
     <>
       <div className="sideBarSectionName">
         <CategoryTitle svg={svg} categoryName="ボード" />
-        <IconButton onClick={() => switchFormDisplay('board')}>
-          <AddBoardButton />
-        </IconButton>
+        <Tooltip title="ボード作成" placement="top">
+          <IconButton onClick={() => switchFormDisplay('board')}>
+            <AddBoardButton />
+          </IconButton>
+        </Tooltip>
       </div>
 
       {formDisplay && (
@@ -82,12 +84,19 @@ function BoardList({ boards }) {
         />
       )}
       {orderArray && (
-        <List ref={setNodeRef} sx={{ py: 1 }}>
+        <List
+          ref={setNodeRef}
+          sx={{
+            py: 1,
+            minHeight: 120,
+            background: isOver ? '#F2FDFF' : 'none',
+          }}
+        >
           <SortableContext items={orderArray}>
             {orderArray &&
-              boards.map((board) => (
+              boards.map((board, index) => (
                 <BoardItem
-                  key={board.id}
+                  key={index}
                   board={board}
                   orderArray={orderArray}
                   bookmark={false}

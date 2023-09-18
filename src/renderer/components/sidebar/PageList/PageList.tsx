@@ -1,8 +1,7 @@
 import { useContext, useState } from 'react';
-import { List, Box, IconButton } from '@mui/material';
+import { List, Box, IconButton, Tooltip } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
-import { SortableContext } from '@dnd-kit/sortable';
 import {
   ProjectContext,
   CurrentPageContext,
@@ -75,12 +74,16 @@ function PageList({ root }) {
     <>
       <div className="sideBarSectionName">
         <CategoryTitle svg={svg} categoryName="テキスト" />
-        <IconButton onClick={() => switchNewForm('page')}>
-          <AddPageButton />
-        </IconButton>
-        <IconButton onClick={() => switchNewForm('folder')}>
-          <AddFolderButton />
-        </IconButton>
+        <Tooltip title="テキスト作成" placement="top">
+          <IconButton onClick={() => switchNewForm('page')}>
+            <AddPageButton />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="フォルダ作成" placement="top">
+          <IconButton onClick={() => switchNewForm('folder')}>
+            <AddFolderButton />
+          </IconButton>
+        </Tooltip>
       </div>
 
       {newForm === 'page' && (
@@ -102,6 +105,8 @@ function PageList({ root }) {
         sx={{
           py: 1,
           transition: 'background-color 1s ease',
+          minHeight: 120,
+          background: isOver ? '#F2FDFF' : 'none',
         }}
       >
         {root && <TreeBranch parentNode={root} />}

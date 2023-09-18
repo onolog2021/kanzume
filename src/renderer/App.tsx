@@ -1,8 +1,8 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@emotion/react';
 import StartMenu from './components/StartMenu/StartMenu';
 import Editor from './Editor';
 import './App.scss';
-import { ThemeProvider } from '@emotion/react';
 import theme from './theme';
 
 export default function App() {
