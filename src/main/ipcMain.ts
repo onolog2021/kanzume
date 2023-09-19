@@ -554,22 +554,26 @@ ipcMain.on('importText', async (event, { projectId, pageId }) => {
     `${pageId}.json`
   );
 
-  fs.readFile(pageFilePath, 'utf-8', (err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const query = {
-        table: 'page',
-        columns: {
-          content: data,
-        },
-        conditions: {
-          id: pageId,
-        },
-      };
-      updateRecord(query);
-    }
-  });
+  const { readFile } = fs.promises;
+
+  try {
+    const data = await readFile(pageFilePath, 'utf-8');
+    const query = {
+      table: 'page',
+      columns: {
+        content: data,
+      },
+      conditions: {
+        id: pageId,
+      },
+    };
+    updateRecord(query);
+    event.reply('updateEditor', JSON.parse(data));
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw error; // ipcMain.handleはエラーを自動的にキャッチして、rendererプロセスにエラーとして返します。
+  }
 });
 
 ipcMain.on('initProject', async (event, newId) => {

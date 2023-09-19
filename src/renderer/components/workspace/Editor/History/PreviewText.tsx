@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Tooltip } from '@mui/material';
 import { styled } from '@mui/system';
 
 function PreviewText({ diffText }) {
@@ -13,7 +13,7 @@ function PreviewText({ diffText }) {
 
   const addedText = {
     ...defaultStyle,
-    color: '#999',
+    color: 'red',
   };
 
   function categorize(category: number) {
@@ -29,11 +29,19 @@ function PreviewText({ diffText }) {
   return (
     <Box sx={{ whiteSpace: 'pre-wrap' }}>
       {diffText &&
-        diffText.map((text, index) => (
-          <span key={index} style={categorize(text[0])}>
-            {text[1]}
-          </span>
-        ))}
+        diffText.map((text, index) =>
+          text[0] === -1 ? (
+            <s key={index} style={deletedText}>
+              {text[1]}
+            </s>
+          ) : (
+            <Tooltip title="現在、追加されている内容">
+              <span key={index} style={categorize(text[0])}>
+                {text[1]}
+              </span>
+            </Tooltip>
+          )
+        )}
     </Box>
   );
 }

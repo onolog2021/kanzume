@@ -26,7 +26,11 @@ export default function HistorySpace({ pageId, toggleStatus }) {
           selectFunc={selectFunc}
           selected={selected}
         />
-        <HistoryPreviewWindow pageId={pageId} log={selected} />
+        <HistoryPreviewWindow
+          pageId={pageId}
+          log={selected}
+          toggleStatus={toggleStatus}
+        />
       </Box>
     </>
   );

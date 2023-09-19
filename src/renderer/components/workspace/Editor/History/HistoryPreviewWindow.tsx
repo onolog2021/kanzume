@@ -7,15 +7,14 @@ import {
   gitDiffParse,
   getDiff,
 } from 'renderer/components/GlobalMethods';
+import ReactLoading from 'react-loading';
 import DifferenceOverlay from './DifferenceOverlay';
 import PreviewText from './PreviewText';
 
-export default function HistoryPreviewWindow({ pageId, log }) {
+export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
   const [project] = useContext(ProjectContext);
-  const [logText, setLogText] = useState();
-  const [diff, setDiff] = useState();
   const [diffText, setDiffText] = useState<[number, string]>([]);
-  const [displayDiff, setDisplayDiff] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchLogProfile() {
@@ -44,10 +43,7 @@ export default function HistoryPreviewWindow({ pageId, log }) {
       const json = JSON.parse(profile);
       const oldText = editorTextToPlaneText(json);
       const diffArray = getDiff(oldText, currentText);
-      setDiffText(diffArray)
-      // setDiffText(diffArray);
-      // console.log(diffArray);
-      // setLogText(text);
+      setDiffText(diffArray);
     }
 
     if (log) {
@@ -71,10 +67,7 @@ export default function HistoryPreviewWindow({ pageId, log }) {
       projectId: project.id,
     };
     window.electron.ipcRenderer.sendMessage('importText', importQuery);
-  };
-
-  const switchDisplayDiff = (boolean: Boolean) => {
-    setDisplayDiff(boolean);
+    toggleStatus('editor');
   };
 
   return (
@@ -85,10 +78,12 @@ export default function HistoryPreviewWindow({ pageId, log }) {
         p: 4,
       }}
     >
-      <Button onClick={rollBack}>ここに戻る</Button>
-      <Button onClick={() => switchDisplayDiff(true)}>最新との比較</Button>
+      {loading && loading ? (
+        <ReactLoading type="spin" color="gray" width={40} height={40} />
+      ) : (
+        <Button onClick={rollBack}>ロールバックする</Button>
+      )}
       {diffText && <PreviewText diffText={diffText} />}
-
     </Box>
   );
 }

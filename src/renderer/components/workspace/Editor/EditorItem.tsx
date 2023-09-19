@@ -11,7 +11,7 @@ import TextStyle from '@tiptap/extension-text-style';
 import Placeholder from '@tiptap/extension-placeholder';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
 
-function MyEditor({ page, isCount,pageStatus }) {
+function MyEditor({ page, isCount, pageStatus }) {
   const editor = useRef();
   const timeoutId = useRef(null);
   const [editorStatus, setEditorStatus] = useState(false);
@@ -83,6 +83,10 @@ function MyEditor({ page, isCount,pageStatus }) {
       .catch((error) => {
         console.log(error);
       });
+
+    window.electron.ipcRenderer.on('updateEditor', (newText) => {
+      editor.current.commands.setContent(newText);
+    });
 
     return () => {
       if (timeoutId.current) {
