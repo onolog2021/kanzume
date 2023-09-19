@@ -12,7 +12,7 @@ export default function HistorySpace({ pageId, toggleStatus }) {
 
   return (
     <>
-      <Button onClick={() => toggleStatus(null)}>Editorに戻る</Button>
+      <Button onClick={() => toggleStatus('editor')}>Editorに戻る</Button>
       <Box
         sx={{
           display: 'grid',

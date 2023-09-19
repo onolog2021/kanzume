@@ -38,6 +38,7 @@ export default function KanzumeBubbleMenu({ editor }) {
       sx={{
         py: 1,
         px: 2,
+        my: 4,
         zIndex: 200,
         background: 'white',
         border: '.2px solid gray',

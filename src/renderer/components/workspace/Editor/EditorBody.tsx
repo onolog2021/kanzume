@@ -15,16 +15,11 @@ import EditorTools from './EditorTools';
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [page, setPage] = useState();
-  const [editor, setEditor] = useState(null);
-  const [fontStyle, setFontStyle] = useState('Meiryo');
   const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
   const titleRef = useRef();
-
-  // const style = {
-  //   fontFamily: fontStyle,
-  // };
+  const [fontSize, setFontSize] = useState<number>(18);
+  const [fontFamily, setFontFamily] = useState<string>('serif');
 
   useEffect(() => {
     async function setPageData() {
@@ -41,23 +36,7 @@ function EditorBody({ targetId, page_id, title }) {
       setPage(pageData);
     }
     setPageData();
-  }, []);
-
-  // // useEffect(() => {
-  // //   if (page_id === currentPage.id && editor) {
-  // //     editor.setFirst();
-  // //   }
-  // // }, [currentPage]);
-
-  // const softDelete = () => {
-  //   const query = {
-  //     table: 'page',
-  //     conditions: {
-  //       id: page_id,
-  //     },
-  //   };
-  //   window.electron.ipcRenderer.sendMessage('softDelete', query);
-  // };
+  }, [pageStatus]);
 
   const toggleStatus = (status) => {
     setPageStatus(status);
@@ -85,21 +64,45 @@ function EditorBody({ targetId, page_id, title }) {
     return <HistorySpace pageId={page.id} toggleStatus={toggleStatus} />;
   }
 
+  const changeFontSize = (size: number) => {
+    setFontSize(size);
+  };
+
+  const changeFontFamily = (family: string) => {
+    setFontFamily(family);
+  };
+
+  const style = {
+    fontSize: fontSize && fontSize,
+    fontFamily: fontFamily && fontFamily
+  }
+
   return (
     <div className="editorBody">
       <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
-          <Box>
+          <Box sx={style}>
             <PlaneTextField
               onBlur={saveTitle}
               placeholder="タイトル"
               defaultValue={page.title}
               inputRef={titleRef}
+              sx={{
+                input: {
+                  fontSize: 20,
+                  pl: 'calc((100% - 600px) / 2)',
+                },
+              }}
             />
-            <EditorItem page={page} />
+            <EditorItem page={page} isCount />
           </Box>
         )}
-        <EditorTools page={page} toggleStatus={toggleStatus} />
+        <EditorTools
+          page={page}
+          toggleStatus={toggleStatus}
+          changeFontSize={changeFontSize}
+          changeFontFamily={changeFontFamily}
+        />
       </Box>
     </div>
   );

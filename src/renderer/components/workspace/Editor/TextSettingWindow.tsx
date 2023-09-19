@@ -8,10 +8,10 @@ import {
   MenuItem,
 } from '@mui/material';
 
-function TextSettingWindow({ closeWindow, changeFontFunc }) {
+function TextSettingWindow({ closeWindow, changeFontSize, changeFontFamily }) {
   const [fontList, setFontList] = useState({});
   const [fontStyle, setFontStyle] = useState('');
-  const selectRef = useRef();
+  const sizeRef = useRef<number>(18);
 
   function runCloseWindow(event) {
     closeWindow(false);
@@ -30,16 +30,19 @@ function TextSettingWindow({ closeWindow, changeFontFunc }) {
       小塚明朝: 'Kozuka Mincho',
       'Source Han Sans': 'Source Han Sans',
       'Source Han Serif': 'Source Han Serif',
-      'Noto Sans CJK': 'Noto Sans CJK',
+      'Noto Sans CJK': 'serif',
       'Noto Serif CJK': 'Noto Serif CJK',
     };
     setFontList(list);
   }, []);
 
   const changeFont = (event) => {
-    const selectedFont = event.target.value;
-    setFontStyle(selectedFont);
-    changeFontFunc(selectedFont);
+    const { value } = event.target;
+    changeFontFamily(value);
+  };
+
+  const changeSize = (event, value) => {
+    changeFontSize(value);
   };
 
   return (
@@ -47,6 +50,8 @@ function TextSettingWindow({ closeWindow, changeFontFunc }) {
       <Box
         role="presentation"
         sx={{
+          color: '#333',
+          textAlign: 'left',
           position: 'fixed',
           top: '50%',
           left: '50%',
@@ -63,12 +68,18 @@ function TextSettingWindow({ closeWindow, changeFontFunc }) {
         <Typography>フォントサイズ：</Typography>
         <Slider
           size="small"
-          defaultValue={70}
+          defaultValue={18}
+          min={12}
+          max={40}
+          step={1}
           aria-label="Small"
           valueLabelDisplay="auto"
+          onChange={(event, value) => {
+            changeSize(event, value);
+          }}
         />
         <Typography>フォントスタイル：</Typography>
-        <select name="" id="" onChange={changeFont}>
+        <select name="" id="" onChange={(event) => changeFont(event)}>
           {fontList &&
             Object.entries(fontList).map(([key, value]) => (
               <option value={value as string} key={value as string}>

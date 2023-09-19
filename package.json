@@ -102,6 +102,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.2",
     "@tiptap/extension-character-count": "^2.1.8",
+    "@tiptap/extension-placeholder": "^2.1.10",
     "@tiptap/extension-text-style": "^2.1.10",
     "@tiptap/react": "^2.1.8",
     "@tiptap/starter-kit": "^2.1.10",

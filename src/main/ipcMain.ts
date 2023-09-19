@@ -7,6 +7,7 @@ import { type } from 'os';
 import { rejects } from 'assert';
 import simpleGit from 'simple-git';
 import { exec } from 'child_process';
+import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
@@ -365,13 +366,13 @@ ipcMain.on('mergeTextData', (event, args) => {
       rows.forEach((row) => {
         const pageData = JSON.parse(row.content);
         const textFragment = pageData.content;
-        mergedText = [...mergedText, ...textFragment]
+        mergedText = [...mergedText, ...textFragment];
       });
 
       const newText = {
         type: 'doc',
         content: mergedText,
-      }
+      };
       const stringriedText = JSON.stringify(newText);
 
       const query = {
@@ -624,7 +625,7 @@ ipcMain.handle('commitPage', (event, pageId) => {
     if (isGit) {
       const git = simpleGit(projectFilePath);
       const date = new Date();
-      const time = date.toString();
+      const time = dateTranslateForYYMMDD(date);
       try {
         await git.add(pageFilePath).commit(`${time}`);
         resolve(true);
@@ -746,3 +747,13 @@ ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
 ipcMain.on('openFolder', (event, folderId) => {
   event.reply('openFolder', folderId);
 });
+
+function dateTranslateForYYMMDD(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
+}

@@ -8,9 +8,10 @@ import Text from '@tiptap/extension-text';
 import CharacterCount from '@tiptap/extension-character-count';
 import History from '@tiptap/extension-history';
 import TextStyle from '@tiptap/extension-text-style';
+import Placeholder from '@tiptap/extension-placeholder';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
 
-function MyEditor({ page }) {
+function MyEditor({ page, isCount,pageStatus }) {
   const editor = useRef();
   const timeoutId = useRef(null);
   const [editorStatus, setEditorStatus] = useState(false);
@@ -54,6 +55,9 @@ function MyEditor({ page }) {
           CharacterCount,
           History,
           Ruby,
+          Placeholder.configure({
+            placeholder: 'No text ...',
+          }),
         ],
         content: page.content ? JSON.parse(page.content) : '',
         onUpdate: () => {
@@ -120,18 +124,21 @@ function MyEditor({ page }) {
 
   return (
     <>
-      {/* <p
-        style={{
-          textAlign: 'center',
-          position: 'fixed',
-          bottom: '16px',
-          right: '16px',
-          fontWeight: 'bold',
-          color: '#999'
-        }}
-      >
-        文字数：{textCount}
-      </p> */}
+      {isCount && isCount ? (
+        <p
+          style={{
+            fontSize: 16,
+            textAlign: 'center',
+            position: 'fixed',
+            bottom: '16px',
+            right: '16px',
+            fontWeight: 'bold',
+            color: '#999',
+          }}
+        >
+          文字数：{textCount}
+        </p>
+      ) : null}
       {editorStatus && (
         <>
           <EditorContent editor={editor.current} />

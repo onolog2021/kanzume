@@ -28,7 +28,7 @@ body {
   margin: 0;
   font-size: 1.6rem;
   &::-webkit-scrollbar {
-    width: 3px;
+    width: 8px;
   }
   &::-webkit-scrollbar-thumb {
     background-color: #999;
@@ -146,7 +146,7 @@ body {
 .editorTools {
   position: fixed;
   right: 16px;
-  width: 24px;
+  width: 40px;
   svg {
     width: 24px;
     height: 24px;
@@ -271,12 +271,20 @@ $workspace-width: calc(100vw - 240px);
   }
 }
 
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 .editorBody {
   .tiptap {
-    height: calc(100vh - 80px);
+    min-height: calc(100vh - 80px);
     padding-top: 40px;
-    padding-left: calc(($workspace-width - 600px) / 2);
-    padding-right: calc(($workspace-width - 600px) / 2);
+    padding-left: calc((100% - 600px) / 2);
+    padding-right: calc((100% - 600px) / 2);
     .ruby {
       position: relative;
       &:hover {

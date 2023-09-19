@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { Collapse } from '@mui/material';
 import Folder from 'renderer/Classes/Folder';
+import Confirmation from 'renderer/GlobalComponent/Confirmation';
 import { ProjectContext } from '../../Context';
 import TreeBranch from './TreeBranch';
 import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
@@ -14,6 +15,7 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
   const [open, setOpen] = useState(false);
   const [hasPage, setHasPage] = useState([]);
   const [isShowInput, setIsShowInput] = useState(false);
+  const [isConfirm, setIsConfirm] = useState(false);
 
   const icon = (
     <Expand
@@ -112,6 +114,10 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
     }
   };
 
+  const showConfirm = () => {
+    setIsConfirm(true);
+  };
+
   const menues = [
     {
       id: 'changeName',
@@ -121,7 +127,7 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
     {
       id: 'delete',
       menuName: '削除',
-      method: softDelete,
+      method: showConfirm,
     },
     {
       id: 'merge',
@@ -146,13 +152,25 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
   }
 
   return (
-    <SidebarItem
-      icon={icon}
-      text={folderData.title}
-      functions={functions}
-      dndTag={dndTag}
-      collapse={collapse}
-    />
+    <>
+      <SidebarItem
+        icon={icon}
+        text={folderData.title}
+        functions={functions}
+        dndTag={dndTag}
+        collapse={collapse}
+      />
+      {isConfirm && (
+        <Confirmation
+          onclick={softDelete}
+          text={'フォルダ内のデータも削除されます。\n問題ありませんか？'}
+          isOpen={isConfirm}
+          closeConfirm={() => {
+            setIsConfirm(false);
+          }}
+        />
+      )}
+    </>
   );
 }
 
