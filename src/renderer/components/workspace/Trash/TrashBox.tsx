@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import TrashActiveWindow from './TrashActiveWindow';
 import TrashIndex from './TrashIndex';
 
-interface TrashItem{
+interface TrashItem {
   type: string;
   data: any;
 }
@@ -14,13 +14,11 @@ function TrashBox() {
   const [selectedItem, setSelectedItem] = useState<TrashItem | null>(null);
   const [trashedItems, setTrashedItems] = useState([]);
 
-
-
   useEffect(() => {
     async function fetchTrashedData() {
       const pageQuery = {
         table: 'page',
-        columns: ['title', 'id'],
+        columns: ['title', 'id', 'updated_at'],
         conditions: {
           is_deleted: true,
           project_id: project.id,
@@ -32,7 +30,7 @@ function TrashBox() {
       );
       const folderQuery = {
         table: 'folder',
-        columns: ['id', 'title', 'type'],
+        columns: ['id', 'title', 'type', 'updated_at'],
         conditions: {
           is_deleted: true,
           project_id: project.id,
@@ -43,8 +41,16 @@ function TrashBox() {
         folderQuery
       );
       const combinedItems = trashedPage.concat(trashedFolder);
+      console.log(combinedItems);
+      combinedItems.sort((a, b) => {
+        const dateA = new Date(a.updated_at);
+        const dateB = new Date(b.updated_at);
+
+        return dateB - dateA;
+      });
       setTrashedItems(combinedItems);
     }
+
     fetchTrashedData();
 
     window.electron.ipcRenderer.on(
@@ -56,19 +62,27 @@ function TrashBox() {
   }, []);
 
   const changeSelectedItem = (item) => {
-    setSelectedItem(item)
-  }
+    setSelectedItem(item);
+  };
 
   return (
     <Box
       sx={{
+        p: 4,
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: 2,
+        gap: 1,
+        minHeight: 'calc(100vh - 80px)',
       }}
     >
-      <TrashIndex items={trashedItems} click={changeSelectedItem}/>
-      <TrashActiveWindow previewItem={selectedItem} />
+      {trashedItems && trashedItems.length > 0 ? (
+        <>
+          <TrashIndex items={trashedItems} click={changeSelectedItem} />
+          <TrashActiveWindow previewItem={selectedItem} />
+        </>
+      ) : (
+        <Typography>ゴミ箱の中は空です。</Typography>
+      )}
     </Box>
   );
 }

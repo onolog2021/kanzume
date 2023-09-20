@@ -86,8 +86,8 @@ function BoadItem({ board, orderArray, bookmark }) {
         id: board.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('softDelete', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
   };
 
   const removeBookmark = () => {

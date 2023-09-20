@@ -8,10 +8,13 @@ import { rejects } from 'assert';
 import simpleGit from 'simple-git';
 import { exec } from 'child_process';
 import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
+import { getFonts } from 'font-list';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 
 const dbPath = path.resolve(__dirname, '../../editor.db');
 const db = new sqlite3.Database(dbPath);
+
+
 
 function createPlaceholder(length: number) {
   const placeholders = Array(length).fill('?').join(', ');
@@ -66,7 +69,7 @@ ipcMain.handle('getStores', (_e, projectId) => {
 
 ipcMain.handle('boardChildren', (_e, folderId) => {
   const sql =
-    'SELECT p.id, p.title, p.content FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? AND p.is_deleted = 0 ORDER BY s.position ASC';
+    'SELECT p.id, p.title, p.content, p.setting FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? AND p.is_deleted = 0 ORDER BY s.position ASC';
   return executeDbAll(sql, folderId);
 });
 
@@ -501,12 +504,13 @@ function destroyRecord(args) {
 
 function softDelete(args) {
   const { table, conditions } = args;
-  let sql = `UPDATE ${table} SET is_deleted = ?`;
+  let sql = `UPDATE ${table} SET is_deleted = ?, updated_at = ?`;
   const placeholder = Object.keys(conditions)
     .map((key) => `${key} = ?`)
     .join(' AND ');
   sql += ` WHERE ${placeholder}`;
-  const values = [1].concat(Object.values(conditions));
+  const deletedTime = getCurrentTime();
+  const values = [1, deletedTime].concat(Object.values(conditions));
   db.run(sql, values, (error) => {
     if (error) {
       console.log(error);
@@ -516,6 +520,7 @@ function softDelete(args) {
 
 ipcMain.on('softDelete', (event, args) => {
   softDelete(args);
+  event.reply('updateTrashIndex');
 });
 
 ipcMain.on('runUpdateTrashIndex', (event) => {
@@ -761,3 +766,18 @@ function dateTranslateForYYMMDD(date: Date) {
 
   return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
+
+function getCurrentTime() {
+  const currentDate = new Date();
+  const offset = currentDate.getTimezoneOffset() * 60000;
+  const localISOTime = new Date(currentDate - offset)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
+  return localISOTime;
+}
+
+ipcMain.handle('getFonts', async () => {
+  const list = await getFonts();
+  return list;
+})

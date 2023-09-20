@@ -34,7 +34,19 @@ function EditorBody({ targetId, page_id, title }) {
         query
       );
       setPage(pageData);
+      const setting = JSON.parse(pageData.setting);
+      if (setting) {
+        const initialSize = setting.fontSize;
+        if (initialSize) {
+          setFontSize(initialSize);
+        }
+        const initialFamily = setting.fontFamily;
+        if (initialFamily) {
+          setFontFamily(initialFamily);
+        }
+      }
     }
+
     setPageData();
   }, [pageStatus]);
 
@@ -74,11 +86,20 @@ function EditorBody({ targetId, page_id, title }) {
 
   const style = {
     fontSize: fontSize && fontSize,
-    fontFamily: fontFamily && fontFamily
-  }
+    fontFamily: fontFamily && fontFamily,
+  };
+
+  const focusEditor = (event) => {
+    event.stopPropagation();
+    const tiptap = document.querySelector(`.tiptap-${page_id} .tiptap`);
+    if (event.key === 'Enter' && tiptap) {
+      event.preventDefault();
+      tiptap.focus();
+    }
+  };
 
   return (
-    <div className="editorBody">
+    <div className={`editorBody tiptap-${page_id}`}>
       <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
           <Box sx={style}>
@@ -87,6 +108,9 @@ function EditorBody({ targetId, page_id, title }) {
               placeholder="タイトル"
               defaultValue={page.title}
               inputRef={titleRef}
+              onKeyDown={(event) => {
+                focusEditor(event);
+              }}
               sx={{
                 input: {
                   fontSize: 20,

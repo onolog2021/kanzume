@@ -79,6 +79,7 @@ function MyEditor({ page, isCount, pageStatus }) {
     initialSetUp()
       .then(() => {
         setEditorStatus(true);
+        editor.current.commands.focus();
       })
       .catch((error) => {
         console.log(error);

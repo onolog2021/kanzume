@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ReactComponent as TextSettingButton } from '../../../../../assets/text.svg';
 import TextSettingWindow from './TextSettingWindow';
 

@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { editorTextToPlaneText } from 'renderer/components/GlobalMethods';
 
 export default function TrashActiveWindow({ previewItem }) {
   const [page, setPage] = useState();
@@ -18,21 +19,16 @@ export default function TrashActiveWindow({ previewItem }) {
         'fetchRecord',
         query
       );
-      setPage(data);
+      if (data) {
+        setPage(data);
 
-      const textArray = JSON.parse(data.content).blocks;
-      const content = [];
-      const target = ['paragraph', 'header'];
-      textArray.forEach((element) => {
-        if (target.includes(element.type)) {
-          content.push(element.data);
-        }
-      });
-      setText(content);
-      console.log(content)
+        const textData = JSON.parse(data.content);
+        const content = textData ? editorTextToPlaneText(textData) : null;
+        setText(content);
+      }
     }
 
-    if (previewItem) {
+    if (previewItem !== null) {
       fetchPreviewData();
     }
   }, [previewItem]);
@@ -42,9 +38,10 @@ export default function TrashActiveWindow({ previewItem }) {
       sx={{
         p: 2,
         borderLeft: '1px solid gray',
+        whiteSpace: 'pre-wrap',
       }}
     >
-      {text && text.map((paragraph) => <Typography key={paragraph}>{paragraph.text}</Typography>)}
+      {text && text}
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import ContextMenu from 'renderer/components/ContextMenu';
 import { ProjectContext } from 'renderer/components/Context';
+import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { ReactComponent as RollbackIcon } from '../../../../../assets/rollback.svg';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../../assets/square.svg';
@@ -24,7 +25,8 @@ function TrashedItem({ item, setSelectedItem }) {
     icon = <PageIcon />;
   }
 
-  const rollBackItem = async () => {
+  const rollBackItem = async (event) => {
+    setSelectedItem(null);
     const query = {
       table: item.type ? 'folder' : 'page',
       columns: {
@@ -34,17 +36,13 @@ function TrashedItem({ item, setSelectedItem }) {
         id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    await window.electron.ipcRenderer.sendMessage(
-      'runUpdateTrashIndex',
-      project.id
-    );
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('runUpdateTrashIndex', project.id);
     if (item.type === 'board') {
       window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
     } else {
       window.electron.ipcRenderer.sendMessage('runUpdatePageList');
     }
-    setSelectedItem(null);
   };
 
   const showPreview = () => {
@@ -55,6 +53,9 @@ function TrashedItem({ item, setSelectedItem }) {
       setSelectedItem(itemData);
     }
   };
+
+  const deletedTime = new Date(item.updated_at);
+  const displayTime = dateTranslateForYYMMDD(deletedTime);
 
   return (
     <ListItemButton
@@ -94,7 +95,7 @@ function TrashedItem({ item, setSelectedItem }) {
       >
         {icon}
       </ListItemIcon>
-      <ListItemText primary={title} secondary="test" />
+      <ListItemText primary={title} secondary={displayTime} />
     </ListItemButton>
   );
 }

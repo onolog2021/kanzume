@@ -15,13 +15,21 @@ import {
 import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../assets/board.svg';
+import { ReactComponent as TrashIcon } from '../../../../assets/trash.svg';
 
 function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
 
-  const svg = tab.type === 'editor' ? <PageIcon /> : <BoardIcon />;
+  let svg;
+  if (tab.type === 'editor') {
+    svg = <PageIcon />;
+  } else if (tab.type === 'board') {
+    svg = <BoardIcon />;
+  } else {
+    svg = <TrashIcon />;
+  }
 
   const isActive = tab.id === currentPage.id;
 
@@ -51,9 +59,9 @@ function TabItem({ tab, orderArray }) {
     setTabList(newTabList);
   };
 
-  function middleClick(event: MouseEvent){
+  function middleClick(event: MouseEvent) {
     event.preventDefault();
-    console.log('fire')
+    console.log('fire');
     if (event.button === 1) {
       console.log('中央ボタンがクリックされました。');
     }
@@ -68,7 +76,7 @@ function TabItem({ tab, orderArray }) {
       {...attributes}
       sx={{
         background: '#E9E9E9;',
-        minWidth: 200,
+        minWidth: tab.type === 'trash' ? 0 : 200,
         height: 48,
         lineHeight: '48px',
         whiteSpace: 'nowrap',

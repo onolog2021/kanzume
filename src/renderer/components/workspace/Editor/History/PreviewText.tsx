@@ -35,7 +35,7 @@ function PreviewText({ diffText }) {
               {text[1]}
             </s>
           ) : (
-            <Tooltip title="現在、追加されている内容">
+            <Tooltip key={index} title="現在、追加されている内容">
               <span key={index} style={categorize(text[0])}>
                 {text[1]}
               </span>

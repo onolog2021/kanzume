@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import {
   ClickAwayListener,
   Box,
@@ -7,11 +7,18 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { CurrentPageContext } from 'renderer/components/Context';
 
-function TextSettingWindow({ closeWindow, changeFontSize, changeFontFamily }) {
+function TextSettingWindow({
+  isOpen,
+  closeWindow,
+  changeFontSize,
+  changeFontFamily,
+}) {
   const [fontList, setFontList] = useState({});
   const [fontStyle, setFontStyle] = useState('');
   const sizeRef = useRef<number>(18);
+  const [currentPage] = useContext(CurrentPageContext);
 
   function runCloseWindow(event) {
     closeWindow(false);
@@ -19,30 +26,74 @@ function TextSettingWindow({ closeWindow, changeFontSize, changeFontFamily }) {
 
   useEffect(() => {
     setFontStyle('Meiryo');
-    const list = {
-      游ゴシック: 'YuGothic',
-      メイリオ: 'Meiryo',
-      'ＭＳ ゴシック': 'MS Gothic',
-      'ＭＳ 明朝': 'MS Mincho',
-      ヒラギノ角ゴシック: 'Hiragino Kaku Gothic',
-      ヒラギノ明朝: 'Hiragino Mincho',
-      小塚ゴシック: 'Kozuka Gothic',
-      小塚明朝: 'Kozuka Mincho',
-      'Source Han Sans': 'Source Han Sans',
-      'Source Han Serif': 'Source Han Serif',
-      'Noto Sans CJK': 'serif',
-      'Noto Serif CJK': 'Noto Serif CJK',
-    };
-    setFontList(list);
+    window.electron.ipcRenderer.invoke('getFonts').then((result) => {
+      const list = new Object();
+      result.map((font, index) => {list[font] = font});
+      setFontList(list)
+    })
+    // setFontList(list);
   }, []);
 
-  const changeFont = (event) => {
+  const changeFont = async (event) => {
     const { value } = event.target;
     changeFontFamily(value);
+    const fetchQuery = {
+      table: 'page',
+      conditions: {
+        id: currentPage.id,
+      },
+    };
+    const pageData = await window.electron.ipcRenderer.invoke(
+      'fetchRecord',
+      fetchQuery
+    );
+    const oldSetting = pageData.setting ? JSON.parse(pageData.setting) : {};
+    const newFamily = {
+      fontFamily: value,
+    };
+    const newSetting = {
+      ...oldSetting,
+      ...newFamily,
+    };
+    const updateQuery = {
+      ...fetchQuery,
+      columns: {
+        setting: JSON.stringify(newSetting),
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
   };
 
   const changeSize = (event, value) => {
     changeFontSize(value);
+  };
+
+  const changeSetting = async (event, value) => {
+    const fetchQuery = {
+      table: 'page',
+      conditions: {
+        id: currentPage.id,
+      },
+    };
+    const pageData = await window.electron.ipcRenderer.invoke(
+      'fetchRecord',
+      fetchQuery
+    );
+    const oldSetting = pageData.setting ? JSON.parse(pageData.setting) : {};
+    const newSize = {
+      fontSize: value,
+    };
+    const newSetting = {
+      ...oldSetting,
+      ...newSize,
+    };
+    const updateQuery = {
+      ...fetchQuery,
+      columns: {
+        setting: JSON.stringify(newSetting),
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
   };
 
   return (
@@ -77,6 +128,7 @@ function TextSettingWindow({ closeWindow, changeFontSize, changeFontFamily }) {
           onChange={(event, value) => {
             changeSize(event, value);
           }}
+          onChangeCommitted={changeSetting}
         />
         <Typography>フォントスタイル：</Typography>
         <select name="" id="" onChange={(event) => changeFont(event)}>

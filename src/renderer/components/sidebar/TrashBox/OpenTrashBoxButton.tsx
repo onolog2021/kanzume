@@ -21,7 +21,7 @@ function OpenTrashBoxButton() {
   const addTabList = () => {
     const value = {
       id: 0,
-      title: 'ゴミ箱',
+      title: '',
       type: 'trash',
       tabId: 'tab-trash',
     };
