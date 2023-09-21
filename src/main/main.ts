@@ -14,8 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
 import { error } from 'console';
-import Project from 'renderer/Classes/Project';
-import Folder from 'renderer/Classes/Folder';
+import Store from 'electron-store';
 import sqlite3 from '../../release/app/node_modules/sqlite3';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -39,12 +38,7 @@ if (!fs.existsSync(dbPath)) {
 const db = new sqlite3.Database(dbPath);
 
 let mainWindow: BrowserWindow | null = null;
-
-// ipcMain.on('ipc-example', async (event, arg) => {
-//   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-//   console.log(msgTemplate(arg));
-//   event.reply('ipc-example', msgTemplate('pong'));
-// });
+Menu.setApplicationMenu(null);
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -85,10 +79,13 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  const store = new Store();
+  const beforeSize = store.get('windowSize');
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: beforeSize ? beforeSize.width : 600,
+    height: beforeSize ? beforeSize.height : 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -110,12 +107,17 @@ const createWindow = async () => {
     }
   });
 
+  mainWindow.on('close', () => {
+    const windowSize = mainWindow?.getBounds();
+    store.set('windowSize', windowSize);
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  // const menuBuilder = new MenuBuilder(mainWindow);
+  // menuBuilder.buildMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
