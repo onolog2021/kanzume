@@ -1,4 +1,4 @@
-import { ipcMain, Menu, MenuItem } from 'electron';
+import { ipcMain, Menu, MenuItem, app } from 'electron';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
@@ -9,12 +9,18 @@ import simpleGit from 'simple-git';
 import { exec } from 'child_process';
 import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { getFonts } from 'font-list';
-import sqlite3 from '../../release/app/node_modules/sqlite3';
+import sqlite3 from 'sqlite3';
 
-const dbPath = path.resolve(__dirname, '../../editor.db');
+const dbPath = app.isPackaged
+  ? path.resolve(__dirname, '../../../editor.db')
+  : path.resolve(__dirname, '../../editor.db');
+
 const db = new sqlite3.Database(dbPath);
 
-
+// リリース後のプロジェクトパス
+const projectFolderPath = app.isPackaged
+  ? path.resolve(__dirname, '../../../project')
+  : path.resolve(__dirname, '../../project');
 
 function createPlaceholder(length: number) {
   const placeholders = Array(length).fill('?').join(', ');
@@ -583,11 +589,7 @@ ipcMain.on('importText', async (event, { projectId, pageId }) => {
 
 ipcMain.on('initProject', async (event, newId) => {
   const fileTitle = `${newId}`;
-  const filePath = path.resolve(
-    __dirname,
-    '../../assets/projects',
-    `${fileTitle}`
-  );
+  const filePath = path.resolve(projectFolderPath, `${fileTitle}`);
   fs.mkdir(filePath, { recursive: true }, (error) => {
     if (error) throw error;
   });
@@ -613,8 +615,7 @@ ipcMain.handle('commitPage', (event, pageId) => {
 
     // ページ内容をファイルに書き出す
     const projectFilePath = path.resolve(
-      __dirname,
-      '../../assets/projects',
+      projectFolderPath,
       `${page.project_id}`
     );
     const pageFilePath = `${projectFilePath}/${page.id}.json`;
@@ -663,11 +664,7 @@ function checkGit() {
 ipcMain.handle('gitLog', async (event, { page_id, project_id }) => {
   const isGit = await checkGit();
   if (isGit) {
-    const projectFilePath = path.resolve(
-      __dirname,
-      '../../assets/projects',
-      `${project_id}`
-    );
+    const projectFilePath = path.resolve(projectFolderPath, `${project_id}`);
     const git = simpleGit(projectFilePath);
     const pageFilePath = `${projectFilePath}/${page_id}.json`;
 
@@ -685,11 +682,7 @@ ipcMain.handle('gitShow', async (event, { pageId, hash, projectId }) => {
   const isGit = await checkGit();
   if (isGit) {
     return new Promise((resolve, reject) => {
-      const projectFilePath = path.resolve(
-        __dirname,
-        '../../assets/projects',
-        `${projectId}`
-      );
+      const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
 
       const pageFilePath = `${pageId}.json`;
 
@@ -709,11 +702,7 @@ ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
   const isGit = await checkGit();
   if (isGit) {
     return new Promise((resolve, reject) => {
-      const projectFilePath = path.resolve(
-        __dirname,
-        '../../assets/projects',
-        `${projectId}`
-      );
+      const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
 
       const pageFilePath = `${pageId}.json`;
 
@@ -734,11 +723,7 @@ ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
   if (!isGit) {
     return;
   }
-  const projectFilePath = path.resolve(
-    __dirname,
-    '../../assets/projects',
-    `${projectId}`
-  );
+  const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
 
   const pageFilePath = `${pageId}.json`;
 
@@ -780,4 +765,4 @@ function getCurrentTime() {
 ipcMain.handle('getFonts', async () => {
   const list = await getFonts();
   return list;
-})
+});

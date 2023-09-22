@@ -15,7 +15,7 @@ import log from 'electron-log';
 import fs from 'fs';
 import { error } from 'console';
 import Store from 'electron-store';
-import sqlite3 from '../../release/app/node_modules/sqlite3';
+import sqlite3 from 'sqlite3';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import './ipcMain';
@@ -28,14 +28,18 @@ class AppUpdater {
   }
 }
 
-const dbPath = path.resolve(__dirname, '../../editor.db');
+const dbPath = app.isPackaged
+  ? path.resolve(__dirname, '../../../editor.db')
+  : path.resolve(__dirname, '../../editor.db');
+
 if (!fs.existsSync(dbPath)) {
   console.log('building DB');
-  const sqlFilePath = path.resolve(__dirname, '../../editor.db.sql');
+  const sqlFilePath = app.isPackaged
+    ? path.resolve(__dirname, '../../../editor.db.sql')
+    : path.resolve(__dirname, '../../editor.db.sql');
   const db = new sqlite3.Database(dbPath);
   executeSql(sqlFilePath, db);
 }
-const db = new sqlite3.Database(dbPath);
 
 let mainWindow: BrowserWindow | null = null;
 Menu.setApplicationMenu(null);

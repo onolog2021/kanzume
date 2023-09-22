@@ -25,7 +25,8 @@ compile_commands.json
 .envrc
 
 # project
-/assets/projects
+/projects
+/release/build/*
 
 # npm package
 /npm/dist
