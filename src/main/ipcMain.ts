@@ -11,16 +11,46 @@ import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { getFonts } from 'font-list';
 import sqlite3 from 'sqlite3';
 
-const dbPath = app.isPackaged
-  ? path.resolve(__dirname, '../../../editor.db')
-  : path.resolve(__dirname, '../../editor.db');
+// 外部SQLの実行
+function executeSql(sqlFilePath: string, dbPath) {
+  const db = new sqlite3.Database(dbPath);
+  fs.readFile(sqlFilePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('SQLファイルの読み込みエラー:', err);
+      return;
+    }
+    db.exec(data, (err) => {
+      if (err) {
+        console.error('SQLの実行エラー:', err);
+      }
+    });
+  });
+}
+
+// DB設定 ※windowsのみ対応
+const appPath = app.isPackaged ? app.getPath('userData') : app.getAppPath();
+const dbFolderPath = path.join(appPath, './data');
+
+if (!fs.existsSync(dbFolderPath)) {
+  fs.mkdirSync(dbFolderPath, { recursive: true });
+}
+
+const dbPath = path.join(dbFolderPath, './editor.db');
+
+if (!fs.existsSync(dbPath)) {
+  const localFolderPath = path.dirname(app.getPath('exe'));
+  const sqlFilePath = app.isPackaged
+    ? path.join(localFolderPath, './resources/editor.db.sql')
+    : path.join(appPath, './editor.db.sql');
+  executeSql(sqlFilePath, dbPath);
+}
 
 const db = new sqlite3.Database(dbPath);
 
-// リリース後のプロジェクトパス
-const projectFolderPath = app.isPackaged
-  ? path.resolve(__dirname, '../../../project')
-  : path.resolve(__dirname, '../../project');
+const projectFolderPath = path.join(appPath, './project');
+if (!fs.existsSync(projectFolderPath)) {
+  fs.mkdirSync(projectFolderPath, { recursive: true });
+}
 
 function createPlaceholder(length: number) {
   const placeholders = Array(length).fill('?').join(', ');

@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
-
 import SearchProjectForm from './SearchProjectForm';
 
 function StartMenu() {

@@ -19,6 +19,7 @@
 /.idea/
 /dist/
 node_modules/
+project/*
 SHASUMS256.txt
 **/package-lock.json
 compile_commands.json

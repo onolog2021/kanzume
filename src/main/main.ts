@@ -28,19 +28,6 @@ class AppUpdater {
   }
 }
 
-const dbPath = app.isPackaged
-  ? path.resolve(__dirname, '../../../editor.db')
-  : path.resolve(__dirname, '../../editor.db');
-
-if (!fs.existsSync(dbPath)) {
-  console.log('building DB');
-  const sqlFilePath = app.isPackaged
-    ? path.resolve(__dirname, '../../../editor.db.sql')
-    : path.resolve(__dirname, '../../editor.db.sql');
-  const db = new sqlite3.Database(dbPath);
-  executeSql(sqlFilePath, db);
-}
-
 let mainWindow: BrowserWindow | null = null;
 Menu.setApplicationMenu(null);
 
@@ -158,17 +145,3 @@ app
   })
   .catch(console.log);
 
-// 外部SQLの実行
-function executeSql(sqlFilePath: string, db) {
-  fs.readFile(sqlFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('SQLファイルの読み込みエラー:', err);
-      return;
-    }
-    db.exec(data, (err) => {
-      if (err) {
-        console.error('SQLの実行エラー:', err);
-      }
-    });
-  });
-}

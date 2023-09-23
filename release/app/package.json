@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
+  "name": "kanzume-editor",
+  "version": "0.2.0",
   "description": "A foundation for scalable desktop apps",
   "license": "MIT",
   "author": {
     "name": "Electron React Boilerplate Maintainers",
     "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "url": "https://github.com/kanzume-editor"
   },
   "main": "./dist/main/main.js",
   "scripts": {

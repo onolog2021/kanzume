@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/onolog2021/kanzume.git"
   },
   "license": "MIT",
   "author": {
@@ -190,8 +190,9 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "kanzume",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "appId": "org.erb.kanzume",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -246,13 +247,12 @@
     },
     "extraResources": [
       "./assets/**",
-      "./editor.db.sql",
-      "./project"
+      "./editor.db.sql"
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "onolog2021",
+      "repo": "kanzume"
     }
   },
   "collective": {
