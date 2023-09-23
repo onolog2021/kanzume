@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path, { resolve } from 'path';
-import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, shell, dialog, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
@@ -24,13 +24,59 @@ class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.autoDownload = false;
+
+    // アップデートが利用可能な場合
+    autoUpdater.on('update-available', () => {
+      dialog
+        .showMessageBox({
+          type: 'info',
+          title: 'アップデートが利用可能です',
+          message: '新しいバージョンが利用可能です。アップデートしますか？',
+          buttons: ['はい', 'いいえ'],
+        })
+        .then((result) => {
+          const buttonIndex = result.response;
+          if (buttonIndex === 0) {
+            autoUpdater.downloadUpdate();
+          }
+        });
+    });
+
+    // アップデートのダウンロードが完了した場合
+    autoUpdater.on('update-downloaded', () => {
+      dialog
+        .showMessageBox({
+          type: 'info',
+          title: 'アップデートのダウンロードが完了しました',
+          message:
+            'アップデートをインストールしてアプリケーションを再起動しますか？',
+          buttons: ['再起動', '後で'],
+        })
+        .then((result) => {
+          const buttonIndex = result.response;
+          if (buttonIndex === 0) {
+            autoUpdater.quitAndInstall();
+          }
+        });
+    });
+
+    // エラーが発生した場合
+    autoUpdater.on('error', (error) => {
+      log.error('アップデートエラー:', error);
+      dialog.showErrorBox(
+        'アップデートエラー',
+        'アップデート中にエラーが発生しました。詳細はログをご確認ください。'
+      );
+    });
+
+    // アップデートの確認を開始
+    autoUpdater.checkForUpdates();
   }
 }
 
 let mainWindow: BrowserWindow | null = null;
 Menu.setApplicationMenu(null);
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -144,4 +190,3 @@ app
     });
   })
   .catch(console.log);
-
