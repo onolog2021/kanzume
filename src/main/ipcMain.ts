@@ -432,6 +432,11 @@ ipcMain.on('mergeTextData', (event, args) => {
 // 更新用SQLの作成
 function createSqlStatementForUpdate(args) {
   const { table, columns, conditions } = args;
+  const updateDateTable = ['page', 'folder', 'project'];
+  if (updateDateTable.includes(table)) {
+    const currentTime = getCurrentTime();
+    columns.updated_at = currentTime;
+  }
   let sql = `UPDATE ${table} `;
   const columnsPlaceholder = Object.keys(columns)
     .map((key) => `${key} = ?`)
@@ -571,26 +576,25 @@ ipcMain.on('runUpdateBoardList', (event) => {
   event.reply('updateBoardList');
 });
 
-ipcMain.on('exportText', (event, jsonText) => {
-  const filename = 'test';
-  const projectsFilePath = path.resolve(
-    __dirname,
-    '../../assets/projects',
-    `${filename}.json`
-  );
-  fs.writeFile(projectsFilePath, JSON.stringify(jsonText), (err) => {
-    if (err) {
-      console.error('JSONファイルの書き出しエラー:', err);
-    } else {
-      console.log('JSONファイルが正常に書き出されました:', projectsFilePath);
-    }
-  });
-});
+// ipcMain.on('exportText', (event, jsonText) => {
+//   const filename = 'test';
+//   const projectsFilePath = path.join(
+//     __dirname,
+//     '../../assets/projects',
+//     `${filename}.json`
+//   );
+//   fs.writeFile(projectsFilePath, JSON.stringify(jsonText), (err) => {
+//     if (err) {
+//       console.error('JSONファイルの書き出しエラー:', err);
+//     } else {
+//       console.log('JSONファイルが正常に書き出されました:', projectsFilePath);
+//     }
+//   });
+// });
 
 ipcMain.on('importText', async (event, { projectId, pageId }) => {
-  const pageFilePath = path.resolve(
-    __dirname,
-    '../../assets/projects',
+  const pageFilePath = path.join(
+    projectFolderPath,
     `${projectId}`,
     `${pageId}.json`
   );
@@ -619,7 +623,7 @@ ipcMain.on('importText', async (event, { projectId, pageId }) => {
 
 ipcMain.on('initProject', async (event, newId) => {
   const fileTitle = `${newId}`;
-  const filePath = path.resolve(projectFolderPath, `${fileTitle}`);
+  const filePath = path.join(projectFolderPath, `${fileTitle}`);
   fs.mkdir(filePath, { recursive: true }, (error) => {
     if (error) throw error;
   });
@@ -644,10 +648,7 @@ ipcMain.handle('commitPage', (event, pageId) => {
     const page = await fetchRecord(query);
 
     // ページ内容をファイルに書き出す
-    const projectFilePath = path.resolve(
-      projectFolderPath,
-      `${page.project_id}`
-    );
+    const projectFilePath = path.join(projectFolderPath, `${page.project_id}`);
     const pageFilePath = `${projectFilePath}/${page.id}.json`;
 
     const textJson = page.content;
@@ -694,12 +695,12 @@ function checkGit() {
 ipcMain.handle('gitLog', async (event, { page_id, project_id }) => {
   const isGit = await checkGit();
   if (isGit) {
-    const projectFilePath = path.resolve(projectFolderPath, `${project_id}`);
+    const projectFilePath = path.join(projectFolderPath, `${project_id}`);
     const git = simpleGit(projectFilePath);
     const pageFilePath = `${projectFilePath}/${page_id}.json`;
 
     try {
-      const logList = await git.log(['-p', pageFilePath]);
+      const logList = await git.log([pageFilePath]);
       return logList;
     } catch (error) {
       console.error('Error fetching git log:', error);
@@ -712,7 +713,7 @@ ipcMain.handle('gitShow', async (event, { pageId, hash, projectId }) => {
   const isGit = await checkGit();
   if (isGit) {
     return new Promise((resolve, reject) => {
-      const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
+      const projectFilePath = path.join(projectFolderPath, `${projectId}`);
 
       const pageFilePath = `${pageId}.json`;
 
@@ -732,7 +733,7 @@ ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
   const isGit = await checkGit();
   if (isGit) {
     return new Promise((resolve, reject) => {
-      const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
+      const projectFilePath = path.join(projectFolderPath, `${projectId}`);
 
       const pageFilePath = `${pageId}.json`;
 
@@ -753,13 +754,15 @@ ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
   if (!isGit) {
     return;
   }
-  const projectFilePath = path.resolve(projectFolderPath, `${projectId}`);
+  const projectFilePath = path.join(projectFolderPath, `${projectId}`);
 
   const pageFilePath = `${pageId}.json`;
 
   const git = simpleGit(projectFilePath);
 
-  await git.checkout([hash, '--', pageFilePath], (error, result) => {
+  const option = [hash, '--', pageFilePath];
+
+  await git.checkout(option, (error, result) => {
     if (error) {
       console.log(error);
       return error;

@@ -5,7 +5,7 @@ const StyledScrollbarBox = styled(Box)<BoxProps>(({ theme }) => ({
   overflow: 'scroll',
   '&.MuiDrawer-paper': { width: 240, px: 1, minHeight: '100vh' },
   '&::-webkit-scrollbar': {
-    width: '2px',
+    width: '4px',
   },
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: 'transparent',

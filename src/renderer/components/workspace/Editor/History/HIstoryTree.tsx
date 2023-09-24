@@ -2,7 +2,9 @@ import { Box } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import ReactLoading from 'react-loading';
+import theme from 'renderer/theme';
 import HistoryItem from './HistoryItem';
+import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 
 export default function HistoryTree({ pageId, selectFunc, selected }) {
   const [project] = useContext(ProjectContext);
@@ -33,9 +35,16 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
   };
 
   return (
-    <Box>
+    <StyledScrollbarBox
+      sx={{maxHeight: 'calc(100vh - 200px)'}}
+    >
       {loading && loading ? (
-        <ReactLoading type="spin" color="gray" width={40} height={40} />
+        <ReactLoading
+          type="spin"
+          color={theme.palette.primary.main}
+          width={40}
+          height={40}
+        />
       ) : (
         <Box
           sx={{
@@ -55,9 +64,9 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
           }}
         >
           {logs &&
-            logs.map((log) => (
+            logs.map((log, index) => (
               <HistoryItem
-                key={log.hash}
+                key={index}
                 log={log}
                 selectFunc={selectFunc}
                 selected={selected}
@@ -65,6 +74,6 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
             ))}
         </Box>
       )}
-    </Box>
+    </StyledScrollbarBox>
   );
 }

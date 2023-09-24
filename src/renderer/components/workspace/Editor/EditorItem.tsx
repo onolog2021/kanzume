@@ -9,6 +9,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import History from '@tiptap/extension-history';
 import TextStyle from '@tiptap/extension-text-style';
 import Placeholder from '@tiptap/extension-placeholder';
+import { getCurrentTime } from 'renderer/components/GlobalMethods';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
 
 function MyEditor({ page, isCount, pageStatus }) {

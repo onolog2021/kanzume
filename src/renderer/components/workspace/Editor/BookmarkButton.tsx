@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import theme from 'renderer/theme';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 
 function BookmarkButton({ page }) {
@@ -61,7 +62,10 @@ function BookmarkButton({ page }) {
   };
 
   return (
-    <Bookmark fill={bookmark ? 'blue' : 'gray'} onClick={changeBookmark} />
+    <Bookmark
+      fill={bookmark ? theme.palette.primary.main : 'gray'}
+      onClick={changeBookmark}
+    />
   );
 }
 

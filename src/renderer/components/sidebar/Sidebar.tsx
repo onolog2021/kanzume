@@ -1,9 +1,18 @@
 import { useState, useContext } from 'react';
-import  { Drawer, Box, Typography, Tooltip, useTheme } from '@mui/material';
+import {
+  Drawer,
+  Box,
+  Typography,
+  Tooltip,
+  useTheme,
+  IconButton,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
 import { ReactComponent as HomeIcon } from '../../../../assets/home.svg';
+import LogoImage from '../../../../assets/logo.png';
+import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
@@ -42,11 +51,23 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
       <Box sx={{ mb: '40px' }}>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Tooltip title="スタートメニュー" placement="bottom">
-            <HomeIcon
+            <PlaneIconButton onClick={() => returnHome()} sx={{p: 0}}>
+              <img
+                src={LogoImage}
+                alt="logo"
+                className="logo"
+                style={{
+                  margin: '0 auto',
+                  display: 'block',
+                  width: 24,
+                }}
+              />
+            </PlaneIconButton>
+            {/* <HomeIcon
               width={24}
               onClick={() => returnHome()}
               style={{ cursor: 'pointer', fill: theme.palette.primary.main }}
-            />
+            /> */}
           </Tooltip>
           <Typography
             sx={{

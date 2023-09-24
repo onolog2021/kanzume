@@ -8,11 +8,12 @@ function PreviewText({ diffText }) {
 
   const deletedText = {
     ...defaultStyle,
-    color: 'blue',
+    color: 'red',
   };
 
   const addedText = {
     ...defaultStyle,
+    display: 'none',
     color: 'red',
   };
 
@@ -31,15 +32,13 @@ function PreviewText({ diffText }) {
       {diffText &&
         diffText.map((text, index) =>
           text[0] === -1 ? (
-            <s key={index} style={deletedText}>
+            <span key={index} style={deletedText}>
               {text[1]}
-            </s>
+            </span>
           ) : (
-            <Tooltip key={index} title="現在、追加されている内容">
-              <span key={index} style={categorize(text[0])}>
-                {text[1]}
-              </span>
-            </Tooltip>
+            <span key={index} style={categorize(text[0])}>
+              {text[1]}
+            </span>
           )
         )}
     </Box>

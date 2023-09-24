@@ -4,6 +4,7 @@ import EditorBody from './Editor/EditorBody';
 import BoardSpace from './Board/BoardSpace';
 import TrashBox from './Trash/TrashBox';
 import TabList from './TabList';
+import NoSpace from './NoSpace';
 
 function WorkSpace() {
   const [tabList, setTabList] = useContext(TabListContext);
@@ -47,6 +48,10 @@ function WorkSpace() {
     }
     return content;
   };
+
+  if (tabList && tabList.length === 0) {
+    return <NoSpace />;
+  }
 
   return (
     <div className="workSpace">

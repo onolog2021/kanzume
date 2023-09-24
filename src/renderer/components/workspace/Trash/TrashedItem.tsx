@@ -4,15 +4,17 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
+  Box,
 } from '@mui/material';
-import ContextMenu from 'renderer/components/ContextMenu';
 import { ProjectContext } from 'renderer/components/Context';
 import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { ReactComponent as RollbackIcon } from '../../../../../assets/rollback.svg';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../../assets/square.svg';
 import { ReactComponent as FolderIcon } from '../../../../../assets/folder-outline.svg';
+import { ReactComponent as TrashButton } from '../../../../../assets/trash.svg';
 
 function TrashedItem({ item, setSelectedItem }) {
   const { id, title } = item;
@@ -57,32 +59,32 @@ function TrashedItem({ item, setSelectedItem }) {
   const deletedTime = new Date(item.updated_at);
   const displayTime = dateTranslateForYYMMDD(deletedTime);
 
+  const deleteItem = () => {
+    const deleteQuery = {
+      table: item.type ? 'folder' : 'page',
+      conditions: {
+        id,
+      },
+    }
+    window.electron.ipcRenderer.sendMessage('deleteRecord', deleteQuery);
+    window.electron.ipcRenderer.sendMessage('runUpdateTrashIndex');
+  }
+
   return (
-    <ListItemButton
-      onClick={showPreview}
-      sx={{
-        ':hover': {
-          background: 'none',
-          button: {
-            display: 'block',
-          },
-        },
-      }}
-    >
-      <IconButton
-        onClick={rollBackItem}
-        sx={{
-          display: 'none',
-          position: 'absolute',
-          left: 0,
-          width: 40,
-          ':hover': {
-            background: 'none',
-          },
-        }}
-      >
-        <RollbackIcon />
-      </IconButton>
+    <ListItemButton onClick={showPreview}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Tooltip title="もとに戻す" placement="top">
+          <IconButton onClick={rollBackItem}>
+            <RollbackIcon style={{ width: 24, height: 24 }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="完全に削除する" placement="top">
+          <IconButton onClick={deleteItem}>
+            <TrashButton style={{ width: 24, height: 24 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
       <ListItemIcon
         sx={{
           py: 1,
