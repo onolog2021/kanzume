@@ -3,7 +3,7 @@ import { Box, Paper, TextField } from '@mui/material';
 import { Resizable } from 're-resizable';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useSortable } from '@dnd-kit/sortable';
-import { title } from 'process';
+import theme from 'renderer/theme';
 import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
@@ -13,26 +13,20 @@ interface PaperSize {
   height: number;
 }
 
-function Boardpage({
-  pageData,
-  orderArray,
-  boardId,
-  paperWidth,
-  fullWidth,
-  index,
-}) {
-  const [paperSize, setPaperSize] = useState<PaperSize | null>(null);
+function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
+  const [paperSize, setPaperSize] = useState<PaperSize | undefined>();
   const titleRef = useRef();
-  const resizeRef = useRef();
+  const resizeRef = useRef(null);
   const dndId = `bp-${pageData.id}`;
+  const [isResizing, setIsResizing] = useState(false);
 
   useEffect(() => {
-    if(paperSize){
-      const newSize = {...paperSize};
+    if (paperSize) {
+      const newSize = { ...paperSize };
       newSize.width = paperWidth;
       setPaperSize(newSize);
     }
-  },[paperWidth])
+  }, [paperWidth]);
 
   useEffect(() => {
     if (pageData.setting) {
@@ -47,13 +41,11 @@ function Boardpage({
     } else {
       const initialSize = {
         width: paperWidth,
-        height: 400,
+        height: 300,
       };
       setPaperSize(initialSize);
     }
   }, []);
-
-
 
   const dndData = {
     area: 'boardBody',
@@ -72,16 +64,11 @@ function Boardpage({
       data: dndData,
     });
 
-  function tellSize(size: PaperSize) {
-    const currentsize = {
-      width: resizeRef.current.offsetWidth,
-      height: resizeRef.current.offsetHeight,
-    };
-    const newSize = {
-      width: `${(currentsize.width / fullWidth) * 100}%`,
-      height: currentsize.height,
-    };
+  function updateSize(size: PaperSize) {
+    setIsResizing(false);
+    const newSize = resizeRef?.current.size;
     setPaperSize(newSize);
+
     const oldSetting = pageData.setting ? JSON.parse(pageData.setting) : {};
     const newSetting = {
       ...oldSetting,
@@ -126,67 +113,71 @@ function Boardpage({
     }
   }
 
+  const borderColer = theme.palette.primary.main;
+
   return (
     <Resizable
       enable={{ right: true, bottom: true, bottomRight: true }}
+      onResizeStop={(event, data, node, size) => updateSize(size)}
       size={paperSize}
-      onResizeStop={(event, data, node, size) => tellSize(size)}
-      bounds="window"
+      ref={resizeRef}
+      style={{
+        margin: '8px',
+        opacity: isDragging ? 0.4 : 1,
+        paddingRight: isOver && fromWhich() === 'right' ? '16px' : '0',
+        paddingLeft: isOver && fromWhich() === 'left' ? '16px' : '0',
+        borderLeft:
+          isOver && fromWhich() === 'left'
+            ? `2px solid ${borderColer}`
+            : 'none',
+        borderRight:
+          isOver && fromWhich() === 'right'
+            ? `2px solid ${borderColer}`
+            : 'none',
+      }}
     >
-      <Box
-        ref={resizeRef}
+      <Paper
+        className="boardPaper"
+        elevation={2}
+        ref={setNodeRef}
         sx={{
-          height: '100%',
+          position: 'relative',
+          border: '0.5px solid #999',
           width: '100%',
-          borderLeft:
-            isOver && fromWhich() === 'left' ? '2px solid tomato' : 'none',
-          borderRight:
-            isOver && fromWhich() === 'right' ? '2px solid tomato' : 'none',
+          height: '100%',
+          p: 4,
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '2px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'transparent',
+          },
+          '&:hover::-webkit-scrollbar-thumb': {
+            backgroundColor: '#999',
+          },
         }}
       >
-        <Paper
-          className="boardPaper"
-          elevation={2}
-          ref={setNodeRef}
-          sx={{
-            height: '100%',
-            width: '100%',
-            position: 'relative',
-            border: '0.5px solid #999',
-            p: 4,
-            overflow: 'auto',
-            '&::-webkit-scrollbar': {
-              width: '2px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'transparent',
-            },
-            '&:hover::-webkit-scrollbar-thumb': {
-              backgroundColor: '#999',
-            },
+        <HandleIcon
+          {...listeners}
+          {...attributes}
+          style={{
+            width: 24,
+            height: 24,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            position: 'absolute',
+            left: 4,
+            top: 4,
           }}
-        >
-          <HandleIcon
-            {...listeners}
-            {...attributes}
-            style={{
-              width: 24,
-              height: 24,
-              cursor: isDragging ? 'grabbing' : 'grab',
-              position: 'absolute',
-              left: 4,
-              top: 4,
-            }}
-          />
-          <PlaneTextField
-            defaultValue={pageData.title}
-            sx={{ input: { px: 0 } }}
-            inputRef={titleRef}
-            onBlur={changeName}
-          />
-          <EditorItem page={pageData} />
-        </Paper>
-      </Box>
+        />
+        <PlaneTextField
+          defaultValue={pageData.title}
+          sx={{ input: { px: 0 } }}
+          inputRef={titleRef}
+          onBlur={changeName}
+        />
+        <EditorItem page={pageData} />
+      </Paper>
     </Resizable>
   );
 }

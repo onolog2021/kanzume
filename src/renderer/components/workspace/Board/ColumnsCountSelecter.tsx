@@ -38,7 +38,6 @@ function ColumnsCountSelector({ changeColumnsCount, pages, fullwidth }) {
     <Box display="flex" gap={2}>
       <Rating
         name="columns-selecter"
-        defaultValue={3}
         icon={
           <Rectangle
             style={{
@@ -53,7 +52,6 @@ function ColumnsCountSelector({ changeColumnsCount, pages, fullwidth }) {
         }
         onChange={runChangeColumnsCount}
       />
-      <Typography>{count && count}列</Typography>
     </Box>
   );
 }

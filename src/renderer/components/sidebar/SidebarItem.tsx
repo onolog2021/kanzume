@@ -13,7 +13,7 @@ interface contextMenu {
 }
 
 function SidebarItem({ icon, text, functions, dndTag, collapse }) {
-  const [selected, setSelected] = useState();
+  const [selected, setSelected] = useState<Boolean>(false);
   const { click, contextMenu } = functions;
   const [contextMenuStatus, setContextMenuStatus] =
     useState<contextMenu | null>(null);
@@ -23,18 +23,17 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     useSortable(dndTag);
 
   useEffect(() => {
-    if (currentPage) {
-      if (currentPage.id === dndTag.data.id) {
-        if (
-          (currentPage.type === 'editor' && dndTag.data.type === 'page') ||
-          currentPage.type === dndTag.data.type
-        ) {
-          setSelected(true);
-        }
-      } else {
-        setSelected(false);
-      }
+    if (!currentPage) {
+      setSelected(false);
+      return;
     }
+
+    const isSameId = currentPage.id === dndTag.data.id;
+    const isMatchingType =
+      (currentPage.type === 'editor' && dndTag.data.type === 'page') ||
+      currentPage.type === dndTag.data.type;
+
+    setSelected(isSameId && isMatchingType);
   }, [currentPage]);
 
   const style = {

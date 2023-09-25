@@ -11,6 +11,9 @@ function WorkSpace() {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
 
   const isCurrent = (tab) => {
+    if (currentPage === null) {
+      return;
+    }
     return tab.id === currentPage.id && tab.type === currentPage.type
       ? { display: 'block' }
       : { display: 'none' };

@@ -1,6 +1,7 @@
 import { useDroppable } from '@dnd-kit/core';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
+import theme from 'renderer/theme';
 
 interface itemData {
   dndId: string;
@@ -35,14 +36,14 @@ export default function SortableBorder({ tag, index }) {
 
   const style = {
     height: 18,
-    transition: 'border-color 3s ease',
+    // transition: 'border-color 3s ease',
   };
 
   const overedStyle = {
     height: 9,
     mb: '9px',
-    borderBottom: '2px solid gray',
-    transition: 'border-color 3s ease',
+    borderBottom: `2px solid ${theme.palette.primary.main}`,
+    // transition: 'border-color 3s ease',
   };
 
   return <Box ref={setNodeRef} sx={isOver ? overedStyle : style} />;

@@ -56,7 +56,6 @@ async function handleDataDroppedInFolder(
   }
 
   if (activeItem.parentId !== overItem.parentId) {
-    console.log('fire')
     const query = {
       table: 'store',
       columns: {

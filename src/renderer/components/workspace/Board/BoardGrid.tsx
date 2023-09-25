@@ -39,7 +39,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
         ref={sizeRef}
         sx={{
           display: 'flex',
-          gap: '16px',
+          flexShrink: 0,
           flexWrap: 'wrap',
           p: 2,
           minHeight: 800,

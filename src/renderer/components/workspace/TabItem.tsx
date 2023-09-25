@@ -21,6 +21,7 @@ function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
+  const [isActive, setIsActive] = useState<Boolean>(false);
 
   let svg;
   if (tab.type === 'editor') {
@@ -31,7 +32,17 @@ function TabItem({ tab, orderArray }) {
     svg = <TrashIcon />;
   }
 
-  const isActive = tab.id === currentPage.id;
+  useEffect(() => {
+    if (currentPage) {
+      if (currentPage.id === tab.id && tab.type === currentPage.type) {
+        setIsActive(true);
+      } else {
+        setIsActive(false);
+      }
+    } else {
+      setIsActive(false);
+    }
+  }, [currentPage]);
 
   const { attributes, listeners, setNodeRef } = useSortable({
     id: tabId,
@@ -57,6 +68,9 @@ function TabItem({ tab, orderArray }) {
     const newTabList = [...tabList];
     newTabList.splice(closedTabIndex, 1);
     setTabList(newTabList);
+    if (isActive) {
+      setCurrentPage(null);
+    }
   };
 
   function middleClick(event: MouseEvent) {
@@ -69,7 +83,7 @@ function TabItem({ tab, orderArray }) {
 
   return (
     <ListItemButton
-      className={currentPage.id === id ? 'tab selected' : 'tab'}
+      className={isActive ? 'tab selected' : 'tab'}
       onClick={() => handleActiveTab(id)}
       ref={setNodeRef}
       {...listeners}

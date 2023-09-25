@@ -357,10 +357,6 @@ function DragAndDrop() {
   function createNewOrderArray() {
     // 同じ場所でドラッグ＆ドロップした場合
     if (activeItem.area === overItem.area) {
-      if (activeItem?.parentId !== overItem?.parentId) {
-        console.log('違うファイル間でのドロップだから注意ね');
-      }
-
       const orderArray = [...overItem?.orderArray];
       const filteredArray = orderArray.filter(
         (item) => item !== activeItem?.dndId

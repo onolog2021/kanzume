@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
+import theme from 'renderer/theme';
 
 export default function PaperBorder({ boardId, index, orderArray }) {
   const { setNodeRef, over, isOver, active } = useDroppable({
@@ -15,17 +16,15 @@ export default function PaperBorder({ boardId, index, orderArray }) {
   });
 
   const style = {
-    display: 'none',
     width: 20,
     height: 20,
-    background: 'tomato',
+    background: 'transparent'
   };
 
   const overedStyle = {
-    display: 'block',
     minHeight: 10,
-    minWidth: 10,
-    background: isOver ? 'blue' : 'gray',
+    minWidth: 2,
+    background: isOver ? theme.palette.primary.main : 'transparent',
   };
 
   return (

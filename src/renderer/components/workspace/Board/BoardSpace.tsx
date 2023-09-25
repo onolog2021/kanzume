@@ -8,7 +8,7 @@ import { electron } from 'process';
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
-import { ReactComponent as AddButton } from '../../../../../assets/plus.svg';
+import { ReactComponent as AddButton } from '../../../../../assets/paper-plus.svg';
 
 export default function BoardSpace({ boardData }) {
   const [project] = useContext(ProjectContext);
