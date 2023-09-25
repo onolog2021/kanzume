@@ -19,7 +19,7 @@ function NoSpace() {
           className="logo"
           style={{ margin: '0 auto', display: 'block', opacity: 0.7, width:120 }}
         />
-        <Typography
+        {/* <Typography
           sx={{
             mt: 4,
             fontSize: 20,
@@ -29,7 +29,7 @@ function NoSpace() {
           }}
         >
           KANZUMEエディタへようこそ!
-        </Typography>
+        </Typography> */}
       </Box>
     </Box>
   );

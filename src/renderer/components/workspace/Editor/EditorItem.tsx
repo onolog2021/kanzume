@@ -45,6 +45,7 @@ function MyEditor({ page, isCount, pageStatus }) {
     },
   });
 
+
   useEffect(() => {
     async function initialSetUp() {
       const options = {

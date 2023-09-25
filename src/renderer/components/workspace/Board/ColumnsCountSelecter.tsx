@@ -2,21 +2,22 @@ import { Box, Rating, Typography } from '@mui/material';
 import { useState } from 'react';
 import { ReactComponent as Rectangle } from '../../../../../assets/rectangle.svg';
 
-function ColumnsCountSelector({ changeColumnsCount, pages }) {
+function ColumnsCountSelector({ changeColumnsCount, pages, fullwidth }) {
   const [count, setCount] = useState();
 
   const runChangeColumnsCount = async (event, newValue) => {
-    changeColumnsCount(newValue);
-    setCount(newValue);
-
-    const newWidth = `${(1 / newValue) * 100}%`;
+    const width = ((fullwidth - 16 * (newValue + 1)) / newValue);
+    const percent = `${width / fullwidth * 100}%`;
     const queryArray = [];
     pages.forEach((page) => {
       const oldSetting = JSON.parse(page.setting);
       const newSetting = {
         ...oldSetting,
-        width: newWidth,
+        width: percent,
       };
+      if(!newSetting.height){
+        newSetting.height = 300;
+      }
       const query = {
         table: 'page',
         columns: {
@@ -29,6 +30,8 @@ function ColumnsCountSelector({ changeColumnsCount, pages }) {
       queryArray.push(query);
     });
     await window.electron.ipcRenderer.invoke('updateRecords', queryArray);
+    setCount(newValue);
+    changeColumnsCount(newValue);
   };
 
   return (
@@ -45,10 +48,12 @@ function ColumnsCountSelector({ changeColumnsCount, pages }) {
             }}
           />
         }
-        emptyIcon={<Rectangle style={{ width: 30, fill: '#D9D9D9', margin: 3 }} />}
+        emptyIcon={
+          <Rectangle style={{ width: 30, fill: '#D9D9D9', margin: 3 }} />
+        }
         onChange={runChangeColumnsCount}
       />
-      <Typography>{count}列</Typography>
+      <Typography>{count && count}列</Typography>
     </Box>
   );
 }

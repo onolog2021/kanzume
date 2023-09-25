@@ -60,7 +60,7 @@ export default function BoardSpace({ boardData }) {
       const width = titleRef.current.offsetWidth;
       setFullWidth(width);
     }
-  }, [titleRef.current]);
+  }, [titleRef?.current]);
 
   // 集まったIDからpage一覧を作成
   async function flattenPages(ids: number[]) {
@@ -190,6 +190,7 @@ export default function BoardSpace({ boardData }) {
         <ColumnsCountSelector
           changeColumnsCount={changeColumnsCount}
           pages={pages}
+          fullwidth={fullWidth}
         />
         <Tooltip title="テキストの追加" placement="top">
           <IconButton onClick={addText}>

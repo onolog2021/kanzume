@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Box } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Boardpage from './BoardPage';
+import PaperBorder from './PaperBorder';
 
 function BoardGrid({ board, columnsCount, pages, fullWidth }) {
   const [orderArray, setOrderArray] = useState([]);
@@ -20,12 +21,15 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
       setOrderArray(paperOrderArray);
     };
     getPages();
-  }, []);
+  }, [pages]);
 
   useEffect(() => {
     if (columnsCount) {
-      const widthPercent = `${(1 / columnsCount) * 100}%`;
-      setItemWidth(widthPercent);
+      const width = (
+        (fullWidth - 16 * (columnsCount + 1)) / columnsCount
+      );
+      const percent = `${(width / fullWidth) * 100}%`;
+      setItemWidth(percent);
     }
   }, [columnsCount]);
 
@@ -35,6 +39,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
         ref={sizeRef}
         sx={{
           display: 'flex',
+          gap: '16px',
           flexWrap: 'wrap',
           p: 2,
           minHeight: 800,
@@ -43,7 +48,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
         {orderArray && (
           <SortableContext items={orderArray}>
             {pages &&
-              pages.map((page) => (
+              pages.map((page, index) => (
                 <Boardpage
                   key={`page-${page.id}`}
                   boardId={board.id}
@@ -51,8 +56,16 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
                   paperWidth={itemWidth}
                   orderArray={orderArray}
                   fullWidth={fullWidth}
+                  index={index}
                 />
               ))}
+            {pages && (
+              <PaperBorder
+                boardId={board.id}
+                index={pages.length}
+                orderArray={orderArray}
+              />
+            )}
           </SortableContext>
         )}
       </Box>

@@ -215,7 +215,7 @@ function DragAndDrop() {
     boardBody: 'updateBoardBody',
   };
 
-  const DragEnd = ({ over }) => {
+  const DragEnd = () => {
     // dropした場所は？
     const droppedPlace = overItem?.itemType;
 

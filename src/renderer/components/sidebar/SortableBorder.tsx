@@ -23,7 +23,7 @@ export default function SortableBorder({ tag, index }) {
       position: index,
       itemType: 'border',
     };
-    const setId = `border-${modifiedData.area}-${index}`;
+    const setId = `border-${modifiedData.area}-${tag.data.id}-${index}`;
     setItemId(setId);
     setItemData(modifiedData);
   }, [tag, index]);
@@ -35,14 +35,14 @@ export default function SortableBorder({ tag, index }) {
 
   const style = {
     height: 18,
-    transition: 'border-color 3s ease'
+    transition: 'border-color 3s ease',
   };
 
   const overedStyle = {
     height: 9,
     mb: '9px',
     borderBottom: '2px solid gray',
-    transition: 'border-color 3s ease'
+    transition: 'border-color 3s ease',
   };
 
   return <Box ref={setNodeRef} sx={isOver ? overedStyle : style} />;

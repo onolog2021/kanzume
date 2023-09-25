@@ -15,6 +15,9 @@ async function handleDataDroppedInBoardBody(
   overItem: itemData
 ) {
   const isArea = overItem.type === 'area';
+  if (isArea) {
+    return;
+  }
 
   if (activeItem.type === 'page') {
     const position = isArea ? -1 : order.indexOf(activeItem?.dndId);
@@ -38,12 +41,7 @@ async function handleDataDroppedInBoardBody(
     window.electron.ipcRenderer.sendMessage('deleteRecord', deleteQuery);
   }
 
-  if (isArea) {
-    return;
-  }
-
   const argsArray = [];
-
   order.forEach((element, index) => {
     const hash = element.split('-');
     if (hash.includes('bp')) {

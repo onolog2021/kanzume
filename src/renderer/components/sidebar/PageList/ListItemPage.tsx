@@ -62,8 +62,8 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
         id: pageData.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('softDelete', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    window.electron.ipcRenderer.sendMessage('runUpdatePageList');
   };
 
   const removeBookmark = () => {

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, Paper, TextField } from '@mui/material';
 import { Resizable } from 're-resizable';
-import { useDraggable } from '@dnd-kit/core';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
+import { useSortable } from '@dnd-kit/sortable';
+import { title } from 'process';
 import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
@@ -12,12 +13,26 @@ interface PaperSize {
   height: number;
 }
 
-function Boardpage({ pageData, orderArray, boardId, paperWidth, fullWidth }) {
+function Boardpage({
+  pageData,
+  orderArray,
+  boardId,
+  paperWidth,
+  fullWidth,
+  index,
+}) {
   const [paperSize, setPaperSize] = useState<PaperSize | null>(null);
+  const titleRef = useRef();
   const resizeRef = useRef();
   const dndId = `bp-${pageData.id}`;
-  const isTop = orderArray[0] === dndId;
-  const position = orderArray.findIndex((item) => item === dndId);
+
+  useEffect(() => {
+    if(paperSize){
+      const newSize = {...paperSize};
+      newSize.width = paperWidth;
+      setPaperSize(newSize);
+    }
+  },[paperWidth])
 
   useEffect(() => {
     if (pageData.setting) {
@@ -28,25 +43,17 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, fullWidth }) {
           height: data.height,
         };
         setPaperSize(initialSize);
-        return;
       }
+    } else {
+      const initialSize = {
+        width: paperWidth,
+        height: 400,
+      };
+      setPaperSize(initialSize);
     }
-
-    const initialSize = {
-      width: paperWidth,
-      height: 400,
-    };
-
-    setPaperSize(initialSize);
   }, []);
 
-  useEffect(() => {
-    const size = {
-      width: paperWidth,
-      height: 300,
-    };
-    setPaperSize(size);
-  }, [paperWidth]);
+
 
   const dndData = {
     area: 'boardBody',
@@ -55,15 +62,15 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, fullWidth }) {
     id: pageData.id,
     parentId: boardId,
     orderArray,
-    itemType: 'item',
+    itemType: 'border',
+    position: index,
   };
 
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: dndId,
-    data: dndData,
-  });
-
-  useEffect(() => {}, []);
+  const { attributes, listeners, setNodeRef, isDragging, active, isOver } =
+    useSortable({
+      id: dndId,
+      data: dndData,
+    });
 
   function tellSize(size: PaperSize) {
     const currentsize = {
@@ -90,62 +97,97 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, fullWidth }) {
     window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
   }
 
-  return (
-    <>
-      {isTop && <PaperBorder dndData={dndData} index={0} />}
-      {paperSize && (
-        <Resizable
-          enable={{ right: true, bottom: true, bottomRight: true }}
-          size={paperSize}
-          onResizeStop={(event, data, node, size) => tellSize(size)}
-          bounds="window"
-        >
-          <Box ref={resizeRef} sx={{ height: '100%', width: '100%', p: 2 }}>
-            <Paper
-              className="boardPaper"
-              elevation={1}
-              ref={setNodeRef}
-              sx={{
-                height: '100%',
-                width: '100%',
-                position: 'relative',
-                p: 4,
-                overflow: 'auto',
-                '&::-webkit-scrollbar': {
-                  width: '2px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  backgroundColor: 'transparent',
-                },
-                '&:hover::-webkit-scrollbar-thumb': {
-                  backgroundColor: '#999',
-                },
-              }}
-            >
-              <HandleIcon
-                {...listeners}
-                {...attributes}
-                style={{
-                  width: 24,
-                  height: 24,
-                  cursor: isDragging ? 'grabbing' : 'grab',
-                  position: 'absolute',
-                  left: 4,
-                  top: 4,
-                }}
-              />
-              <PlaneTextField
-                defaultValue={pageData.title}
-                sx={{ input: { px: 0 } }}
-              />
-              <EditorItem page={pageData} />
-            </Paper>
-          </Box>
-        </Resizable>
-      )}
+  const changeName = () => {
+    const title = titleRef.current.value;
+    const query = {
+      table: 'page',
+      columns: {
+        title,
+      },
+      conditions: {
+        id: pageData.id,
+      },
+    };
+    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+  };
 
-      <PaperBorder dndData={dndData} index={position + 1} />
-    </>
+  function fromWhich() {
+    if (active) {
+      if (active.data?.current.area !== 'boardBody') {
+        return 'left';
+      }
+      if (active.data?.current.position === index) {
+        return;
+      }
+      if (active.data?.current.position > index) {
+        return 'left';
+      }
+      return 'right';
+    }
+  }
+
+  return (
+    <Resizable
+      enable={{ right: true, bottom: true, bottomRight: true }}
+      size={paperSize}
+      onResizeStop={(event, data, node, size) => tellSize(size)}
+      bounds="window"
+    >
+      <Box
+        ref={resizeRef}
+        sx={{
+          height: '100%',
+          width: '100%',
+          borderLeft:
+            isOver && fromWhich() === 'left' ? '2px solid tomato' : 'none',
+          borderRight:
+            isOver && fromWhich() === 'right' ? '2px solid tomato' : 'none',
+        }}
+      >
+        <Paper
+          className="boardPaper"
+          elevation={2}
+          ref={setNodeRef}
+          sx={{
+            height: '100%',
+            width: '100%',
+            position: 'relative',
+            border: '0.5px solid #999',
+            p: 4,
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '2px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'transparent',
+            },
+            '&:hover::-webkit-scrollbar-thumb': {
+              backgroundColor: '#999',
+            },
+          }}
+        >
+          <HandleIcon
+            {...listeners}
+            {...attributes}
+            style={{
+              width: 24,
+              height: 24,
+              cursor: isDragging ? 'grabbing' : 'grab',
+              position: 'absolute',
+              left: 4,
+              top: 4,
+            }}
+          />
+          <PlaneTextField
+            defaultValue={pageData.title}
+            sx={{ input: { px: 0 } }}
+            inputRef={titleRef}
+            onBlur={changeName}
+          />
+          <EditorItem page={pageData} />
+        </Paper>
+      </Box>
+    </Resizable>
   );
 }
 
