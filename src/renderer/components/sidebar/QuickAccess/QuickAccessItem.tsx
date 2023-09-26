@@ -23,7 +23,7 @@ function QuickAccesItem({ item, orderArray }) {
       setData(result);
     };
     fetchData();
-  }, []);
+  }, [item]);
 
   return (
     <>

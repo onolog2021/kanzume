@@ -78,7 +78,7 @@ ipcMain.on('openURL', (event, url) => {
 });
 
 // 単体レコードの更新
-ipcMain.on('updateRecord', (_e, args) => {
+ipcMain.handle('updateRecord', (_e, args) => {
   updateRecord(args);
 });
 
@@ -597,14 +597,6 @@ ipcMain.on('softDelete', (event, args) => {
 
 ipcMain.on('runUpdateTrashIndex', (event) => {
   event.reply('updateTrashIndex');
-});
-
-ipcMain.on('runUpdatePageList', (event) => {
-  event.reply('updatePageList');
-});
-
-ipcMain.on('runUpdateBoardList', (event) => {
-  event.reply('updateBoardList');
 });
 
 // ipcMain.on('exportText', (event, jsonText) => {

@@ -63,7 +63,8 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
       },
     };
     window.electron.ipcRenderer.sendMessage('softDelete', query);
-    window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
   const removeBookmark = () => {
@@ -96,8 +97,8 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
         id: pageData.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+    await window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
   };
 
   const menues = [

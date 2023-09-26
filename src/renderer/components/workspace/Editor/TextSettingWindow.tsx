@@ -61,7 +61,7 @@ function TextSettingWindow({
         setting: JSON.stringify(newSetting),
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
+    window.electron.ipcRenderer.invoke('updateRecord', updateQuery);
   };
 
   const changeSize = (event, value) => {
@@ -93,7 +93,7 @@ function TextSettingWindow({
         setting: JSON.stringify(newSetting),
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
+    window.electron.ipcRenderer.invoke('updateRecord', updateQuery);
   };
 
   return (

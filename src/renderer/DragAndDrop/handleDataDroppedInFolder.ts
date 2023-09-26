@@ -25,7 +25,7 @@ async function handleDataDroppedInFolder(
         folder_id: activeItem?.parentId,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
   }
 
   if (activeItem.type === 'board') {
@@ -41,7 +41,7 @@ async function handleDataDroppedInFolder(
         id: activeItem?.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
     const deleteBookmarkQuery = {
       table: 'bookmark',
       conditions: {

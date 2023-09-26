@@ -38,12 +38,12 @@ function TrashedItem({ item, setSelectedItem }) {
         id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    window.electron.ipcRenderer.sendMessage('runUpdateTrashIndex', project.id);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateTrashIndex');
     if (item.type === 'board') {
-      window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
+      window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardList');
     } else {
-      window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+      window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
     }
   };
 
@@ -65,10 +65,10 @@ function TrashedItem({ item, setSelectedItem }) {
       conditions: {
         id,
       },
-    }
+    };
     window.electron.ipcRenderer.sendMessage('deleteRecord', deleteQuery);
-    window.electron.ipcRenderer.sendMessage('runUpdateTrashIndex');
-  }
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateTrashIndeX');
+  };
 
   return (
     <ListItemButton onClick={showPreview}>

@@ -26,7 +26,7 @@ async function handleDataDroppedInBoardList(
         id: activeItem?.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
   }
 
   if(isArea){

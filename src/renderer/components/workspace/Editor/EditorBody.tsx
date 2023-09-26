@@ -54,7 +54,7 @@ function EditorBody({ targetId, page_id, title }) {
     setPageStatus(status);
   };
 
-  const saveTitle = () => {
+  const saveTitle = async () => {
     const title = titleRef.current.value;
     const query = {
       table: 'page',
@@ -65,7 +65,9 @@ function EditorBody({ targetId, page_id, title }) {
         id: page_id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    await window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
   if (!project) {

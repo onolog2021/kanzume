@@ -93,7 +93,7 @@ function DragAndDrop() {
       query.columns = {
         updated_at: currentTime,
       };
-      window.electron.ipcRenderer.sendMessage('updateRecord', query);
+      window.electron.ipcRenderer.invoke('updateRecord', query);
       return currentProject;
     } catch (error) {
       console.error(error);
@@ -269,7 +269,7 @@ function DragAndDrop() {
               id: activeItem?.id,
             },
           };
-          window.electron.ipcRenderer.sendMessage('updateRecord', query);
+          window.electron.ipcRenderer.invoke('updateRecord', query);
         } else {
           const query = {
             table: 'store',

@@ -85,8 +85,8 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
         id: folderData.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+    await window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
   };
 
   const softDelete = async () => {
@@ -96,8 +96,8 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
         id: folderData.id,
       },
     };
-    await window.electron.ipcRenderer.sendMessage('softDelete', query);
-    await window.electron.ipcRenderer.sendMessage('runUpdatePageList');
+    window.electron.ipcRenderer.sendMessage('softDelete', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
   };
 
   const mergeChildrenText = () => {

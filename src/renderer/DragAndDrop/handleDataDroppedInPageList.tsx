@@ -34,7 +34,7 @@ async function handleDataDroppedInPageList(
         id: activeItem?.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', updatePaperQuery);
+    window.electron.ipcRenderer.invoke('updateRecord', updatePaperQuery);
   }
 
   if (activeItem.type === 'board') {
@@ -49,7 +49,7 @@ async function handleDataDroppedInPageList(
         id: activeItem?.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', updateFolderQuery);
+    window.electron.ipcRenderer.invoke('updateRecord', updateFolderQuery);
 
     const deleteBookmarkQuery = {
       table: 'bookmark',

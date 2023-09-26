@@ -81,7 +81,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', updateQuery);
+    window.electron.ipcRenderer.invoke('updateRecord', updateQuery);
   }
 
   const changeName = () => {
@@ -95,7 +95,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
         id: pageData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
   };
 
   function fromWhich() {

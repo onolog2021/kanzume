@@ -84,7 +84,7 @@ export default class MyEditor {
             id: pageId,
           },
         };
-        window.electron.ipcRenderer.sendMessage('updateRecord', query);
+        window.electron.ipcRenderer.invoke('updateRecord', query);
 
         const contentLen = this.getBlocksTextLen(data.blocks);
         const textCounter = document.getElementById('textCounter');

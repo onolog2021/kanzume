@@ -147,7 +147,7 @@ export default function BoardSpace({ boardData }) {
         id: boardData.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
   };
 
   const changeBookmark = async () => {

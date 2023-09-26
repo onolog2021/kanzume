@@ -122,7 +122,7 @@ function MyEditor({ page, isCount }) {
         id: page.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
+    window.electron.ipcRenderer.invoke('updateRecord', query);
   }
 
   function countText() {

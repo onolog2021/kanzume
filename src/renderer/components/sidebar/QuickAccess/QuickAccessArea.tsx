@@ -41,7 +41,9 @@ function QuickAccessArea() {
       });
       setItems(index);
     }
+
     fetchBookmarks();
+
     window.electron.ipcRenderer.on('updateQuickArea', () => {
       fetchBookmarks();
     });

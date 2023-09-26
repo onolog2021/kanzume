@@ -75,8 +75,8 @@ function BoadItem({ board, orderArray, bookmark }) {
         id: board.id,
       },
     };
-    window.electron.ipcRenderer.sendMessage('updateRecord', query);
-    window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
+    window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardList');
   };
 
   const softDelete = async () => {
@@ -87,7 +87,7 @@ function BoadItem({ board, orderArray, bookmark }) {
       },
     };
     window.electron.ipcRenderer.sendMessage('softDelete', query);
-    window.electron.ipcRenderer.sendMessage('runUpdateBoardList');
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardList');
   };
 
   const removeBookmark = () => {

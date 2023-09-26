@@ -19,7 +19,7 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     useState<contextMenu | null>(null);
   const [currentPage] = useContext(CurrentPageContext);
   // dnd
-  const { attributes, listeners, setNodeRef, isOver, index, over } =
+  const { attributes, listeners, setNodeRef, isOver, index, over, isDragging } =
     useSortable(dndTag);
 
   useEffect(() => {
@@ -79,6 +79,7 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
         sx={{
           px: 1,
           display: 'grid',
+          opacity: isDragging ? 0.4 : 1,
           gridTemplateColumns: '24px 1fr',
           gap: 1,
           alignItems: 'center',
