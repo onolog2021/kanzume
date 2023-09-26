@@ -9,10 +9,9 @@ import CharacterCount from '@tiptap/extension-character-count';
 import History from '@tiptap/extension-history';
 import TextStyle from '@tiptap/extension-text-style';
 import Placeholder from '@tiptap/extension-placeholder';
-import { getCurrentTime } from 'renderer/components/GlobalMethods';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
 
-function MyEditor({ page, isCount, pageStatus }) {
+function MyEditor({ page, isCount }) {
   const editor = useRef();
   const timeoutId = useRef(null);
   const [editorStatus, setEditorStatus] = useState(false);
@@ -44,7 +43,6 @@ function MyEditor({ page, isCount, pageStatus }) {
       };
     },
   });
-
 
   useEffect(() => {
     async function initialSetUp() {
@@ -87,10 +85,6 @@ function MyEditor({ page, isCount, pageStatus }) {
         console.log(error);
       });
 
-    window.electron.ipcRenderer.on('updateEditor', (newText) => {
-      editor.current.commands.setContent(newText);
-    });
-
     return () => {
       if (timeoutId.current) {
         clearTimeout(timeoutId.current);
@@ -98,6 +92,13 @@ function MyEditor({ page, isCount, pageStatus }) {
       editor.current?.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    if (editor.current) {
+      const jsonData = JSON.parse(page.content);
+      editor.current.commands.setContent(jsonData);
+    }
+  }, [page]);
 
   function autoSave() {
     if (timeoutId.current) {

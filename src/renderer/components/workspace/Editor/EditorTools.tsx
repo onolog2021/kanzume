@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Tooltip } from '@mui/material';
 import ReactLoading from 'react-loading';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
@@ -14,6 +14,16 @@ export default function EditorTools({
   changeFontFamily,
 }) {
   const [loading, setLoading] = useState(false);
+  const [hasGit, setHasGit] = useState(false);
+
+  useEffect(() => {
+    async function checkGit() {
+      const result = await window.electron.ipcRenderer.invoke('hasGit?');
+      setHasGit(result);
+    }
+
+    checkGit();
+  }, []);
 
   const changeFontStyle = (font: string) => {
     setFontStyle(font);
@@ -28,6 +38,26 @@ export default function EditorTools({
   function togglePageStatus() {
     toggleStatus('history');
   }
+
+  const LoadingComponent = (
+    <ReactLoading type="spin" color="gray" width={24} height={24} />
+  );
+
+  const GitComponents = hasGit ? (
+    <>
+      <Tooltip title="タイムマーカーを作成" placement="left">
+        <PlaneIconButton onClick={commitPage}>
+          <MarkerIcon />
+        </PlaneIconButton>
+      </Tooltip>
+
+      <Tooltip title="タイムライン表示" placement="left">
+        <PlaneIconButton onClick={togglePageStatus}>
+          <HistoryIcon />
+        </PlaneIconButton>
+      </Tooltip>
+    </>
+  ) : null;
 
   return (
     <Box className="editorTools">
@@ -44,20 +74,7 @@ export default function EditorTools({
           />
         </PlaneIconButton>
       </Tooltip>
-      {loading && loading ? (
-        <ReactLoading type="spin" color="gray" width={24} height={24} />
-      ) : (
-        <Tooltip title="タイムマーカーを追加" placement="left">
-          <PlaneIconButton onClick={commitPage}>
-            <MarkerIcon />
-          </PlaneIconButton>
-        </Tooltip>
-      )}
-      <Tooltip title="タイムライン表示" placement="left">
-        <PlaneIconButton onClick={() => togglePageStatus()}>
-          <HistoryIcon />
-        </PlaneIconButton>
-      </Tooltip>
+      {loading ? LoadingComponent : GitComponents}
     </Box>
   );
 }

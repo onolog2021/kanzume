@@ -78,11 +78,9 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
         onClick={click}
         sx={{
           px: 1,
-          py: 0,
           display: 'grid',
           gridTemplateColumns: '24px 1fr',
           gap: 1,
-          height: 24,
           alignItems: 'center',
           svg: {
             width: 16,

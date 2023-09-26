@@ -4,6 +4,7 @@ import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
 import SearchProjectForm from './SearchProjectForm';
+import AboutDeveloper from './AboutDeveloper';
 
 function StartMenu() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ function StartMenu() {
           <SearchProjectForm handleClick={openProject} />
         </Box>
       </Box>
+      <AboutDeveloper />
     </Box>
   );
 }

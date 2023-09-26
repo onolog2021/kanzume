@@ -15,7 +15,7 @@ import log from 'electron-log';
 import fs from 'fs';
 import { error } from 'console';
 import Store from 'electron-store';
-import sqlite3 from 'sqlite3';
+import { exec } from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import './ipcMain';
@@ -73,6 +73,19 @@ class AppUpdater {
     // アップデートの確認を開始
     autoUpdater.checkForUpdates();
   }
+}
+
+function checkGit() {
+  return new Promise((resolve, reject) => {
+    exec('git --version', (error, stdout, stderr) => {
+      if (error) {
+        // console.error('Git is not installed:', error);
+        reject(false);
+      }
+      // console.log('Git version:', stdout);
+      resolve(true);
+    });
+  });
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -133,7 +146,7 @@ const createWindow = async () => {
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.on('ready-to-show', async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
@@ -142,6 +155,9 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+
+    const hasGit = await checkGit();
+    store.set('Git', hasGit);
   });
 
   mainWindow.on('close', () => {

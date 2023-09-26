@@ -176,7 +176,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
           inputRef={titleRef}
           onBlur={changeName}
         />
-        <EditorItem page={pageData} />
+        <EditorItem page={pageData} isCount={false} />
       </Paper>
     </Resizable>
   );

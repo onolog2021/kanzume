@@ -24,7 +24,9 @@ export default function SortableBorder({ tag, index }) {
       position: index,
       itemType: 'border',
     };
-    const setId = `border-${modifiedData.area}-${tag.data.id}-${index}`;
+    const setId = `b-${tag.data.type + tag.data.id}-${index}${
+      tag.data.bookmark ? '-b' : ''
+    }`;
     setItemId(setId);
     setItemData(modifiedData);
   }, [tag, index]);
@@ -34,17 +36,30 @@ export default function SortableBorder({ tag, index }) {
     data: itemData,
   });
 
-  const style = {
-    height: 18,
+  const defaultStyle = {
+    width: '100%',
+    background: isOver ? theme.palette.primary.main : 'transparent',
+    height: 2,
+    border: 'none',
     // transition: 'border-color 3s ease',
   };
 
   const overedStyle = {
-    height: 9,
-    mb: '9px',
-    borderBottom: `2px solid ${theme.palette.primary.main}`,
+    height: 10,
+    borderTop: `2px solid ${theme.palette.primary.main}`,
     // transition: 'border-color 3s ease',
   };
 
-  return <Box ref={setNodeRef} sx={isOver ? overedStyle : style} />;
+  return (
+    <Box
+      ref={setNodeRef}
+      sx={{
+        height: 8,
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <hr style={defaultStyle} />
+    </Box>
+  );
 }

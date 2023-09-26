@@ -59,6 +59,7 @@ function BookmarkButton({ page }) {
     };
     window.electron.ipcRenderer.sendMessage('deleteRecord', query);
     setBookmark(false);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
   return (

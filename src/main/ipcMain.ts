@@ -1,4 +1,4 @@
-import { ipcMain, Menu, MenuItem, app } from 'electron';
+import { ipcMain, Menu, MenuItem, app, Shell, shell } from 'electron';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
@@ -10,6 +10,9 @@ import { exec } from 'child_process';
 import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { getFonts } from 'font-list';
 import sqlite3 from 'sqlite3';
+import Store from 'electron-store';
+
+const store = new Store();
 
 // 外部SQLの実行
 function executeSql(sqlFilePath: string, dbPath) {
@@ -68,6 +71,12 @@ function formatObjectKeyValuePairs(obj) {
 
   return keyValuePairs.join(', ');
 }
+
+// urlへ外部繊維
+ipcMain.on('openURL', (event, url) => {
+  shell.openExternal(url)
+});
+
 // 単体レコードの更新
 ipcMain.on('updateRecord', (_e, args) => {
   updateRecord(args);
@@ -76,6 +85,28 @@ ipcMain.on('updateRecord', (_e, args) => {
 // 複数レコードの取得
 ipcMain.handle('fetchRecords', (event, args) => {
   return fetchRecords(args);
+});
+
+ipcMain.once('checkProjectGit', (event, projectId) => {
+  const folderPath = path.join(projectFolderPath, `${projectId}`);
+  const git = simpleGit(folderPath);
+
+  git.revparse(['--is-inside-work-tree'], (err, result) => {
+    if (err) {
+      console.error('Not a git repository or an error occurred:', err);
+      const hasGit = store.get('Git');
+      if (hasGit) {
+        git.init();
+      }
+      return;
+    }
+
+    if (result && result.trim() === 'true') {
+      console.log('The directory is a valid git repository.');
+    } else {
+      console.log('The directory is not a git repository.');
+    }
+  });
 });
 
 ipcMain.handle('findChildPage', (_e, folderId) => {
@@ -592,7 +623,7 @@ ipcMain.on('runUpdateBoardList', (event) => {
 //   });
 // });
 
-ipcMain.on('importText', async (event, { projectId, pageId }) => {
+ipcMain.handle('importText', async (event, { projectId, pageId }) => {
   const pageFilePath = path.join(
     projectFolderPath,
     `${projectId}`,
@@ -613,7 +644,6 @@ ipcMain.on('importText', async (event, { projectId, pageId }) => {
       },
     };
     updateRecord(query);
-    event.reply('updateEditor', JSON.parse(data));
     return true;
   } catch (error) {
     console.error(error);
@@ -629,8 +659,8 @@ ipcMain.on('initProject', async (event, newId) => {
   });
 
   // git initを実行する
-  const isGit = await checkGit();
-  if (isGit) {
+  const hasGit = store.get('Git');
+  if (hasGit) {
     const git = simpleGit(filePath);
     git.init();
   }
@@ -662,8 +692,8 @@ ipcMain.handle('commitPage', (event, pageId) => {
     });
 
     // 現在の内容をcommitする
-    const isGit = await checkGit();
-    if (isGit) {
+    const hasGit = store.get('Git');
+    if (hasGit) {
       const git = simpleGit(projectFilePath);
       const date = new Date();
       const time = dateTranslateForYYMMDD(date);
@@ -678,23 +708,14 @@ ipcMain.handle('commitPage', (event, pageId) => {
   });
 });
 
-// gitを導入しているか
-function checkGit() {
-  return new Promise((resolve, reject) => {
-    exec('git --version', (error, stdout, stderr) => {
-      if (error) {
-        // console.error('Git is not installed:', error);
-        reject(false);
-      }
-      // console.log('Git version:', stdout);
-      resolve(true);
-    });
-  });
-}
+ipcMain.handle('hasGit?', (event) => {
+  const hasGit = store.get('Git');
+  return hasGit;
+});
 
 ipcMain.handle('gitLog', async (event, { page_id, project_id }) => {
-  const isGit = await checkGit();
-  if (isGit) {
+  const hasGit = store.get('Git');
+  if (hasGit) {
     const projectFilePath = path.join(projectFolderPath, `${project_id}`);
     const git = simpleGit(projectFilePath);
     const pageFilePath = `${projectFilePath}/${page_id}.json`;
@@ -710,8 +731,8 @@ ipcMain.handle('gitLog', async (event, { page_id, project_id }) => {
 });
 
 ipcMain.handle('gitShow', async (event, { pageId, hash, projectId }) => {
-  const isGit = await checkGit();
-  if (isGit) {
+  const hasGit = store.get('Git');
+  if (hasGit) {
     return new Promise((resolve, reject) => {
       const projectFilePath = path.join(projectFolderPath, `${projectId}`);
 
@@ -730,8 +751,8 @@ ipcMain.handle('gitShow', async (event, { pageId, hash, projectId }) => {
 });
 
 ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
-  const isGit = await checkGit();
-  if (isGit) {
+  const hasGit = store.get('Git');
+  if (hasGit) {
     return new Promise((resolve, reject) => {
       const projectFilePath = path.join(projectFolderPath, `${projectId}`);
 
@@ -750,8 +771,8 @@ ipcMain.handle('gitDiff', async (event, { pageId, hash, projectId }) => {
 });
 
 ipcMain.handle('gitCheckOut', async (event, { pageId, hash, projectId }) => {
-  const isGit = await checkGit();
-  if (!isGit) {
+  const hasGit = store.get('Git');
+  if (!hasGit) {
     return;
   }
   const projectFilePath = path.join(projectFolderPath, `${projectId}`);

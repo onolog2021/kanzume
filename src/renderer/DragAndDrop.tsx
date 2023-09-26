@@ -77,6 +77,7 @@ function DragAndDrop() {
   }, [project]);
 
   async function fetchProjectData() {
+    window.electron.ipcRenderer.sendMessage('checkProjectGit', projectId);
     try {
       const query = {
         table: 'project',
@@ -193,7 +194,7 @@ function DragAndDrop() {
       const timeoutId = setTimeout(() => {
         timeId.current = null;
         window.electron.ipcRenderer.sendMessage('openFolder', overItemData.id);
-      }, 1500);
+      }, 1200);
       timeId.current = timeoutId;
     }
   };
