@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, Button, Snackbar } from '@mui/material';
+import { useEffect, useState } from 'react';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
@@ -7,11 +8,51 @@ import SearchProjectForm from './SearchProjectForm';
 import AboutDeveloper from './AboutDeveloper';
 
 function StartMenu() {
+  const [snackOpen, setSnackOpen] = useState(false);
   const navigate = useNavigate();
 
   const openProject = (id: number) => {
     navigate('/editor', { state: { project_id: id } });
   };
+
+  useEffect(() => {
+    async function checkGit() {
+      const result = await window.electron.ipcRenderer.invoke('hasGit?');
+      setSnackOpen(!result);
+    }
+
+    checkGit();
+  }, []);
+
+  const message =
+    'Gitがみつかりませんでした。\nKanzumeの一部機能は制限されています。';
+
+  const toGit = () => {
+    window.electron.ipcRenderer.sendMessage(
+      'openURL',
+      'https://git-scm.com/downloads'
+    );
+  };
+
+  const action = (
+    <Button onClick={toGit} sx={{ ':hover': { background: 'white' } }}>
+      Gitをダウンロード
+    </Button>
+  );
+
+  const aboutGit = (
+    <Snackbar
+      open={snackOpen}
+      autoHideDuration={7000}
+      onClose={() => {
+        setSnackOpen(false);
+      }}
+      sx={{ whiteSpace: 'pre-wrap', letterSpacing: 0.5 }}
+      message={message}
+      action={action}
+      // anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+    />
+  );
 
   return (
     <Box className="startMenuWrapper">
@@ -35,6 +76,7 @@ function StartMenu() {
         </Box>
       </Box>
       <AboutDeveloper />
+      {aboutGit}
     </Box>
   );
 }

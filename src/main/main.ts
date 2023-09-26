@@ -79,10 +79,8 @@ function checkGit() {
   return new Promise((resolve, reject) => {
     exec('git --version', (error, stdout, stderr) => {
       if (error) {
-        // console.error('Git is not installed:', error);
         reject(false);
       }
-      // console.log('Git version:', stdout);
       resolve(true);
     });
   });
@@ -117,9 +115,9 @@ const installExtensions = async () => {
 
 const createWindow = async () => {
   // crash error occurrence
-  // if (isDebug) {
-  //   await installExtensions();
-  // }
+  if (isDebug) {
+    await installExtensions();
+  }
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -136,7 +134,7 @@ const createWindow = async () => {
     show: false,
     width: beforeSize ? beforeSize.width : 600,
     height: beforeSize ? beforeSize.height : 728,
-    icon: getAssetPath('icon.png'),
+    icon: getAssetPath('logo.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

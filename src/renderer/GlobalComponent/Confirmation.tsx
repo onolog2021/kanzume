@@ -9,19 +9,13 @@ function Confirmation({ text, isOpen, onclick, closeConfirm }) {
   }, [isOpen]);
 
   return (
-    <>
-      {open && (
-        <Dialog open={isOpen}>
-          <DialogTitle
-            sx={{whiteSpace: 'pre-wrap'}}
-          >{text}</DialogTitle>
-          <DialogActions>
-            <Button onClick={closeConfirm}>いいえ</Button>
-            <Button onClick={onclick}>はい</Button>
-          </DialogActions>
-        </Dialog>
-      )}
-    </>
+    <Dialog open={isOpen}>
+      <DialogTitle sx={{ whiteSpace: 'pre-wrap' }}>{text}</DialogTitle>
+      <DialogActions>
+        <Button onClick={onclick}>はい</Button>
+        <Button onClick={closeConfirm}>いいえ</Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 export default Confirmation;
