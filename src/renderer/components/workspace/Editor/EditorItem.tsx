@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Editor } from '@tiptap/core';
+import { Editor, PasteRule, pasteRulesPlugin } from '@tiptap/core';
 import { EditorContent, BubbleMenu } from '@tiptap/react';
 import Bold from '@tiptap/extension-bold';
 import Document from '@tiptap/extension-document';
@@ -49,21 +49,6 @@ function MyEditor({ page, isCount }) {
           },
       };
     },
-    listeners: {
-      paste: ({ editor, event }) => {
-        if (event.clipboardData) {
-          const text = event.clipboardData.getData('text/plain');
-          if (text) {
-            const paragraphs = text
-              .split('\n')
-              .map((paragraph) => `<p>${paragraph}</p>`)
-              .join('');
-            event.preventDefault();
-            editor.commands.insertContent(paragraphs);
-          }
-        }
-      },
-    },
   });
 
   useEffect(() => {
@@ -95,6 +80,7 @@ function MyEditor({ page, isCount }) {
       };
 
       editor.current = new Editor(options);
+
       return Promise.resolve();
     }
 
