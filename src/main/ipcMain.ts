@@ -1,4 +1,4 @@
-import { ipcMain, Menu, MenuItem, app, Shell, shell } from 'electron';
+import { ipcMain, Menu, MenuItem, app, Shell, shell, dialog } from 'electron';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
@@ -7,7 +7,6 @@ import { type } from 'os';
 import { rejects } from 'assert';
 import simpleGit from 'simple-git';
 import { exec } from 'child_process';
-import { dateTranslateForYYMMDD } from 'renderer/components/GlobalMethods';
 import { getFonts } from 'font-list';
 import sqlite3 from 'sqlite3';
 import Store from 'electron-store';
@@ -72,9 +71,28 @@ function formatObjectKeyValuePairs(obj) {
   return keyValuePairs.join(', ');
 }
 
+function editorTextToPlaneText(json: JSON) {
+  function extractText(node) {
+    if (node.content) {
+      return node.content.map(extractText).join('');
+    }
+    if (node.type === 'text') {
+      return node.text;
+    }
+    return '';
+  }
+
+  function convertToPlainText(data) {
+    return data.content.map(extractText).join('\n').trim();
+  }
+
+  const plainText = convertToPlainText(json);
+  return plainText;
+}
+
 // urlへ外部繊維
 ipcMain.on('openURL', (event, url) => {
-  shell.openExternal(url)
+  shell.openExternal(url);
 });
 
 // 単体レコードの更新
@@ -599,21 +617,43 @@ ipcMain.on('runUpdateTrashIndex', (event) => {
   event.reply('updateTrashIndex');
 });
 
-// ipcMain.on('exportText', (event, jsonText) => {
-//   const filename = 'test';
-//   const projectsFilePath = path.join(
-//     __dirname,
-//     '../../assets/projects',
-//     `${filename}.json`
-//   );
-//   fs.writeFile(projectsFilePath, JSON.stringify(jsonText), (err) => {
-//     if (err) {
-//       console.error('JSONファイルの書き出しエラー:', err);
-//     } else {
-//       console.log('JSONファイルが正常に書き出されました:', projectsFilePath);
-//     }
-//   });
-// });
+ipcMain.on('exportText', async (event, pageId) => {
+  try {
+    const query = {
+      table: 'page',
+      conditions: {
+        id: pageId,
+      },
+    };
+    const pageData = await fetchRecord(query);
+
+    // デフォルトのファイル名と保存形式を設定
+    const defaultFileName = pageData.title
+      ? `${pageData.title}.txt`
+      : 'untitled.txt';
+
+    const reply = await dialog.showSaveDialog({
+      title: 'ファイルを保存',
+      defaultPath: defaultFileName, // デフォルトのファイル名を設定
+      filters: [{ name: 'txt', extensions: ['txt'] }],
+    });
+
+    if (!reply.canceled && reply.filePath) {
+      const { content } = pageData;
+      const data = editorTextToPlaneText(JSON.parse(content));
+
+      fs.writeFile(reply.filePath, data, (error) => {
+        if (error) {
+          console.error('Failed to save the file:', error);
+        } else {
+          console.log('File saved successfully!');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+});
 
 ipcMain.handle('importText', async (event, { projectId, pageId }) => {
   const pageFilePath = path.join(

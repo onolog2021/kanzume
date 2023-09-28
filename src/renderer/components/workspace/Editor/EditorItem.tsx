@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Editor, PasteRule, pasteRulesPlugin } from '@tiptap/core';
+import { Editor, markPasteRule } from '@tiptap/core';
 import { EditorContent, BubbleMenu } from '@tiptap/react';
 import Bold from '@tiptap/extension-bold';
+import Strike from '@tiptap/extension-strike';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -9,6 +10,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import History from '@tiptap/extension-history';
 import TextStyle from '@tiptap/extension-text-style';
 import Placeholder from '@tiptap/extension-placeholder';
+import { Slice, Fragment, Node } from 'prosemirror-model';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
 
 function MyEditor({ page, isCount }) {
@@ -51,6 +53,23 @@ function MyEditor({ page, isCount }) {
     },
   });
 
+  function clipboardTextParser(text, context, plain) {
+    const blocks = text.replace().split(/(?:\r\n?|\n)/);
+    const nodes = [];
+
+    blocks.forEach((line) => {
+      const nodeJson = { type: 'paragraph' };
+      if (line.length > 0) {
+        nodeJson.content = [{ type: 'text', text: line }];
+      }
+      const node = Node.fromJSON(context.doc.type.schema, nodeJson);
+      nodes.push(node);
+    });
+
+    const fragment = Fragment.fromArray(nodes);
+    return Slice.maxOpen(fragment);
+  }
+
   useEffect(() => {
     async function initialSetUp() {
       const options = {
@@ -76,6 +95,9 @@ function MyEditor({ page, isCount }) {
         },
         onBlur: () => {
           saveContent();
+        },
+        editorProps: {
+          clipboardTextParser,
         },
       };
 

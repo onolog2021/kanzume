@@ -101,6 +101,10 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
     window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
   };
 
+  const exportPage = () => {
+    window.electron.ipcRenderer.sendMessage('exportText', pageData.id);
+  };
+
   const menues = [
     {
       id: 'changeName',
@@ -118,6 +122,11 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
           menuName: '削除',
           method: softDelete,
         },
+    {
+      id: 'export',
+      menuName: 'エクスポート',
+      method: exportPage,
+    },
   ];
 
   const functions = {

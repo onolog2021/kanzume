@@ -73,8 +73,8 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
         <StyledScrollbarBox
           sx={{
             background: 'white',
-            width: 1300,
-            height: 1200,
+            width: '80vw',
+            height: '100vh',
             m: 'auto',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
