@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ReactComponent as TextSettingButton } from '../../../../../assets/text.svg';
 import TextSettingWindow from './TextSettingWindow';
 
-function TextSetting({ changeFontSize, changeFontFamily }) {
+function TextSetting({ page,changeFontSize, changeFontFamily,changeContentWidth,changeLineHeight,setting }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleIsOpen = (boolean: Boolean) => {
@@ -14,10 +14,13 @@ function TextSetting({ changeFontSize, changeFontFamily }) {
     <>
       {isOpen ? (
         <TextSettingWindow
+          page={page}
           closeWindow={toggleIsOpen}
-          isOpen={isOpen}
+          setting={setting}
           changeFontSize={changeFontSize}
           changeFontFamily={changeFontFamily}
+          changeContentWidth={changeContentWidth}
+          changeLineHeight={changeLineHeight}
         />
       ) : null}
       <TextSettingButton

@@ -7,12 +7,7 @@ import TextSetting from './TextSetting';
 import { ReactComponent as HistoryIcon } from '../../../../../assets/history.svg';
 import { ReactComponent as MarkerIcon } from '../../../../../assets/marker.svg';
 
-export default function EditorTools({
-  page,
-  toggleStatus,
-  changeFontSize,
-  changeFontFamily,
-}) {
+export default function EditorTools({ page, toggleStatus, textSetting }) {
   const [loading, setLoading] = useState(false);
   const [hasGit, setHasGit] = useState(false);
 
@@ -24,10 +19,6 @@ export default function EditorTools({
 
     checkGit();
   }, []);
-
-  const changeFontStyle = (font: string) => {
-    setFontStyle(font);
-  };
 
   const commitPage = async () => {
     setLoading(true);
@@ -67,12 +58,7 @@ export default function EditorTools({
         </PlaneIconButton>
       </Tooltip>
       <Tooltip title="テキスト設定" placement="left">
-        <PlaneIconButton>
-          <TextSetting
-            changeFontFamily={changeFontFamily}
-            changeFontSize={changeFontSize}
-          />
-        </PlaneIconButton>
+        <PlaneIconButton>{textSetting}</PlaneIconButton>
       </Tooltip>
       {loading ? LoadingComponent : GitComponents}
     </Box>

@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import ReactLoading from 'react-loading';
 import theme from 'renderer/theme';
-import HistoryItem from './HistoryItem';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
+import HistoryItem from './HistoryItem';
 
 export default function HistoryTree({ pageId, selectFunc, selected }) {
   const [project] = useContext(ProjectContext);
@@ -34,10 +34,12 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
     setSelected(paramHash);
   };
 
+  if (logs && logs.length === 0) {
+    return <p>まだタイムラインは作成されていません。</p>;
+  }
+
   return (
-    <StyledScrollbarBox
-      sx={{maxHeight: 'calc(100vh - 200px)'}}
-    >
+    <StyledScrollbarBox sx={{ maxHeight: 'calc(100vh - 200px)' }}>
       {loading && loading ? (
         <ReactLoading
           type="spin"

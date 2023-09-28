@@ -20,7 +20,7 @@ const Ruby = Mark.create({
   parseHTML() {
     return [
       {
-        tag: 'span',
+        tag: 'span.ruby',
       },
     ];
   },
@@ -31,8 +31,7 @@ const Ruby = Mark.create({
     return {
       toggleRuby:
         (selection) =>
-        ({ commands, editor }) => {
-        },
+        ({ commands, editor }) => {},
       addRuby:
         (rubi = 'rubi', selection) =>
         ({ commands, editor }) => {

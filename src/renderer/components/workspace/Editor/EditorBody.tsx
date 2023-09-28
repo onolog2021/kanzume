@@ -1,25 +1,38 @@
 import { useEffect, useRef, useContext, useState } from 'react';
-import { Button, Box, InputLabe, Select, MenuItem } from '@mui/material';
-import Page from 'renderer/Classes/Page';
+import { Box } from '@mui/material';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
-import MyEditor from '../../MyEditor';
-import {
-  CurrentPageContext,
-  ProjectContext,
-  PageListContext,
-} from '../../Context';
-import EditorPageTitle from './EditorPageTitle';
+import { styled } from '@mui/system';
+import { CurrentPageContext, ProjectContext } from '../../Context';
 import HistorySpace from './History/HistorySpace';
 import EditorItem from './EditorItem';
 import EditorTools from './EditorTools';
+import TextSetting from './TextSetting';
+
+type PageSetting = {
+  fontSize: number;
+  fontFamily: string;
+  contentWidth: number;
+  lineHeight: number;
+};
 
 function EditorBody({ targetId, page_id, title }) {
   const [project, setProject] = useContext(ProjectContext);
   const [page, setPage] = useState();
   const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
   const titleRef = useRef();
-  const [fontSize, setFontSize] = useState<number>(18);
-  const [fontFamily, setFontFamily] = useState<string>('serif');
+  const [fontSize, setFontSize] = useState<number | undefined>();
+  const [fontFamily, setFontFamily] = useState<string | undefined>();
+  const [contentWidth, setContentWidth] = useState<number | undefined>();
+  const [lineHeight, setLineHeight] = useState<number | undefined>();
+  const [editorSetting, setEditorSetting] = useState<PageSetting>();
+  const [currentPage] = useContext(CurrentPageContext);
+
+  const defaultSetting = {
+    fontSize: 18,
+    fontFamily: 'Meiryo',
+    contentWidth: 600,
+    lineHeight: 1,
+  };
 
   useEffect(() => {
     async function setPageData() {
@@ -34,21 +47,34 @@ function EditorBody({ targetId, page_id, title }) {
         query
       );
       setPage(pageData);
-      const setting = JSON.parse(pageData.setting);
-      if (setting) {
-        const initialSize = setting.fontSize;
-        if (initialSize) {
-          setFontSize(initialSize);
-        }
-        const initialFamily = setting.fontFamily;
-        if (initialFamily) {
-          setFontFamily(initialFamily);
-        }
-      }
+
+      const setting = pageData.setting ? JSON.parse(pageData.setting) : {};
+      const pageSetting = { ...defaultSetting, ...setting };
+
+      setFontSize(pageSetting.fontSize);
+      setFontFamily(pageSetting.fontFamily);
+      setContentWidth(pageSetting.contentWidth);
+      setLineHeight(pageSetting.lineHeight);
+      setEditorSetting(pageSetting);
     }
 
     setPageData();
   }, [pageStatus]);
+
+  useEffect(() => {
+    if (
+      currentPage &&
+      currentPage.type === 'editor' &&
+      page_id === currentPage.id &&
+      contentWidth
+    ) {
+      const paddingWidth = `calc((100% - ${contentWidth}px) / 2)`;
+      document.documentElement.style.setProperty(
+        '--editor-padding',
+        paddingWidth
+      );
+    }
+  }, [currentPage, contentWidth]);
 
   const toggleStatus = (status) => {
     setPageStatus(status);
@@ -86,10 +112,24 @@ function EditorBody({ targetId, page_id, title }) {
     setFontFamily(family);
   };
 
-  const style = {
-    fontSize: fontSize && fontSize,
-    fontFamily: fontFamily && fontFamily,
+  const changeContentWidth = (width: number) => {
+    setContentWidth(width);
   };
+
+  const changeLineHeight = (height: number) => {
+    setLineHeight(height);
+  };
+
+  const textSetting = (
+    <TextSetting
+      page={page}
+      setting={editorSetting}
+      changeFontSize={changeFontSize}
+      changeFontFamily={changeFontFamily}
+      changeContentWidth={changeContentWidth}
+      changeLineHeight={changeLineHeight}
+    />
+  );
 
   const focusEditor = (event) => {
     event.stopPropagation();
@@ -104,7 +144,13 @@ function EditorBody({ targetId, page_id, title }) {
     <div className={`editorBody tiptap-${page_id}`}>
       <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
-          <Box sx={style}>
+          <Box
+            sx={{
+              fontSize,
+              fontFamily,
+              lineHeight,
+            }}
+          >
             <PlaneTextField
               onBlur={saveTitle}
               placeholder="タイトル"
@@ -116,7 +162,7 @@ function EditorBody({ targetId, page_id, title }) {
               sx={{
                 input: {
                   fontSize: 20,
-                  pl: 'calc((100% - 600px) / 2)',
+                  pl: `calc((100% - ${contentWidth}px) / 2)`,
                 },
               }}
             />
@@ -126,8 +172,7 @@ function EditorBody({ targetId, page_id, title }) {
         <EditorTools
           page={page}
           toggleStatus={toggleStatus}
-          changeFontSize={changeFontSize}
-          changeFontFamily={changeFontFamily}
+          textSetting={textSetting}
         />
       </Box>
     </div>

@@ -88,6 +88,10 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
     setIsConfirm(true);
   }
 
+  if(!log){
+    return <p>選択されたアイテムはありません</p>
+  }
+
   return (
     <>
       <StyledScrollbarBox

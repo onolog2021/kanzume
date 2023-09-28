@@ -18,6 +18,13 @@ function MyEditor({ page, isCount }) {
   const [textCount, setTextCount] = useState(0);
 
   const Ruby = TextStyle.extend({
+    parseHTML() {
+      return [
+        {
+          tag: 'span.ruby',
+        },
+      ];
+    },
     addAttributes() {
       return {
         class: {
@@ -41,6 +48,21 @@ function MyEditor({ page, isCount }) {
             commands.toggleMark('textStyle');
           },
       };
+    },
+    listeners: {
+      paste: ({ editor, event }) => {
+        if (event.clipboardData) {
+          const text = event.clipboardData.getData('text/plain');
+          if (text) {
+            const paragraphs = text
+              .split('\n')
+              .map((paragraph) => `<p>${paragraph}</p>`)
+              .join('');
+            event.preventDefault();
+            editor.commands.insertContent(paragraphs);
+          }
+        }
+      },
     },
   });
 
@@ -136,6 +158,7 @@ function MyEditor({ page, isCount }) {
         <p
           style={{
             fontSize: 16,
+            fontFamily: 'Meiryo',
             textAlign: 'center',
             position: 'fixed',
             bottom: '16px',
