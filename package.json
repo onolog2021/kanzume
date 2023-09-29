@@ -191,7 +191,7 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "kanzume",
+    "productName": "Kanzume",
     "artifactName": "${productName}-Setup-${version}.${ext}",
     "appId": "org.erb.kanzume",
     "asar": true,
@@ -233,7 +233,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon" : "/assets/icon.png"
     },
     "linux": {
       "target": [
@@ -255,9 +256,6 @@
       "owner": "onolog2021",
       "repo": "kanzume"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",
