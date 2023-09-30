@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import Folder from 'renderer/Classes/Folder';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import {
   CurrentPageContext,
   ProjectContext,
@@ -62,7 +63,7 @@ function BoardList({ boards }) {
   };
 
   if (!boards) {
-    <h3>Now Loading...</h3>;
+    return <NowLoading loading />;
   }
 
   return (

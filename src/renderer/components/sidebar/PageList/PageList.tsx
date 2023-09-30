@@ -13,6 +13,7 @@ import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import CategoryTitle from '../CategoryTitle';
 import { ReactComponent as AddPageButton } from '../../../../../assets/paper-plus.svg';
 import { ReactComponent as AddFolderButton } from '../../../../../assets/folder-plus.svg';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 
 function PageList({ root }) {
   const [project] = useContext(ProjectContext);
@@ -67,7 +68,7 @@ function PageList({ root }) {
   };
 
   if (!root) {
-    return <h1>Now Loading...</h1>;
+    return <NowLoading loading />;
   }
 
   return (

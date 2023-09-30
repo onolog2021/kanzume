@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import {
   Drawer,
   Box,
@@ -8,24 +8,40 @@ import {
   IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import { ProjectContext } from '../Context';
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
-import { ReactComponent as HomeIcon } from '../../../../assets/home.svg';
 import LogoImage from '../../../../assets/logo.png';
-import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
+import { ReactComponent as SettingIcon } from '../../../../assets/gear.svg';
+import ProjectSettingWindow from './ProjectSettingWindow';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [project, setProject] = useContext(ProjectContext);
-  const [isHidden, setIsHidden] = useState<Boolean>(false);
+  const [projectTitle, setProjectTitle] = useState();
+  const [openSetting, setOpenSetting] = useState<Boolean>(false);
   const navigate = useNavigate();
-  const theme = useTheme();
 
   function returnHome() {
     navigate('/');
   }
 
+  const toggleSetting = (boolean: Boolean) => {
+    setOpenSetting(boolean);
+  };
+
+  const changeTitlte = (title:string) => {
+    setProjectTitle(title)
+  }
+
+  useEffect(() => {
+    if (project) {
+      setProjectTitle(project.title);
+    }
+  }, [project]);
+
   if (!project) {
-    return <h1>loading...</h1>;
+    return <NowLoading loading />;
   }
 
   return (
@@ -51,7 +67,7 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
       <Box sx={{ mb: '40px' }}>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Tooltip title="スタートメニュー" placement="bottom">
-            <PlaneIconButton onClick={() => returnHome()} sx={{p: 0}}>
+            <PlaneIconButton onClick={() => returnHome()} sx={{ p: 0 }}>
               <img
                 src={LogoImage}
                 alt="logo"
@@ -63,11 +79,6 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
                 }}
               />
             </PlaneIconButton>
-            {/* <HomeIcon
-              width={24}
-              onClick={() => returnHome()}
-              style={{ cursor: 'pointer', fill: theme.palette.primary.main }}
-            /> */}
           </Tooltip>
           <Typography
             sx={{
@@ -81,9 +92,22 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
               my: 2,
             }}
           >
-            {project.title}
+            {projectTitle}
           </Typography>
+          <PlaneIconButton
+            sx={{ ml: 'auto' }}
+            onClick={() => toggleSetting(true)}
+          >
+            <SettingIcon width={16} fill="gray" />
+          </PlaneIconButton>
         </Box>
+        {openSetting && (
+          <ProjectSettingWindow
+            closdeWindow={() => toggleSetting(false)}
+            changeTitlte={changeTitlte}
+            project={project}
+          />
+        )}
 
         {quickAccessArea}
         {pageList}

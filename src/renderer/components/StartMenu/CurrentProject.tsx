@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { List } from '@mui/material';
-import ReactLoading from 'react-loading';
+import { List, Typography } from '@mui/material';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import ProjectItem from './ProjectItem';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as DocumentsSvg } from '../../../../assets/documents.svg';
 
 function CurrentProjects({ handleClick }) {
-  const [projectlist, setProjectList] = useState<unknown>();
+  const [projectList, setProjectList] = useState<unknown>();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchProjects() {
+      setLoading(true);
       const queryJson = {
         table: 'project',
         order: ['updated_at', 'DESC'],
@@ -22,27 +24,41 @@ function CurrentProjects({ handleClick }) {
       );
 
       setProjectList(currentProjects);
+      setLoading(false);
     }
 
     fetchProjects();
   }, []);
 
-  if (!projectlist) {
-    return <ReactLoading type="spin" color="gray" width={40} height={40} />;
+  const noProjects = <Typography>まだプロジェクトはありません</Typography>;
+
+  const projectMap = (
+    <List>
+      {projectList &&
+        projectList.map((project, index) => (
+          <ProjectItem
+            key={index}
+            project={project}
+            handleClick={handleClick}
+          />
+        ))}
+    </List>
+  );
+
+  let content;
+
+  if (loading) {
+    content = <NowLoading loading={loading} />;
+  } else if (projectList && projectList.length > 0) {
+    content = projectMap;
+  } else {
+    content = noProjects;
   }
 
   return (
     <div>
       <TextWithSvg SvgComponent={DocumentsSvg} text="最近のプロジェクト" />
-      <List>
-        {projectlist.map((project) => (
-          <ProjectItem
-            key={project.id}
-            project={project}
-            handleClick={handleClick}
-          />
-        ))}
-      </List>
+      {content}
     </div>
   );
 }

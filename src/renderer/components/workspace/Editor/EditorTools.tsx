@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Box, Tooltip } from '@mui/material';
-import ReactLoading from 'react-loading';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import BookmarkButton from './BookmarkButton';
 import TextSetting from './TextSetting';
@@ -30,9 +30,7 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
     toggleStatus('history');
   }
 
-  const LoadingComponent = (
-    <ReactLoading type="spin" color="gray" width={24} height={24} />
-  );
+  const LoadingComponent = <NowLoading loading={loading} />;
 
   const GitComponents = hasGit ? (
     <>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SortableContext } from '@dnd-kit/sortable';
 import Node from 'renderer/Classes/Node';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import ListItemFolder from './ListItemFoder';
 import ListItemPage from './ListItemPage';
 
@@ -9,17 +10,15 @@ export default function TreeBranch({ parentNode }) {
   const [items, setItems] = useState([]);
   const [parentId, setParentId] = useState<number>();
 
-
   if (!parentNode) {
-    return <p>Now Loading...</p>;
+    return <NowLoading loading />;
   }
 
   useEffect(() => {
-    if(parentNode.type === 'folder'){
+    if (parentNode.type === 'folder') {
       setParentId(parentNode.id);
     }
-  },[])
-
+  }, []);
 
   useEffect(() => {
     if (children) {

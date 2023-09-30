@@ -7,6 +7,7 @@ import HistorySpace from './History/HistorySpace';
 import EditorItem from './EditorItem';
 import EditorTools from './EditorTools';
 import TextSetting from './TextSetting';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 
 type PageSetting = {
   fontSize: number;
@@ -26,6 +27,7 @@ function EditorBody({ targetId, page_id, title }) {
   const [lineHeight, setLineHeight] = useState<number | undefined>();
   const [editorSetting, setEditorSetting] = useState<PageSetting>();
   const [currentPage] = useContext(CurrentPageContext);
+  const [loading, setLoading] = useState(false);
 
   const defaultSetting = {
     fontSize: 18,
@@ -36,6 +38,7 @@ function EditorBody({ targetId, page_id, title }) {
 
   useEffect(() => {
     async function setPageData() {
+      setLoading(true);
       const query = {
         table: 'page',
         conditions: {
@@ -56,6 +59,7 @@ function EditorBody({ targetId, page_id, title }) {
       setContentWidth(pageSetting.contentWidth);
       setLineHeight(pageSetting.lineHeight);
       setEditorSetting(pageSetting);
+      setLoading(false);
     }
 
     setPageData();
@@ -97,7 +101,7 @@ function EditorBody({ targetId, page_id, title }) {
   };
 
   if (!project) {
-    return <h1>Loading...</h1>;
+    return <NowLoading loading={loading} />
   }
 
   if (pageStatus === 'history') {
