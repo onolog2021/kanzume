@@ -4,6 +4,7 @@ import CreateForm from './PageList/CreateForm';
 
 export default function ProjectSettingWindow({
   closdeWindow,
+  title,
   project,
   changeTitlte,
 }) {
@@ -31,8 +32,9 @@ export default function ProjectSettingWindow({
         px: 8,
         py: 4,
         background: 'white',
-        top: '25%',
+        top: '50%',
         left: '50%',
+        transform: 'translate(-50%,-50%)',
         border: '1px solid gray',
         borderRadius: 2,
       }}
@@ -43,13 +45,13 @@ export default function ProjectSettingWindow({
             <CreateForm
               createFunc={changeName}
               setStatus={(param) => setTitleForm(param)}
-              initialValue={project.title}
+              initialValue={title}
               label="プロジェクト名"
             />
           ) : (
             <>
               <Typography sx={{ fontSize: 12 }}>プロジェクト名</Typography>
-              {project.title}
+              {title}
               <Button onClick={() => setTitleForm(true)}>変更</Button>
             </>
           )}

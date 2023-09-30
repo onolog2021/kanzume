@@ -104,6 +104,7 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
         {openSetting && (
           <ProjectSettingWindow
             closdeWindow={() => toggleSetting(false)}
+            title={projectTitle}
             changeTitlte={changeTitlte}
             project={project}
           />
