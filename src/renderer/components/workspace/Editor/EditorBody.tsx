@@ -2,12 +2,12 @@ import { useEffect, useRef, useContext, useState } from 'react';
 import { Box } from '@mui/material';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { styled } from '@mui/system';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import { CurrentPageContext, ProjectContext } from '../../Context';
 import HistorySpace from './History/HistorySpace';
 import EditorItem from './EditorItem';
 import EditorTools from './EditorTools';
 import TextSetting from './TextSetting';
-import NowLoading from 'renderer/GlobalComponent/NowLoading';
 
 type PageSetting = {
   fontSize: number;
@@ -28,13 +28,27 @@ function EditorBody({ targetId, page_id, title }) {
   const [editorSetting, setEditorSetting] = useState<PageSetting>();
   const [currentPage] = useContext(CurrentPageContext);
   const [loading, setLoading] = useState(false);
+  const [defaultSetting, setDefaultSetting] = useState<PageSetting>();
 
-  const defaultSetting = {
-    fontSize: 18,
-    fontFamily: 'Meiryo',
-    contentWidth: 600,
-    lineHeight: 1,
-  };
+  useEffect(() => {
+    async function getDefaultSetting() {
+      const storeSetting = await window.electron.ipcRenderer.invoke(
+        'storeGet',
+        'defaultPageSetting'
+      );
+      if (storeSetting) {
+        setDefaultSetting(storeSetting);
+      } else {
+        setDefaultSetting({
+          fontSize: 18,
+          fontFamily: 'Meiryo',
+          contentWidth: 600,
+          lineHeight: 1.3,
+        });
+      }
+    }
+    getDefaultSetting();
+  }, []);
 
   useEffect(() => {
     async function setPageData() {
@@ -63,7 +77,7 @@ function EditorBody({ targetId, page_id, title }) {
     }
 
     setPageData();
-  }, [pageStatus]);
+  }, [pageStatus, defaultSetting]);
 
   useEffect(() => {
     if (
@@ -101,7 +115,7 @@ function EditorBody({ targetId, page_id, title }) {
   };
 
   if (!project) {
-    return <NowLoading loading={loading} />
+    return <NowLoading loading={loading} />;
   }
 
   if (pageStatus === 'history') {

@@ -8,7 +8,7 @@ import SearchProjectForm from './SearchProjectForm';
 import AboutDeveloper from './AboutDeveloper';
 
 function StartMenu() {
-  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackOpen, setSnackOpen] = useState<boolean | undefined>(false);
   const navigate = useNavigate();
 
   const openProject = (id: number) => {
@@ -16,7 +16,7 @@ function StartMenu() {
   };
 
   useEffect(() => {
-    async function checkGit() {
+    async function checkGit(): Promise<void> {
       const result = await window.electron.ipcRenderer.invoke('hasGit?');
       setSnackOpen(!result);
     }
@@ -25,7 +25,7 @@ function StartMenu() {
   }, []);
 
   const message =
-    'Gitがみつかりませんでした。\nKanzumeの一部機能は制限されています。';
+    'Gitと連携できませんでした。\nKanzumeの一部機能は制限されています。';
 
   const toGit = () => {
     window.electron.ipcRenderer.sendMessage(
@@ -50,7 +50,6 @@ function StartMenu() {
       sx={{ whiteSpace: 'pre-wrap', letterSpacing: 0.5 }}
       message={message}
       action={action}
-      // anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     />
   );
 

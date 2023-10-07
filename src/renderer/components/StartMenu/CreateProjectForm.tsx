@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import TextWithSvg from './TextWithSVG';
 import { ReactComponent as PlusSvg } from '../../../../assets/new.svg';
@@ -7,7 +7,7 @@ export default function CreateProjectForm({ handleClick }) {
   const projectTitleRef = useRef();
 
   const createNewPage = async () => {
-    const titleValue = projectTitleRef.current.value;
+    const titleValue = projectTitleRef.current?.value;
     const title = titleValue || '無題';
     const json = {
       table: 'project',

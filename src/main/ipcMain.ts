@@ -852,3 +852,13 @@ ipcMain.handle('getFonts', async () => {
   const list = await getFonts();
   return list;
 });
+
+ipcMain.on('storeSet', (event, storePare) => {
+  const { key, value } = storePare;
+  store.set(key, value);
+});
+
+ipcMain.handle('storeGet', (event, key) => {
+  const value = store.get(key);
+  return value;
+});

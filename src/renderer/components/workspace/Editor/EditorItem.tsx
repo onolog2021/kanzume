@@ -70,6 +70,28 @@ function MyEditor({ page, isCount }) {
     return Slice.maxOpen(fragment);
   }
 
+  function serializeNodeToText(node) {
+    if (node.isText) {
+      return node.text;
+    }
+    if (node.isBlock && node.childCount === 0) {
+      return '\n'; // 空のブロックノードには改行を追加
+    }
+    let result = '';
+    node.forEach((child) => {
+      result += serializeNodeToText(child);
+    });
+    if (node.isBlock) {
+      result += '\n'; // ブロックノードの終わりに改行を追加
+    }
+    return result;
+  }
+
+  // clipboardTextSerializerの定義
+  function clipboardTextSerializer(slice) {
+    return serializeNodeToText(slice.content);
+  }
+
   useEffect(() => {
     async function initialSetUp() {
       const options = {
@@ -96,12 +118,15 @@ function MyEditor({ page, isCount }) {
         onBlur: () => {
           saveContent();
         },
-        editorProps: {
-          clipboardTextParser,
-        },
       };
 
-      editor.current = new Editor(options);
+      editor.current = new Editor({
+        ...options,
+        editorProps: {
+          clipboardTextParser,
+          clipboardTextSerializer,
+        },
+      });
 
       return Promise.resolve();
     }

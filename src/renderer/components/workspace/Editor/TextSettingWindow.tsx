@@ -1,5 +1,11 @@
 import { useEffect, useState, useRef, useContext } from 'react';
-import { ClickAwayListener, Box, Typography, Slider } from '@mui/material';
+import {
+  ClickAwayListener,
+  Box,
+  Typography,
+  Slider,
+  Button,
+} from '@mui/material';
 
 function TextSettingWindow({
   page,
@@ -82,6 +88,21 @@ function TextSettingWindow({
     window.electron.ipcRenderer.invoke('updateRecord', query);
   };
 
+  const setDefaultStyle = () => {
+    const currentSetting = {
+      fontSize: sizeRef.current,
+      fontFamily: fontFamiryRef.current,
+      contentWidth: contentWidthRef.current,
+      lineHeight: lineHeightRef.current,
+    };
+
+    const storePare = {
+      key: 'defaultPageSetting',
+      value: currentSetting,
+    };
+    window.electron.ipcRenderer.sendMessage('storeSet', storePare);
+  };
+
   return (
     <ClickAwayListener onClickAway={() => runCloseWindow()}>
       {setting && (
@@ -103,7 +124,9 @@ function TextSettingWindow({
             zIndex: 10,
           }}
         >
-          <Typography variant="h6">テキスト設定</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            テキスト設定
+          </Typography>
           <Typography>フォントサイズ：</Typography>
           <Slider
             size="small"
@@ -161,6 +184,9 @@ function TextSettingWindow({
                 ))}
             </select>
           )}
+          <Button sx={{ mt: 4 }} onClick={setDefaultStyle}>
+            現在のスタイルをデフォルトにする
+          </Button>
         </Box>
       )}
     </ClickAwayListener>

@@ -14,6 +14,19 @@ async function handleDataDroppedInPageList(
 ) {
   const isArea = overItem.type === 'area';
 
+  if (activeItem.type === 'folder') {
+    const updateQuery = {
+      table: 'folder',
+      columns: {
+        parent_id: null,
+      },
+      conditions: {
+        id: activeItem.id,
+      },
+    };
+    window.electron.ipcRenderer.invoke('updateRecord', updateQuery);
+  }
+
   if (activeItem.type === 'paper' || activeItem.area === 'folder') {
     const deleteStoreQuery = {
       table: 'store',

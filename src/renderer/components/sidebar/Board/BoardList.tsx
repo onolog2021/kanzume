@@ -58,7 +58,7 @@ function BoardList({ boards }) {
       prevTab.push(value);
       return prevTab;
     });
-    const current = { id: newId, type: 'board' };
+    const current = { id: newId, type: 'board', parentId: null };
     setCurrentPage(current);
   };
 

@@ -25,9 +25,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }) {
 
   useEffect(() => {
     if (columnsCount) {
-      const width = (
-        (fullWidth - 16 * (columnsCount + 1)) / columnsCount
-      );
+      const width = (fullWidth - 16 * (columnsCount + 1)) / columnsCount;
       const percent = `${(width / fullWidth) * 100}%`;
       setItemWidth(percent);
     }

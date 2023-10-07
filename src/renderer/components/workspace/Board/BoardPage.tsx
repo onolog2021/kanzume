@@ -4,6 +4,7 @@ import { Resizable } from 're-resizable';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useSortable } from '@dnd-kit/sortable';
 import theme from 'renderer/theme';
+import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
@@ -122,7 +123,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
       size={paperSize}
       ref={resizeRef}
       style={{
-        margin: '8px',
+        margin: '16px 8px',
         opacity: isDragging ? 0.4 : 1,
         paddingRight: isOver && fromWhich() === 'right' ? '16px' : '0',
         paddingLeft: isOver && fromWhich() === 'left' ? '16px' : '0',
@@ -138,24 +139,13 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
     >
       <Paper
         className="boardPaper"
-        elevation={2}
+        elevation={1}
         ref={setNodeRef}
         sx={{
           position: 'relative',
           border: '0.5px solid #999',
           width: '100%',
           height: '100%',
-          p: 4,
-          overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '2px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'transparent',
-          },
-          '&:hover::-webkit-scrollbar-thumb': {
-            backgroundColor: '#999',
-          },
         }}
       >
         <HandleIcon
@@ -172,11 +162,25 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
         />
         <PlaneTextField
           defaultValue={pageData.title}
-          sx={{ input: { px: 0 } }}
           inputRef={titleRef}
           onBlur={changeName}
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            transform: 'translate(0, -100%)',
+            overflow: 'visible',
+            input: {
+              opacity: 0.5,
+              p: 0,
+              fontSize: 11,
+              fontWeight: 500,
+            },
+          }}
         />
-        <EditorItem page={pageData} isCount={false} />
+        <StyledScrollbarBox sx={{ overflow: 'auto', height: '100%', p: 4 }}>
+          <EditorItem page={pageData} isCount={false} />
+        </StyledScrollbarBox>
       </Paper>
     </Resizable>
   );

@@ -55,9 +55,7 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
           <BookmarkButton page={page} />
         </PlaneIconButton>
       </Tooltip>
-      <Tooltip title="テキスト設定" placement="left">
-        <PlaneIconButton>{textSetting}</PlaneIconButton>
-      </Tooltip>
+      {textSetting}
       {loading ? LoadingComponent : GitComponents}
     </Box>
   );

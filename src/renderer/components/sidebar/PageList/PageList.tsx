@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { List, Box, IconButton, Tooltip } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import Folder from 'renderer/Classes/Folder';
+import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import {
   ProjectContext,
   CurrentPageContext,
@@ -13,13 +14,14 @@ import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
 import CategoryTitle from '../CategoryTitle';
 import { ReactComponent as AddPageButton } from '../../../../../assets/paper-plus.svg';
 import { ReactComponent as AddFolderButton } from '../../../../../assets/folder-plus.svg';
-import NowLoading from 'renderer/GlobalComponent/NowLoading';
+
+type FormStatus = 'page' | 'folder' | null;
 
 function PageList({ root }) {
   const [project] = useContext(ProjectContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
-  const [newForm, setNewForm] = useState(null);
+  const [newForm, setNewForm] = useState<FormStatus>(null);
   const svg = <PageIcon style={{ fill: '#999' }} />;
 
   const { setNodeRef, isOver } = useDroppable({
@@ -27,7 +29,7 @@ function PageList({ root }) {
     data: { area: 'pageList', type: 'area' },
   });
 
-  const switchNewForm = (status: string) => {
+  const switchNewForm = (status: FormStatus) => {
     setNewForm(status);
   };
 

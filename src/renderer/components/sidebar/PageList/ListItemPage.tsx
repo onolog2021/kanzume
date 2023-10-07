@@ -52,7 +52,11 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
     ) {
       setTabList((prevTabs) => [...prevTabs, value]);
     }
-    setCurrentPage({ id: pageData.id, type: 'editor' });
+    setCurrentPage({
+      id: pageData.id,
+      type: 'editor',
+      parentId: parentId || null,
+    });
   };
 
   const softDelete = async () => {

@@ -27,20 +27,20 @@ export default function TreeBranch({ parentNode }) {
   }, [children]);
 
   return (
-    <div>
+    <div className={`folder-${parentId}`}>
       <SortableContext items={items}>
         {children &&
-          children.map((item) =>
+          children.map((item, index) =>
             item.type === 'folder' ? (
               <ListItemFolder
-                key={`folder-${item.id}`}
+                key={index}
                 folderData={item}
                 orderArray={items}
                 parentId={parentId}
               />
             ) : (
               <ListItemPage
-                key={`page-${item.id}`}
+                key={index}
                 pageData={item}
                 orderArray={items}
                 parentId={parentId}
