@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path, { resolve } from 'path';
-import { app, BrowserWindow, shell, dialog, Menu } from 'electron';
+import { app, BrowserWindow, shell, dialog, Menu, nativeTheme } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
@@ -126,6 +126,8 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
+
+  // nativeTheme.themeSource = 'light';
 
   const store = new Store();
   const beforeSize = store.get('windowSize');

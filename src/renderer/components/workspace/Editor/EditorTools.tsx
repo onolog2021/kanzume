@@ -26,9 +26,9 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
     setLoading(false);
   };
 
-  function togglePageStatus() {
+  const togglePageStatus = () => {
     toggleStatus('history');
-  }
+  };
 
   const LoadingComponent = <NowLoading loading={loading} />;
 

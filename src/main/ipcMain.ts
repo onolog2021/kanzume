@@ -90,6 +90,33 @@ function editorTextToPlaneText(json: JSON) {
   return plainText;
 }
 
+function transformForSite(json: JSON, site: 'kakuyomu' | 'narou') {
+  function extractText(node) {
+    if (node.content) {
+      return node.content.map(extractText).join('');
+    }
+    if (node.type === 'text') {
+      if (node.marks) {
+        if (site === 'narou' ) {
+          return `|${node.text}《${node.marks[0].attrs.ruby}》`;
+        }
+        if (site === 'kakuyomu') {
+          return `|${node.text}《${node.marks[0].attrs.ruby}》`;
+        }
+      }
+      return node.text;
+    }
+    return '';
+  }
+
+  function convertToPlainText(data) {
+    return data.content.map(extractText).join('\n').trim();
+  }
+
+  const plainText = convertToPlainText(json);
+  return plainText;
+}
+
 // urlへ外部繊維
 ipcMain.on('openURL', (event, url) => {
   shell.openExternal(url);
@@ -627,6 +654,18 @@ ipcMain.on('exportText', async (event, pageId) => {
     };
     const pageData = await fetchRecord(query);
 
+    // 出力形式を選択
+    const formatChoice = dialog.showMessageBoxSync({
+      message: '出力形式を選択してください',
+      buttons: ['プレーン', 'なろう', 'カクヨム'],
+      cancelId: -1, // キャンセルボタンの場合のID
+    });
+
+    console.log(formatChoice);
+
+    // ユーザーがキャンセルした場合
+    if (formatChoice === -1) return;
+
     // デフォルトのファイル名と保存形式を設定
     const defaultFileName = pageData.title
       ? `${pageData.title}.txt`
@@ -640,7 +679,16 @@ ipcMain.on('exportText', async (event, pageId) => {
 
     if (!reply.canceled && reply.filePath) {
       const { content } = pageData;
-      const data = editorTextToPlaneText(JSON.parse(content));
+      let data;
+      if (formatChoice === 2) {
+        console.log('kakuyomu');
+        data = content;
+      } else if (formatChoice === 1) {
+        console.log('narou');
+        data = transformForSite(JSON.parse(content), 'narou');
+      } else {
+        data = editorTextToPlaneText(JSON.parse(content));
+      }
 
       fs.writeFile(reply.filePath, data, (error) => {
         if (error) {

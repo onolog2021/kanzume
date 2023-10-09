@@ -28,7 +28,7 @@ function TextSetting({
             toggleIsOpen(true);
           }}
         >
-          <TextSettingButton />
+          <TextSettingButton fill="#777" />
         </PlaneIconButton>
       </Tooltip>
 

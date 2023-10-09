@@ -169,23 +169,28 @@ function TextSettingWindow({
             }}
             onChangeCommitted={updateSetting}
           />
-          {setting.fontFamily && (
-            <select
-              name="font-family"
-              id="font-family-select"
-              defaultValue={setting.fontFamily}
-              onChange={(event) => updateFontFamily(event)}
-            >
-              {fontList &&
-                Object.entries(fontList).map(([key, value]) => (
-                  <option value={value as string} key={value as string}>
-                    {key}
-                  </option>
-                ))}
-            </select>
-          )}
+          <Box>
+            {setting && (
+              <select
+                name="font-family"
+                id="font-family-select"
+                defaultValue={setting.fontFamily}
+                onChange={(event) => updateFontFamily(event)}
+              >
+                {fontList &&
+                  Object.entries(fontList).map(([key, value]) => (
+                    <option value={value as string} key={value as string}>
+                      {key}
+                    </option>
+                  ))}
+              </select>
+            )}
+          </Box>
+
           <Button sx={{ mt: 4 }} onClick={setDefaultStyle}>
-            現在のスタイルをデフォルトにする
+            <Typography sx={{ fontSize: 12, letterSpacing: '-0.05em' }}>
+              現在のスタイルをデフォルトにする
+            </Typography>
           </Button>
         </Box>
       )}

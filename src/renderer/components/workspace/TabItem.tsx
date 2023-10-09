@@ -74,10 +74,9 @@ function TabItem({ tab, orderArray }) {
   };
 
   function middleClick(event: MouseEvent) {
-    event.preventDefault();
-    console.log('fire');
     if (event.button === 1) {
-      console.log('中央ボタンがクリックされました。');
+      closeTab(event);
+      event.preventDefault();
     }
   }
 
@@ -106,36 +105,43 @@ function TabItem({ tab, orderArray }) {
         },
       }}
     >
-      <ListItemIcon>{svg}</ListItemIcon>
-      <ListItemText
-        primary={tab.title}
-        primaryTypographyProps={{
-          fontSize: isActive ? 14 : 12,
-          fontWeight: isActive ? 'bolder' : 'normal',
-        }}
-        sx={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          webkitBoxOrient: 'vertical',
-          webkitLineClamp: 1,
-        }}
-      />
-      <IconButton
-        onClick={closeTab}
-        sx={{
-          position: 'absolute',
-          right: 2,
-          height: 48,
-          top: 0,
-          ':hover': {
-            background: 'transparent',
-          },
-        }}
+      <Box
+        onMouseDown={(event) => middleClick(event)}
+        sx={{ display: 'flex', width: '100%' }}
       >
-        <CloseButton style={{ fill: 'gray', width: 12, height: 12 }} />
-      </IconButton>
+        <ListItemIcon sx={{ minWidth: 24, mr: 1, svg: { width: 16 } }}>
+          {svg}
+        </ListItemIcon>
+        <ListItemText
+          primary={tab.title}
+          primaryTypographyProps={{
+            fontSize: isActive ? 14 : 12,
+            fontWeight: isActive ? 'bolder' : 'normal',
+          }}
+          sx={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            webkitBoxOrient: 'vertical',
+            webkitLineClamp: 1,
+          }}
+        />
+        <IconButton
+          onClick={closeTab}
+          sx={{
+            position: 'absolute',
+            right: 2,
+            height: 48,
+            top: 0,
+            ':hover': {
+              background: 'transparent',
+            },
+          }}
+        >
+          <CloseButton style={{ fill: 'gray', width: 12, height: 12 }} />
+        </IconButton>
+      </Box>
     </ListItemButton>
   );
 }

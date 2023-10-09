@@ -5,6 +5,7 @@ import { ProjectContext } from 'renderer/components/Context';
 import Page from 'renderer/Classes/Page';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { electron } from 'process';
+import theme from 'renderer/theme';
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
@@ -199,7 +200,9 @@ export default function BoardSpace({ boardData }) {
         </Tooltip>
 
         <IconButton onClick={changeBookmark} sx={{ ml: 'auto' }}>
-          <Bookmark style={{ fill: bookmark ? 'blue' : '#999' }} />
+          <Bookmark
+            style={{ fill: bookmark ? theme.palette.primary.main : '#999' }}
+          />
         </IconButton>
       </Box>
 
