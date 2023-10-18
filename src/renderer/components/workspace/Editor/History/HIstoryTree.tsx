@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import ReactLoading from 'react-loading';
@@ -35,7 +35,13 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
   };
 
   if (logs && logs.length === 0) {
-    return <p>まだタイムラインは作成されていません。</p>;
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography sx={{ textAlign: 'center' }}>
+          まだタイムラインは作成されていません。
+        </Typography>
+      </Box>
+    );
   }
 
   return (

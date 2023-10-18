@@ -127,7 +127,7 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  // nativeTheme.themeSource = 'light';
+  // nativeTheme.themeSource = 'dark';
 
   const store = new Store();
   const beforeSize = store.get('windowSize');

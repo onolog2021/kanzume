@@ -179,7 +179,7 @@ function EditorBody({ targetId, page_id, title }) {
               }}
               sx={{
                 input: {
-                  fontSize: 20,
+                  fontSize: 24,
                   pl: `calc((100% - ${contentWidth}px) / 2)`,
                 },
               }}

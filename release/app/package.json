@@ -1,7 +1,7 @@
 {
   "name": "kanzume-editor",
-  "version": "0.2.6",
-  "description": "A foundation for scalable desktop apps",
+  "version": "0.2.7",
+  "description": "editor for novel",
   "license": "MIT",
   "author": {
     "name": "Electron React Boilerplate Maintainers",

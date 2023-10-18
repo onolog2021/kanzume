@@ -1,4 +1,4 @@
-import { Button, Box, Tooltip } from '@mui/material';
+import { Button, Box, Tooltip,Typography } from '@mui/material';
 import { profile } from 'console';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
@@ -86,10 +86,16 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
 
   const showConfirm = () => {
     setIsConfirm(true);
-  }
+  };
 
-  if(!log){
-    return <p>選択されたアイテムはありません</p>
+  if (!log) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography sx={{ textAlign: 'center' }}>
+          選択されたアイテムはありません。
+        </Typography>
+      </Box>
+    );
   }
 
   return (

@@ -11,13 +11,21 @@ import History from '@tiptap/extension-history';
 import TextStyle from '@tiptap/extension-text-style';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Slice, Fragment, Node } from 'prosemirror-model';
+import ContextMenu from 'renderer/components/ContextMenu';
 import KanzumeBubbleMenu from './KanzumeBubbleMenu';
+
+interface contextMenu {
+  mouseX: number;
+  mouseY: number;
+}
 
 function MyEditor({ page, isCount }) {
   const editor = useRef();
   const timeoutId = useRef(null);
   const [editorStatus, setEditorStatus] = useState(false);
   const [textCount, setTextCount] = useState(0);
+  const [contextMenuStatus, setContextMenuStatus] =
+    useState<contextMenu | null>(null);
 
   const Ruby = TextStyle.extend({
     parseHTML() {
@@ -185,6 +193,64 @@ function MyEditor({ page, isCount }) {
     setTextCount(count);
   }
 
+  const contextMenuClose = () => {
+    setContextMenuStatus(null);
+  };
+
+  const contextMenuOpen = (event) => {
+    event.stopPropagation();
+    setContextMenuStatus(
+      contextMenuStatus === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : null
+    );
+  };
+
+  const copyText = () => {
+    const { state } = editor.current;
+    if (!state.selection.empty) {
+      const selectedFragment = state.selection.content().content;
+      const selectedText = serializeNodeToText(selectedFragment);
+      window.navigator.clipboard.writeText(selectedText);
+      contextMenuClose();
+    }
+  };
+
+  const pasteText = async () => {
+    const clipboardText = await window.navigator.clipboard.readText();
+
+    const transaction = editor.current.state.tr.insertText(clipboardText);
+    editor.current.view.dispatch(transaction);
+    contextMenuClose()
+  };
+
+  const cutText = () => {
+    copyText()
+    const transaction = editor.current.state.tr.deleteSelection();
+    editor.current.view.dispatch(transaction);
+  }
+
+  const menues = [
+    {
+      id: 'copy',
+      menuName: 'コピー',
+      method: copyText,
+    },
+    {
+      id: 'paste',
+      menuName: 'ペースト',
+      method: pasteText,
+    },
+    {
+      id: 'cut',
+      menuName: '切り抜き',
+      method: cutText,
+    },
+  ];
+
   return (
     <>
       {isCount && isCount ? (
@@ -205,10 +271,22 @@ function MyEditor({ page, isCount }) {
       ) : null}
       {editorStatus && (
         <>
-          <EditorContent editor={editor.current} />
+          <EditorContent
+            editor={editor.current}
+            onContextMenu={(e) => {
+              contextMenuOpen(e)
+            }}
+          />
           <BubbleMenu editor={editor.current}>
             <KanzumeBubbleMenu editor={editor.current} />
           </BubbleMenu>
+          {contextMenuStatus && (
+            <ContextMenu
+              contextMenu={contextMenuStatus}
+              onClose={contextMenuClose}
+              menues={menues}
+            />
+          )}
         </>
       )}
     </>

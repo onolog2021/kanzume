@@ -96,7 +96,7 @@ function transformForSite(json: JSON, site: 'kakuyomu' | 'narou') {
       return node.content.map(extractText).join('');
     }
     if (node.type === 'text') {
-      if (node.marks) {
+      if (node.marks && node.marks[0].type !== 'bold') {
         if (site === 'narou' ) {
           return `|${node.text}《${node.marks[0].attrs.ruby}》`;
         }

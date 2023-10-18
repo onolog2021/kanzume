@@ -1,7 +1,6 @@
 import { Menu, MenuItem } from '@mui/material';
 
 function ContextMenu({ contextMenu, onClose, menues }) {
-
   return (
     <Menu
       open={contextMenu !== null}
@@ -15,7 +14,9 @@ function ContextMenu({ contextMenu, onClose, menues }) {
     >
       {menues &&
         menues.map((menu) => (
-          <MenuItem onClick={menu.method} key={menu.id}>{menu.menuName}</MenuItem>
+          <MenuItem onClick={menu.method} key={menu.id}>
+            {menu.menuName}
+          </MenuItem>
         ))}
     </Menu>
   );

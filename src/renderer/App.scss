@@ -296,7 +296,6 @@ $workspace-width: calc(100vw - 240px);
 .editorBody {
   .tiptap {
     min-height: calc(100vh - 80px);
-    padding-top: 40px;
     padding-left: var(--editor-padding);
     padding-right: var(--editor-padding);
     .ruby {

@@ -1,7 +1,14 @@
-import { Box, Button } from '@mui/material';
+import {
+  Box,
+  Button,
+  ListItemButton,
+  ListItemIcon,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 import HIstoryTree from './HIstoryTree';
 import HistoryPreviewWindow from './HistoryPreviewWindow';
+import { ReactComponent as PenIcon } from '../../../../../../assets/pen.svg';
 
 export default function HistorySpace({ pageId, toggleStatus }) {
   const [selected, setSelected] = useState<string>('');
@@ -12,7 +19,15 @@ export default function HistorySpace({ pageId, toggleStatus }) {
 
   return (
     <>
-      <Button onClick={() => toggleStatus('editor')}>Editorに戻る</Button>
+      <ListItemButton
+        onClick={() => toggleStatus('editor')}
+        sx={{ width: 'fit-content' }}
+      >
+        <ListItemIcon sx={{ minWidth: 24, mr: 1 }}>
+          <PenIcon width={24} height={24} />
+        </ListItemIcon>
+        <Typography sx={{ lineHeight: '24px' }}>エディタにもどる</Typography>
+      </ListItemButton>
       <Box
         sx={{
           display: 'grid',
