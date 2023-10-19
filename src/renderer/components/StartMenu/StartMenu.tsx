@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
@@ -18,7 +19,7 @@ import { ReactComponent as ModeIdon } from '../../../../assets/brightness.svg';
 function StartMenu() {
   const [snackOpen, setSnackOpen] = useState<boolean | undefined>(false);
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'dark' | 'light'>('light');
+  const theme = useTheme();
 
   const openProject = (id: number) => {
     navigate('/editor', { state: { project_id: id } });
@@ -31,24 +32,6 @@ function StartMenu() {
     }
 
     checkGit();
-
-    async function fetchMode() {
-      const initialMode = await window.electron.ipcRenderer.invoke(
-        'storeGet',
-        'mode'
-      );
-      if (initialMode) {
-        setMode(initialMode);
-      } else {
-        setMode('light');
-        window.electron.ipcRenderer.sendMessage('storeSet', {
-          key: 'mode',
-          value: 'light',
-        });
-      }
-    }
-
-    fetchMode();
   }, []);
 
   const message =
@@ -81,9 +64,8 @@ function StartMenu() {
   );
 
   const switchMode = () => {
-    const newMode = mode === 'dark' ? 'light' : 'dark';
+    const newMode = theme.palette.mode === 'dark' ? 'light' : 'dark';
     window.electron.ipcRenderer.sendMessage('switchMode', newMode);
-    setMode(newMode);
   };
 
   return (
@@ -104,7 +86,7 @@ function StartMenu() {
             mr: 1,
           }}
         >
-          {mode === 'dark' ? 'ダークモード' : 'ライトモード'}
+          {theme.palette.mode === 'dark' ? 'ダーク' : 'ライト'}
         </Typography>
         <ModeIdon style={{ width: 16, height: 16 }} />
       </ListItemButton>

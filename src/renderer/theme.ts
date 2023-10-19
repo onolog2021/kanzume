@@ -1,6 +1,8 @@
 import { createTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 
-function theme(prefersDarkMode: 'dark' | 'light') {
+function useTheme() {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const kanzumeTheme = createTheme({
     palette: {
       mode: prefersDarkMode ? 'dark' : 'light',
@@ -89,4 +91,4 @@ function theme(prefersDarkMode: 'dark' | 'light') {
   return kanzumeTheme;
 }
 
-export default theme;
+export default useTheme;
