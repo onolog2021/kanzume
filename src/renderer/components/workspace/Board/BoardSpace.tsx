@@ -5,7 +5,8 @@ import { ProjectContext } from 'renderer/components/Context';
 import Page from 'renderer/Classes/Page';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { electron } from 'process';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
+
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
@@ -19,6 +20,7 @@ export default function BoardSpace({ boardData }) {
   const [bookmark, setBookmark] = useState<Boolean>(false);
   const [fullWidth, setFullWidth] = useState();
   const titleRef = useRef();
+  const theme = useTheme();
 
   async function initialBoard() {
     const boards = await createBoardTree(boardData.id);

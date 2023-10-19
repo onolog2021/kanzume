@@ -6,6 +6,7 @@ import { ReactComponent as MenuIcon } from '../../../../assets/dots.svg';
 import ContextMenu from '../ContextMenu';
 import { CurrentPageContext } from '../Context';
 import SortableBorder from './SortableBorder';
+import { useTheme } from '@mui/material/styles';
 
 interface contextMenu {
   mouseX: number;
@@ -21,6 +22,7 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
   // dnd
   const { attributes, listeners, setNodeRef, isOver, index, over, isDragging } =
     useSortable(dndTag);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!currentPage) {
@@ -50,9 +52,10 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     }
   };
 
+  const overColor = theme.palette.mode === 'dark' ? theme.palette.secondary.dark : '#F2FDFF';
   const overStyle = {
     transition: 'none',
-    background: isFolder() ? '#F2FDFF' : 'none',
+    background: isFolder() ?  overColor : 'none',
   };
 
   const contextMenuOpen = (event) => {

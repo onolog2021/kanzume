@@ -1,11 +1,13 @@
 import { Box, ClickAwayListener, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
+import { useTheme } from '@mui/material/styles';
 
 export default function DifferenceOverlay({ diffText, switchDisplsy }) {
   const switchVisible = () => {
     switchDisplsy(false);
   };
+  const theme = useTheme();
 
   function baseTextStyle(text: [number, string], index: number) {
     if (text[0] === 0) {
@@ -72,7 +74,10 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
       <ClickAwayListener onClickAway={switchVisible}>
         <StyledScrollbarBox
           sx={{
-            background: 'white',
+            background:
+              theme.palette.mode === 'dark'
+                ? theme.palette.primary.dark
+                : 'white',
             width: '80vw',
             height: '100vh',
             m: 'auto',

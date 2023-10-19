@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   Box,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../assets/board.svg';
@@ -22,6 +23,7 @@ function TabItem({ tab, orderArray }) {
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [isActive, setIsActive] = useState<Boolean>(false);
+  const theme = useTheme();
 
   let svg;
   if (tab.type === 'editor') {
@@ -88,7 +90,8 @@ function TabItem({ tab, orderArray }) {
       {...listeners}
       {...attributes}
       sx={{
-        background: '#E9E9E9;',
+        background:
+          theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'white',
         minWidth: tab.type === 'trash' ? 0 : 200,
         height: 48,
         lineHeight: '48px',

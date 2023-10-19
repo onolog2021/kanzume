@@ -3,7 +3,7 @@ import { Box, Paper, TextField } from '@mui/material';
 import { Resizable } from 're-resizable';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useSortable } from '@dnd-kit/sortable';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
@@ -20,6 +20,7 @@ function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
   const resizeRef = useRef(null);
   const dndId = `bp-${pageData.id}`;
   const [isResizing, setIsResizing] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     if (paperSize) {

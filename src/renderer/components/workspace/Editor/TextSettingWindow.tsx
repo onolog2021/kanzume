@@ -6,6 +6,7 @@ import {
   Slider,
   Button,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 function TextSettingWindow({
   page,
@@ -22,6 +23,7 @@ function TextSettingWindow({
   const fontFamiryRef = useRef();
   const contentWidthRef = useRef<number | undefined>();
   const lineHeightRef = useRef<number | undefined>();
+  const theme = useTheme();
 
   function runCloseWindow() {
     closeWindow(false);
@@ -110,7 +112,6 @@ function TextSettingWindow({
           role="presentation"
           ref={boxRef}
           sx={{
-            color: '#333',
             textAlign: 'left',
             position: 'fixed',
             top: '50%',
@@ -118,8 +119,11 @@ function TextSettingWindow({
             transform: 'translate(-50%,-50%)',
             width: 520,
             p: 4,
+            background:
+              theme.palette.mode === 'dark'
+                ? theme.palette.primary.dark
+                : 'white',
             border: '1px solid rgba(0, 0, 0, 0.20)',
-            backgroundColor: 'rgba(255, 255, 255, 0.95);',
             boxShadow: '0px 2px 2px 0px rgba(0, 0, 0, 0.2)',
             zIndex: 10,
           }}
@@ -172,6 +176,15 @@ function TextSettingWindow({
           <Box>
             {setting && (
               <select
+                style={{
+                  color: theme.palette.mode === 'dark' ? 'white' : '#333',
+                  padding: 2,
+                  marginTop: 16,
+                  background:
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.primary.dark
+                      : 'white',
+                }}
                 name="font-family"
                 id="font-family-select"
                 defaultValue={setting.fontFamily}

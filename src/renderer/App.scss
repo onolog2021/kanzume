@@ -3,6 +3,8 @@ $font: (
   'main': 'Meiryo',
   'sub': 'MS UI Gothic'
 );
+$dark-base-color: #1e1e23;
+$dark-base-color-secondary: #5b5b66;
 
 $tab-list-height: 48px;
 $editor-title-height: 48px;
@@ -12,6 +14,18 @@ $editor-height: (
   'tab-list': $tab-list-height,
   'editor-title': $editor-title-height
 );
+
+@mixin dark-mode-styles {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+@mixin light-mode-style {
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
+}
 
 * {
   margin: 0;
@@ -33,21 +47,18 @@ body {
   &::-webkit-scrollbar-thumb {
     background-color: #999;
   }
+  @include dark-mode-styles {
+    color: #dddddd;
+    background: $dark-base-color;
+    svg {
+      fill: #dddddd;
+    }
+  }
+  @include light-mode-style {
+    color: #1e1e23;
+    background: #ffffff;
+  }
 }
-
-// @media (prefers-color-scheme: dark) {
-//   body {
-//     color: #dddddd;
-//     background: #1e1e23;
-//   }
-// }
-
-// @media (prefers-color-scheme: light) {
-//   body {
-//     color: #1e1e23;
-//     background: #ffffff;
-//   }
-// }
 
 // StartMenu
 .startMenuWrapper {
@@ -110,7 +121,6 @@ body {
     height: 50%;
     border-radius: 4px;
     border: 1px solid var(--unnamed, #6b9ebb);
-    background: #fff;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     padding: 40px;
     position: absolute;
@@ -118,6 +128,12 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     overflow-y: auto;
+    @include dark-mode-styles {
+      background: $dark-base-color;
+    }
+    @include light-mode-style {
+      background: white;
+    }
   }
 }
 
@@ -221,7 +237,6 @@ body {
   display: flex;
   padding: 0;
   overflow-x: auto;
-  background: white;
   width: 100%;
   &::-webkit-scrollbar {
     height: 2px;
@@ -235,6 +250,12 @@ body {
       background-color: #999;
     }
   }
+  @include dark-mode-styles {
+    background: $dark-base-color;
+  }
+  @include light-mode-style {
+    background-color: white;
+  }
 }
 
 .tab {
@@ -244,13 +265,11 @@ body {
   height: 48px;
   font-size: 1.4rem;
   border: none;
-  background-color: #e9e9e9;
   overflow: hidden;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   cursor: pointer;
   text-align: left;
-  border-right: 0.1px solid #d5d5d5;
   max-width: 120px;
   p {
     display: -webkit-box;
@@ -263,7 +282,19 @@ body {
   &.selected {
     font-size: 1.6rem;
     font-weight: bold;
-    background-color: white;
+  }
+  @include light-mode-style {
+    background-color: #e9e9e9;
+    border-right: 0.1px solid #d5d5d5;
+    &.selected {
+      background-color: white;
+    }
+  }
+  @include dark-mode-styles {
+    background-color: $dark-base-color;
+    &.selected{
+      background-color: $dark-base-color-secondary;
+    }
   }
 }
 
@@ -279,8 +310,8 @@ $workspace-width: calc(100vw - 240px);
   padding-right: calc(($workspace-width - 600px) / 2);
 }
 
-.tiptap{
-  p{
+.tiptap {
+  p {
     margin-top: 4px;
   }
 }
@@ -317,8 +348,8 @@ $workspace-width: calc(100vw - 240px);
   }
 }
 
-.boardPaper{
-  .tiptap{
+.boardPaper {
+  .tiptap {
     min-height: 200px;
   }
 }

@@ -1,5 +1,7 @@
 import { Box, Button, ClickAwayListener, Typography } from '@mui/material';
 import { useRef, useState } from 'react';
+import { inherits } from 'util';
+import { useTheme } from '@mui/material/styles';
 import CreateForm from './PageList/CreateForm';
 
 export default function ProjectSettingWindow({
@@ -10,6 +12,7 @@ export default function ProjectSettingWindow({
 }) {
   const boxRef = useRef();
   const [titleForm, setTitleForm] = useState<Boolean | null>(false);
+  const theme = useTheme();
 
   const changeName = (title: string) => {
     const query = {
@@ -31,12 +34,13 @@ export default function ProjectSettingWindow({
         position: 'fixed',
         px: 8,
         py: 4,
-        background: 'white',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%,-50%)',
         border: '1px solid gray',
         borderRadius: 2,
+        background:
+          theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'white',
       }}
     >
       <ClickAwayListener onClickAway={closdeWindow}>

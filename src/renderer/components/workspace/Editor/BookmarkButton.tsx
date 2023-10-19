@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
+
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 
 function BookmarkButton({ page }) {
   const [bookmark, setBookmark] = useState<Boolean>();
+  const theme = useTheme();
 
   useEffect(() => {
     if (page) {
@@ -64,7 +66,9 @@ function BookmarkButton({ page }) {
 
   return (
     <Bookmark
-      fill={bookmark ? theme.palette.primary.main : 'gray'}
+      style={{
+        fill: bookmark ? theme.palette.primary.main : 'gray',
+      }}
       onClick={changeBookmark}
     />
   );

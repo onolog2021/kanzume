@@ -1,15 +1,25 @@
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Snackbar } from '@mui/material';
+import {
+  Box,
+  Button,
+  ListItemButton,
+  Snackbar,
+  Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
 import SearchProjectForm from './SearchProjectForm';
 import AboutDeveloper from './AboutDeveloper';
+import { ReactComponent as ModeIdon } from '../../../../assets/brightness.svg';
 
 function StartMenu() {
   const [snackOpen, setSnackOpen] = useState<boolean | undefined>(false);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const openProject = (id: number) => {
     navigate('/editor', { state: { project_id: id } });
@@ -53,8 +63,33 @@ function StartMenu() {
     />
   );
 
+  const switchMode = () => {
+    const newMode = theme.palette.mode === 'dark' ? 'light' : 'dark';
+    window.electron.ipcRenderer.sendMessage('switchMode', newMode);
+  };
+
   return (
     <Box className="startMenuWrapper">
+      <ListItemButton
+        sx={{
+          position: 'absolute',
+          top: 24,
+          left: 16,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+        onClick={switchMode}
+      >
+        <Typography
+          sx={{
+            fontSize: 12,
+            mr: 1,
+          }}
+        >
+          {theme.palette.mode === 'dark' ? 'ダーク' : 'ライト'}
+        </Typography>
+        <ModeIdon style={{ width: 16, height: 16 }} />
+      </ListItemButton>
       <img src={LogoImage} alt="logo" className="logo" />
       <Box
         sx={{

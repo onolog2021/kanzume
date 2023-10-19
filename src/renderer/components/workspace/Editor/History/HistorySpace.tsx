@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
+import theme from 'renderer/theme';
 import HIstoryTree from './HIstoryTree';
 import HistoryPreviewWindow from './HistoryPreviewWindow';
 import { ReactComponent as PenIcon } from '../../../../../../assets/pen.svg';
