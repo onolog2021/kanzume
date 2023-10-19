@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
+
 import LogoImage from '../../../../assets/logo.png';
 
 function NoSpace() {

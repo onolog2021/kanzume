@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
 import ReactLoading from 'react-loading';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import HistoryItem from './HistoryItem';
 
@@ -10,6 +10,7 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
   const [project] = useContext(ProjectContext);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([]);
+  const theme = useTheme();
 
   useEffect(() => {
     async function fetchLogs() {

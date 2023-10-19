@@ -72,7 +72,7 @@ function BoardList({ boards }) {
         <CategoryTitle svg={svg} categoryName="ボード" />
         <Tooltip title="ボード作成" placement="top">
           <IconButton onClick={() => switchFormDisplay('board')}>
-            <AddBoardButton />
+            <AddBoardButton style={{width: 16, height: 16}}/>
           </IconButton>
         </Tooltip>
       </div>

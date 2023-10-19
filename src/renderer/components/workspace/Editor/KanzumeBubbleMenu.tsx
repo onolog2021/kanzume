@@ -1,8 +1,6 @@
 import { useState, useRef } from 'react';
-import {
-  Box,
-  IconButton,
-} from '@mui/material';
+import { Box, IconButton } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import RubyForm from './RubyForm';
 import { ReactComponent as BoldIcon } from '../../../../../assets/bold.svg';
 import { ReactComponent as RubyIcon } from '../../../../../assets/ruby.svg';
@@ -10,10 +8,12 @@ import { ReactComponent as RubyIcon } from '../../../../../assets/ruby.svg';
 export default function KanzumeBubbleMenu({ editor }) {
   const [onMenu, setOnMenu] = useState<'ruby' | 'search' | null>(null);
   const { selection } = editor;
+  const theme = useTheme();
 
   const buttonStyle = {
     p: 1,
-    background: 'white',
+    background:
+      theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'white',
     borderRadius: 4,
     border: '.2px solid gray',
   };
@@ -37,10 +37,11 @@ export default function KanzumeBubbleMenu({ editor }) {
         px: 2,
         my: 4,
         zIndex: 200,
-        background: 'white',
         border: '.2px solid gray',
         boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.25)',
         borderRadius: 1,
+        background:
+          theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'white',
       }}
     >
       {onMenu && menuMap[onMenu]}
@@ -55,10 +56,10 @@ export default function KanzumeBubbleMenu({ editor }) {
           style={buttonStyle}
           onClick={() => editor.chain().toggleBold().focus().run()}
         >
-          <BoldIcon style={{ width: 16, height: 16, fill: '#555' }} />
+          <BoldIcon style={{ width: 16, height: 16 }} />
         </IconButton>
         <IconButton style={buttonStyle} onClick={() => menuToggle('ruby')}>
-          <RubyIcon style={{ width: 16, height: 16, fill: '#555' }} />
+          <RubyIcon style={{ width: 16, height: 16 }} />
         </IconButton>
       </Box>
     </Box>

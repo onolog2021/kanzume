@@ -79,12 +79,12 @@ function PageList({ root }) {
         <CategoryTitle svg={svg} categoryName="テキスト" />
         <Tooltip title="テキスト作成" placement="top">
           <IconButton onClick={() => switchNewForm('page')}>
-            <AddPageButton />
+            <AddPageButton style={{ width: 16, height: 16 }} />
           </IconButton>
         </Tooltip>
         <Tooltip title="フォルダ作成" placement="top">
           <IconButton onClick={() => switchNewForm('folder')}>
-            <AddFolderButton />
+            <AddFolderButton style={{ width: 16, height: 16 }} />
           </IconButton>
         </Tooltip>
       </div>

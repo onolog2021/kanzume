@@ -1,4 +1,4 @@
-import { Button, Box, Tooltip,Typography } from '@mui/material';
+import { Button, Box, Tooltip, Typography } from '@mui/material';
 import { profile } from 'console';
 import { useContext, useEffect, useState } from 'react';
 import { ProjectContext } from 'renderer/components/Context';
@@ -10,7 +10,8 @@ import {
 import ReactLoading from 'react-loading';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
+
 import Confirmation from 'renderer/GlobalComponent/Confirmation';
 import DifferenceOverlay from './DifferenceOverlay';
 import PreviewText from './PreviewText';
@@ -23,6 +24,7 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
   const [loading, setLoading] = useState(false);
   const [overlayOn, setOverlayOn] = useState(false);
   const [isConfirm, setIsConfirm] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     async function fetchLogProfile() {
@@ -111,7 +113,10 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
         <Box
           sx={{
             position: 'fixed',
-            background: 'white',
+            background:
+              theme.palette.mode === 'dark'
+                ? theme.palette.primary.dark
+                : 'white',
             right: 40,
             bottom: 20,
           }}

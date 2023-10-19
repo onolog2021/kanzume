@@ -1,4 +1,13 @@
-import { ipcMain, Menu, MenuItem, app, Shell, shell, dialog } from 'electron';
+import {
+  ipcMain,
+  Menu,
+  MenuItem,
+  app,
+  Shell,
+  shell,
+  dialog,
+  nativeTheme,
+} from 'electron';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import { IpcMainEvent } from 'electron/main';
@@ -97,7 +106,7 @@ function transformForSite(json: JSON, site: 'kakuyomu' | 'narou') {
     }
     if (node.type === 'text') {
       if (node.marks && node.marks[0].type !== 'bold') {
-        if (site === 'narou' ) {
+        if (site === 'narou') {
           return `|${node.text}《${node.marks[0].attrs.ruby}》`;
         }
         if (site === 'kakuyomu') {
@@ -909,4 +918,9 @@ ipcMain.on('storeSet', (event, storePare) => {
 ipcMain.handle('storeGet', (event, key) => {
   const value = store.get(key);
   return value;
+});
+
+ipcMain.on('switchMode', (event, newMode) => {
+  nativeTheme.themeSource = newMode;
+  event.reply('changeMode', newMode);
 });

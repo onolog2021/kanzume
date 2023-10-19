@@ -1,8 +1,10 @@
 import { Box } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
+
 
 export default function PaperBorder({ boardId, index, orderArray }) {
+  const theme = useTheme();
   const { setNodeRef, over, isOver, active } = useDroppable({
     id: `border-${boardId}-${index}`,
     data: {

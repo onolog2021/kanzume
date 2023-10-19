@@ -8,11 +8,13 @@ import {
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import TabItem from './TabItem';
 import { ReactComponent as TrackButton } from '../../../../assets/expand.svg';
+import { useTheme } from '@mui/material/styles';
 
 function TabList() {
   const [orderArray, setOrderArray] = useState();
   const [tabList, setTabList] = useContext(TabListContext);
   const tabListRef = useRef(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const tabOrderArray = tabList.map((tab) => {

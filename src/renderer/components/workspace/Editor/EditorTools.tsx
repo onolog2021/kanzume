@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Tooltip } from '@mui/material';
 import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
+import { useTheme } from '@mui/material/styles';
 import BookmarkButton from './BookmarkButton';
 import TextSetting from './TextSetting';
 import { ReactComponent as HistoryIcon } from '../../../../../assets/history.svg';
@@ -10,6 +11,7 @@ import { ReactComponent as MarkerIcon } from '../../../../../assets/marker.svg';
 export default function EditorTools({ page, toggleStatus, textSetting }) {
   const [loading, setLoading] = useState(false);
   const [hasGit, setHasGit] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     async function checkGit() {
@@ -49,7 +51,14 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
   ) : null;
 
   return (
-    <Box className="editorTools">
+    <Box
+      className="editorTools"
+      sx={{
+        svg: {
+          fill: theme.palette.mode === 'dark' ? '#dddd' : '#777',
+        },
+      }}
+    >
       <Tooltip title="クイックアクセス登録" placement="left">
         <PlaneIconButton>
           <BookmarkButton page={page} />

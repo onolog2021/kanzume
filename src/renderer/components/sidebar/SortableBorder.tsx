@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
 
 interface itemData {
   dndId: string;
@@ -17,6 +17,7 @@ interface itemData {
 export default function SortableBorder({ tag, index }) {
   const [itemId, setItemId] = useState<string>('');
   const [itemData, setItemData] = useState<itemData>();
+  const theme = useTheme();
 
   useEffect(() => {
     const modifiedData = {

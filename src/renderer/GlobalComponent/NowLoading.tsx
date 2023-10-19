@@ -1,8 +1,9 @@
 import { Box } from '@mui/material';
 import ReactLoading from 'react-loading';
-import theme from 'renderer/theme';
+import { useTheme } from '@mui/material/styles';
 
 export default function NowLoading({ loading }) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
