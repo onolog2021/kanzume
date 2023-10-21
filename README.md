@@ -6,7 +6,7 @@ Gitを導入せずに利用することは可能ですが、機能を100％利�
 
 # ダウンロード・インストール方法
 以下のURLをクリックするとsetupファイルがダウンロードできます。
-[Setupファイル](https://github.com/onolog2021/kanzume/releases/download/v0.2.7/Kanzume-Setup-0.2.7.exe)
+[Setupファイル](https://github.com/onolog2021/kanzume/releases/download/v0.2.8/Kanzume-Setup-0.2.8.exe)
 
 もしうまく行かない場合は以下から最新のリリースを開き、添付のファイルをダウンロードの上、実行してください
 [リリース一覧](https://github.com/onolog2021/kanzume/releases)
