@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path, { resolve } from 'path';
-import { app, BrowserWindow, shell, dialog, Menu } from 'electron';
+import { app, BrowserWindow, shell, dialog, Menu, nativeTheme } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
@@ -141,6 +141,18 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+
+  const mode = store.get('mode');
+  if (mode) {
+    nativeTheme.themeSource = mode;
+  } else {
+    nativeTheme.themeSource = 'light';
+  }
+
+  // appバージョンの保存
+  const version = app.getVersion();
+  console.log(version);
+  store.set('version', version);
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 

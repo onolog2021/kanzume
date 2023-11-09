@@ -922,5 +922,6 @@ ipcMain.handle('storeGet', (event, key) => {
 
 ipcMain.on('switchMode', (event, newMode) => {
   nativeTheme.themeSource = newMode;
+  store.set('mode', newMode);
   event.reply('changeMode', newMode);
 });

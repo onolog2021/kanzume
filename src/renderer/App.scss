@@ -292,7 +292,7 @@ body {
   }
   @include dark-mode-styles {
     background-color: $dark-base-color;
-    &.selected{
+    &.selected {
       background-color: $dark-base-color-secondary;
     }
   }

@@ -18,6 +18,7 @@ import { ReactComponent as ModeIdon } from '../../../../assets/brightness.svg';
 
 function StartMenu() {
   const [snackOpen, setSnackOpen] = useState<boolean | undefined>(false);
+  const [version, setVersion] = useState();
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -32,6 +33,16 @@ function StartMenu() {
     }
 
     checkGit();
+
+    async function getVersion() {
+      const currentVersion = await window.electron.ipcRenderer.invoke(
+        'storeGet',
+        'version'
+      );
+      setVersion(currentVersion);
+    }
+
+    getVersion();
   }, []);
 
   const message =
@@ -109,7 +120,7 @@ function StartMenu() {
           <SearchProjectForm handleClick={openProject} />
         </Box>
       </Box>
-      <AboutDeveloper />
+      <AboutDeveloper version={version} />
       {aboutGit}
     </Box>
   );
