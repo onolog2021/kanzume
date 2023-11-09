@@ -77,6 +77,7 @@ function BoadItem({ board, orderArray, bookmark }) {
     };
     window.electron.ipcRenderer.invoke('updateRecord', query);
     window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardList');
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardBody');
   };
 
   const softDelete = async () => {
@@ -102,7 +103,7 @@ function BoadItem({ board, orderArray, bookmark }) {
     window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
-  const icon = <BoardIcon style={{fill: 'gray'}}/>;
+  const icon = <BoardIcon style={{ fill: 'gray' }} />;
 
   const menues = [
     {

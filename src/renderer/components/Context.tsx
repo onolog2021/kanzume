@@ -32,19 +32,20 @@ export function CurrentPageProvider({ children }) {
   );
 }
 
+export type TabListElement = {
+  id: number;
+  title: string;
+  type: 'editor' | 'board';
+  tabId: string;
+};
+
 export const TabListContext = createContext([]);
 
 export function TabListProvider({ children }) {
-  interface tabData {
-    id: number;
-    title: string;
-    type: 'editor' | 'board';
-    tabId: string;
-  }
-  const [tabList, setTabList] = useState<tabData[]>([]);
+  const [tabList, setTabList] = useState<TabListElement[]>([]);
 
   const addTab = useCallback(
-    (newTab: tabData) => {
+    (newTab: TabListElement) => {
       // Check for duplication based on tabId
       if (!tabList.some((tab) => tab.tabId === newTab.tabId)) {
         setTabList((prevTabs) => [...prevTabs, newTab]);

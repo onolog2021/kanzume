@@ -69,6 +69,17 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
     window.electron.ipcRenderer.sendMessage('softDelete', query);
     window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
     window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
+
+    if (
+      tabList.some((item) => item.id === pageData.id && item.type === 'editor')
+    ) {
+      console.log('hi');
+      setTabList((prevTabs) =>
+        prevTabs.filter(
+          (tab) => !(tab.id === pageData.id && tab.type === 'editor')
+        )
+      );
+    }
   };
 
   const removeBookmark = () => {

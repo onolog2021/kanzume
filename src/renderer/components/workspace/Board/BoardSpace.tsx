@@ -53,8 +53,23 @@ export default function BoardSpace({ boardData }) {
 
     initialBoard();
 
-    window.electron.ipcRenderer.on('updateBoardBody', () => {
+    window.electron.ipcRenderer.on('updateBoardBody', async () => {
       initialBoard();
+      const query = {
+        table: 'folder',
+        conditions: {
+          id: boardData.id,
+        },
+      };
+      const newData = await window.electron.ipcRenderer.invoke(
+        'fetchRecord',
+        query
+      );
+      const newBoard = new Board({
+        id: newData.id,
+        title: newData.title,
+      });
+      setBoard(newBoard);
     });
   }, []);
 
@@ -151,6 +166,7 @@ export default function BoardSpace({ boardData }) {
       },
     };
     window.electron.ipcRenderer.invoke('updateRecord', query);
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardList');
   };
 
   const changeBookmark = async () => {
@@ -180,11 +196,22 @@ export default function BoardSpace({ boardData }) {
     window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
   };
 
+  function updateBoardTitle(event) {
+    const newTitle = event.target.value; // Get the new title from the input event
+
+    // Update the board's title in the state
+    setBoard((prevBoard) => {
+      return { ...prevBoard, title: newTitle };
+    });
+  }
+
   return (
     <>
       {board && (
         <PlaneTextField
-          defaultValue={board.title}
+          // defaultValue={board.title}
+          value={board.title}
+          onChange={(event) => updateBoardTitle(event)}
           onBlur={changeBoardTitle}
           inputRef={titleRef}
         />
