@@ -1,4 +1,4 @@
-import Board from 'renderer/Classes/Board';
+import Board, { BoardElement } from 'renderer/Classes/Board';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { useEffect, useState, useRef } from 'react';
 import { Box } from '@mui/material';
@@ -6,7 +6,12 @@ import { useDroppable } from '@dnd-kit/core';
 import Boardpage from './BoardPage';
 import PaperBorder from './PaperBorder';
 
-function BoardGrid({ board, columnsCount, pages, fullWidth }) {
+function BoardGrid({ board, columnsCount, pages, fullWidth }): {
+  board: Board;
+  columnCount: number;
+  pages: [];
+  fullWidth: number;
+} {
   const [orderArray, setOrderArray] = useState([]);
   const [itemWidth, setItemWidth] = useState();
   const sizeRef = useRef();

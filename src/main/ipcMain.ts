@@ -368,15 +368,15 @@ function createRecord(args) {
   });
 }
 
-interface fetchRecordQuery {
-  table: string;
+export interface FetchiRecordElement {
+  table: 'store' | 'bookmark' | 'project' | 'page' | 'folder';
   columns: string[];
   conditions: { [key: string]: any };
   order: [string, string];
   limit: number;
 }
 
-function fetchRecord(args: fetchRecordQuery) {
+function fetchRecord(args: FetchiRecordElement) {
   const { table, columns } = args;
   const conditions = args.conditions || {};
   if (

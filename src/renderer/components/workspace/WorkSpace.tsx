@@ -1,5 +1,5 @@
 import { useState, useContext, useRef, useEffect } from 'react';
-import { TabListContext, CurrentPageContext } from '../Context';
+import { TabListContext, CurrentPageContext, TabListElement } from '../Context';
 import EditorBody from './Editor/EditorBody';
 import BoardSpace from './Board/BoardSpace';
 import TrashBox from './Trash/TrashBox';
@@ -7,7 +7,7 @@ import TabList from './TabList';
 import NoSpace from './NoSpace';
 
 function WorkSpace() {
-  const [tabList, setTabList] = useContext(TabListContext);
+  const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
   const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
 
   const isCurrent = (tab) => {

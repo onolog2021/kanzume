@@ -1,18 +1,19 @@
 import { useState, useEffect, useContext, useRef } from 'react';
 import Board from 'renderer/Classes/Board';
-import { Box, Paper, Button, IconButton, Tooltip } from '@mui/material';
-import { ProjectContext } from 'renderer/components/Context';
-import Page from 'renderer/Classes/Page';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import { ProjectContext, TabListElement } from 'renderer/components/Context';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
-import { electron } from 'process';
 import { useTheme } from '@mui/material/styles';
-
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 import { ReactComponent as AddButton } from '../../../../../assets/paper-plus.svg';
 
-export default function BoardSpace({ boardData }) {
+export default function BoardSpace({
+  boardData,
+}: {
+  boardData: TabListElement;
+}) {
   const [project] = useContext(ProjectContext);
   const [board, setBoard] = useState();
   const [pages, setPages] = useState();
@@ -22,7 +23,68 @@ export default function BoardSpace({ boardData }) {
   const titleRef = useRef();
   const theme = useTheme();
 
-  async function initialBoard() {
+  // ボードの取得
+  async function fetchBoardData(id: number) {
+    const query = {
+      table: 'folder',
+      conditions: {
+        id,
+      },
+    };
+    const data = await window.electron.ipcRenderer.invoke('fetchRecord', query);
+    setBoard(data);
+  }
+
+  // ボード内のフォルダを取得
+  async function childrenBoards(boardId: number) {
+    const query = {
+      table: 'folder',
+      conditions: {
+        parent_id: boardId,
+      },
+    };
+    const boardsChildren = await window.electron.ipcRenderer.invoke(
+      'fetchRecords',
+      query
+    );
+    return boardsChildren;
+  }
+
+  // フォルダ内フォルダの階層をすべて取得し、ボードデータの配列を生成
+  async function createBoardTree(
+    paretntBoardId: number,
+    parentArray = []
+  ): Promise<any[]> {
+    // ボードのページチルドレンを取得
+    const children = await childrenBoards(paretntBoardId);
+    parentArray.push(...children);
+
+    // もしボードにストアがあり、それがparent_idを持つものであれば、そのフォルダがのparent_idを取得
+    if (children && children.length > 0) {
+      for (const child of children) {
+        await createBoardTree(child.id, parentArray);
+      }
+    }
+    return parentArray;
+  }
+
+  // 集まったボードIDからpage一覧を作成
+  async function flattenPages(ids: number[]) {
+    const parentboard = new Board({
+      id: boardData.id,
+    });
+    const pagesData = await parentboard.pages();
+    for (const id of ids) {
+      const board = new Board({ id });
+      const pages = await board.pages();
+      pagesData.push(...pages);
+    }
+    return pagesData;
+  }
+
+  // ボードの初期設定
+  async function initialBoard(id: number) {
+    await fetchBoardData(id);
     const boards = await createBoardTree(boardData.id);
     const boardIds = boards.map((board) => board.id);
     const pagesData = await flattenPages(boardIds);
@@ -45,13 +107,7 @@ export default function BoardSpace({ boardData }) {
   }
 
   useEffect(() => {
-    const newBoard = new Board({
-      id: boardData.id,
-      title: boardData.title,
-    });
-    setBoard(newBoard);
-
-    initialBoard();
+    initialBoard(boardData.id);
 
     window.electron.ipcRenderer.on('updateBoardBody', async () => {
       initialBoard();
@@ -79,51 +135,6 @@ export default function BoardSpace({ boardData }) {
       setFullWidth(width);
     }
   }, [titleRef?.current]);
-
-  // 集まったIDからpage一覧を作成
-  async function flattenPages(ids: number[]) {
-    const parentboard = new Board({
-      id: boardData.id,
-    });
-    const pagesData = await parentboard.pages();
-    for (const id of ids) {
-      const board = new Board({ id });
-      const pages = await board.pages();
-      pagesData.push(...pages);
-    }
-    return pagesData;
-  }
-
-  async function createBoardTree(
-    paretntBoardId: number,
-    parentArray = []
-  ): Promise<any[]> {
-    // ボードのページチルドレンを取得
-    const children = await childrenBoards(paretntBoardId);
-    parentArray.push(...children);
-
-    // もしボードにストアがあり、それがparent_idを持つものであれば、そのフォルダがのparent_idを取得
-    if (children && children.length > 0) {
-      for (const child of children) {
-        await createBoardTree(child.id, parentArray);
-      }
-    }
-    return parentArray;
-  }
-
-  async function childrenBoards(boardId: number) {
-    const query = {
-      table: 'folder',
-      conditions: {
-        parent_id: boardId,
-      },
-    };
-    const boardsChildren = await window.electron.ipcRenderer.invoke(
-      'fetchRecords',
-      query
-    );
-    return boardsChildren;
-  }
 
   const addText = async () => {
     const query = {

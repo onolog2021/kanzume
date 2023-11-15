@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
-
-import { CurrentPageContext } from 'renderer/components/Context';
-// import Folder from 'renderer/Classes/Folder';
-import { TabListContext } from 'renderer/components/Context';
+import {
+  CurrentPageContext,
+  TabListContext,
+} from 'renderer/components/Context';
 import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from '../PageList/CreateForm';

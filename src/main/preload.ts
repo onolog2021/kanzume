@@ -2,7 +2,43 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-// export type Channels = 'ipc-example';
+export type Channels =
+  | 'gitDiff'
+  | 'updateRecord'
+  | 'createNewStore'
+  | 'openURL'
+  | 'updateBoardList'
+  | 'initProject'
+  | 'fetchRecord'
+  | 'getFonts'
+  | 'gitShow'
+  | 'updateRecords'
+  | 'updateBoardPapers'
+  | 'destroyStore'
+  | 'boardChildren'
+  | 'updatePosition'
+  | 'droppedBoardBody'
+  | 'openFolder'
+  | 'switchMode'
+  | 'bookmarking'
+  | 'runUpdateTrashIndex'
+  | 'importText'
+  | 'deleteRecord'
+  | 'getStores'
+  | 'insertRecord'
+  | 'commitPage'
+  | 'mergeTextData'
+  | 'softDelete'
+  | 'hasGit?'
+  | 'updatePageList'
+  | 'storeGet'
+  | 'findChildPage'
+  | 'exportText'
+  | 'gitLog'
+  | 'storeSet'
+  | 'eventReply'
+  | 'fetchRecords'
+  | 'gitCheckOut';
 
 const electronHandler = {
   ipcRenderer: {
