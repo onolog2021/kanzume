@@ -1,6 +1,7 @@
 // src/contexts/CountContexts.jsx
 
 import { useState, createContext, useCallback } from 'react';
+import { TabListElement } from '../../types/renderElement';
 
 export const ProjectContext = createContext(null);
 
@@ -31,13 +32,6 @@ export function CurrentPageProvider({ children }) {
     </CurrentPageContext.Provider>
   );
 }
-
-export type TabListElement = {
-  id: number;
-  title: string;
-  type: 'editor' | 'board';
-  tabId: string;
-};
 
 export const TabListContext = createContext([]);
 

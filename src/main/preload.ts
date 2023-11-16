@@ -38,7 +38,8 @@ export type Channels =
   | 'storeSet'
   | 'eventReply'
   | 'fetchRecords'
-  | 'gitCheckOut';
+  | 'gitCheckOut'
+  | 'fetchAllPagesInFolder';
 
 const electronHandler = {
   ipcRenderer: {
@@ -66,3 +67,9 @@ const electronHandler = {
 contextBridge.exposeInMainWorld('electron', electronHandler);
 
 export type ElectronHandler = typeof electronHandler;
+
+declare global {
+  interface Window {
+    electron: ElectronHandler;
+  }
+}

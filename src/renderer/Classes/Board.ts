@@ -5,9 +5,10 @@
 //   project_id: number;
 //   parent_id: number | null;
 //   is_deleted: boolean;
-// };
-import { FolderElement } from '../../@types/sqlElement';
 
+import { PageElement } from '../../types/sqlElement';
+
+// };
 export default class Board {
   id: number;
 
@@ -18,7 +19,10 @@ export default class Board {
     this.title = data.title;
   }
 
-  async pages() {
-    return await window.electron.ipcRenderer.invoke('boardChildren', [this.id]);
+  async pages(): Promise<PageElement[]> {
+    const result = await window.electron.ipcRenderer.invoke('boardChildren', [
+      this.id,
+    ]);
+    return result;
   }
 }

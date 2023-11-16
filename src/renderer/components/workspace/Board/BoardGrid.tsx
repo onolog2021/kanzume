@@ -1,19 +1,23 @@
-import Board, { BoardElement } from 'renderer/Classes/Board';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box } from '@mui/material';
-import { useDroppable } from '@dnd-kit/core';
 import Boardpage from './BoardPage';
 import PaperBorder from './PaperBorder';
+import { FolderElement, PageElement } from '../../../../types/sqlElement';
 
-function BoardGrid({ board, columnsCount, pages, fullWidth }): {
-  board: Board;
-  columnCount: number;
-  pages: [];
+function BoardGrid({
+  board,
+  columnsCount,
+  pages,
+  fullWidth,
+}: {
+  board: FolderElement;
+  columnsCount: number;
+  pages: PageElement[];
   fullWidth: number;
-} {
-  const [orderArray, setOrderArray] = useState([]);
-  const [itemWidth, setItemWidth] = useState();
+}) {
+  const [orderArray, setOrderArray] = useState<string[]>([]);
+  const [itemWidth, setItemWidth] = useState<string>();
   const sizeRef = useRef();
   const { setNodeRef } = useSortable({
     id: 'paper-list',
@@ -22,7 +26,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }): {
 
   useEffect(() => {
     const getPages = () => {
-      const paperOrderArray = pages.map((item) => `bp-${item.id}`);
+      const paperOrderArray: string[] = pages.map((item) => `bp-${item.id}`);
       setOrderArray(paperOrderArray);
     };
     getPages();
@@ -34,7 +38,7 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }): {
       const percent = `${(width / fullWidth) * 100}%`;
       setItemWidth(percent);
     }
-  }, [columnsCount]);
+  }, [columnsCount, fullWidth]);
 
   return (
     <Box ref={setNodeRef}>
@@ -58,7 +62,6 @@ function BoardGrid({ board, columnsCount, pages, fullWidth }): {
                   pageData={page}
                   paperWidth={itemWidth}
                   orderArray={orderArray}
-                  fullWidth={fullWidth}
                   index={index}
                 />
               ))}

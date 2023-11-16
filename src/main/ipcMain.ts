@@ -925,3 +925,23 @@ ipcMain.on('switchMode', (event, newMode) => {
   store.set('mode', newMode);
   event.reply('changeMode', newMode);
 });
+
+ipcMain.handle('fetchAllPagesInFolder', (event, idArray: number[]) => {
+  const placeholders = idArray.map(() => '?').join(', ');
+  const sql = `SELECT p.*
+               FROM page AS p
+               JOIN store AS s ON p.id = s.page_id
+               WHERE s.folder_id IN (${placeholders})
+               AND p.is_deleted = 0
+               ORDER BY s.position ASC`;
+
+  return new Promise((resolve, reject) => {
+    db.all(sql, idArray, (error, rows) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+});

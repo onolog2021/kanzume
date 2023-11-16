@@ -1,13 +1,22 @@
 import { Box, Rating, Typography } from '@mui/material';
 import { useState } from 'react';
 import { ReactComponent as Rectangle } from '../../../../../assets/rectangle.svg';
+import { PageElement } from '../../../../types/sqlElement';
 
-function ColumnsCountSelector({ changeColumnsCount, pages, fullwidth }) {
+function ColumnsCountSelector({
+  changeColumnsCount,
+  pages,
+  fullwidth,
+}: {
+  changeColumnsCount: void | any;
+  pages: PageElement[] | undefined;
+  fullwidth: string | undefined;
+}) {
   const [count, setCount] = useState();
 
   const runChangeColumnsCount = async (event, newValue) => {
-    const width = ((fullwidth - 16 * (newValue + 1)) / newValue);
-    const percent = `${width / fullwidth * 100}%`;
+    const width = (fullwidth - 16 * (newValue + 1)) / newValue;
+    const percent = `${(width / fullwidth) * 100}%`;
     const queryArray = [];
     pages.forEach((page) => {
       const oldSetting = JSON.parse(page.setting);
@@ -15,7 +24,7 @@ function ColumnsCountSelector({ changeColumnsCount, pages, fullwidth }) {
         ...oldSetting,
         width: percent,
       };
-      if(!newSetting.height){
+      if (!newSetting.height) {
         newSetting.height = 300;
       }
       const query = {

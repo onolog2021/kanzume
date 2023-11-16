@@ -5,16 +5,28 @@ import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useSortable } from '@dnd-kit/sortable';
 import { useTheme } from '@mui/material/styles';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
-import PaperBorder from './PaperBorder';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
+import { PageElement } from '../../../../types/sqlElement';
 
 interface PaperSize {
   width: number;
   height: number;
 }
 
-function Boardpage({ pageData, orderArray, boardId, paperWidth, index }) {
+function Boardpage({
+  pageData,
+  orderArray,
+  boardId,
+  paperWidth,
+  index,
+}: {
+  pageData: PageElement;
+  orderArray: string[];
+  boardId: number;
+  paperWidth: string | undefined;
+  index: number;
+}) {
   const [paperSize, setPaperSize] = useState<PaperSize | undefined>();
   const titleRef = useRef();
   const resizeRef = useRef(null);

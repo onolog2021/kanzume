@@ -1,13 +1,15 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import Board from 'renderer/Classes/Board';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import { ProjectContext, TabListElement } from 'renderer/components/Context';
+import { ProjectContext } from 'renderer/components/Context';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useTheme } from '@mui/material/styles';
 import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 import { ReactComponent as AddButton } from '../../../../../assets/paper-plus.svg';
+import { TabListElement } from '../../../../types/renderElement';
+import { FolderElement } from '../../../../types/sqlElement';
 
 export default function BoardSpace({
   boardData,
@@ -54,7 +56,7 @@ export default function BoardSpace({
   async function createBoardTree(
     paretntBoardId: number,
     parentArray = []
-  ): Promise<any[]> {
+  ): Promise<FolderElement[]> {
     // ボードのページチルドレンを取得
     const children = await childrenBoards(paretntBoardId);
     parentArray.push(...children);
@@ -73,20 +75,32 @@ export default function BoardSpace({
     const parentboard = new Board({
       id: boardData.id,
     });
-    const pagesData = await parentboard.pages();
-    for (const id of ids) {
-      const board = new Board({ id });
-      const pages = await board.pages();
-      pagesData.push(...pages);
-    }
+
+    const parentPageData = await parentboard.pages();
+    const childPagesData = await window.electron.ipcRenderer.invoke(
+      'fetchAllPagesInFolder',
+      ids
+    );
+
+    const pagesData = [...parentPageData, ...childPagesData];
+
+    console.log(pagesData);
     return pagesData;
   }
 
   // ボードの初期設定
   async function initialBoard(id: number) {
+    // ボードのセットアップ
     await fetchBoardData(id);
+
+    // ボード内のフォルダ階層を配列化
     const boards = await createBoardTree(boardData.id);
-    const boardIds = boards.map((board) => board.id);
+
+    // ボードのIDを並列にする
+    const boardIds = boards.map((item) => item.id);
+    console.log(boardIds);
+
+    // ボード内とフォルダ内のページを取得
     const pagesData = await flattenPages(boardIds);
     setPages(pagesData);
 
@@ -110,7 +124,7 @@ export default function BoardSpace({
     initialBoard(boardData.id);
 
     window.electron.ipcRenderer.on('updateBoardBody', async () => {
-      initialBoard();
+      initialBoard(boardData.id);
       const query = {
         table: 'folder',
         conditions: {
@@ -186,7 +200,7 @@ export default function BoardSpace({
         table: 'bookmark',
         conditions: {
           target: 'folder',
-          target_id: board.id,
+          target_id: boardData.id,
         },
       };
       window.electron.ipcRenderer.sendMessage('deleteRecord', query);
@@ -196,7 +210,7 @@ export default function BoardSpace({
         table: 'bookmark',
         columns: {
           target: 'folder',
-          target_id: board.id,
+          target_id: boardData.id,
           position: -1,
           project_id: project.id,
         },

@@ -22,7 +22,7 @@ interface ProjectElement {
 }
 
 // Folder interface
-declare interface FolderElement {
+interface FolderElement {
   id: number;
   title: string;
   position: number;
