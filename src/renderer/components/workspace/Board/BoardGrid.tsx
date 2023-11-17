@@ -19,6 +19,7 @@ function BoardGrid({
   const [orderArray, setOrderArray] = useState<string[]>([]);
   const [itemWidth, setItemWidth] = useState<string>();
   const sizeRef = useRef();
+
   const { setNodeRef } = useSortable({
     id: 'paper-list',
     data: { area: 'boardBody', parentId: board.id, type: 'area' },

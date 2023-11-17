@@ -8,8 +8,11 @@ import BoardGrid from './BoardGrid';
 import ColumnsCountSelector from './ColumnsCountSelecter';
 import { ReactComponent as Bookmark } from '../../../../../assets/bookmark.svg';
 import { ReactComponent as AddButton } from '../../../../../assets/paper-plus.svg';
-import { TabListElement } from '../../../../types/renderElement';
-import { FolderElement } from '../../../../types/sqlElement';
+import {
+  InsertRecordQuery,
+  TabListElement,
+} from '../../../../types/renderElement';
+import { FolderElement, PageElement } from '../../../../types/sqlElement';
 
 export default function BoardSpace({
   boardData,
@@ -17,8 +20,8 @@ export default function BoardSpace({
   boardData: TabListElement;
 }) {
   const [project] = useContext(ProjectContext);
-  const [board, setBoard] = useState();
-  const [pages, setPages] = useState();
+  const [board, setBoard] = useState<FolderElement>();
+  const [pages, setPages] = useState<PageElement[]>();
   const [columnsCount, setColumnsCount] = useState<number>(3);
   const [bookmark, setBookmark] = useState<Boolean>(false);
   const [fullWidth, setFullWidth] = useState();
@@ -88,9 +91,9 @@ export default function BoardSpace({
   }
 
   // ボードの初期設定
-  async function initialBoard(id: number) {
+  async function initialBoard() {
     // ボードのセットアップ
-    await fetchBoardData(id);
+    await fetchBoardData(boardData.id);
 
     // ボード内のフォルダ階層を配列化
     const boards = await createBoardTree(boardData.id);
@@ -119,10 +122,10 @@ export default function BoardSpace({
   }
 
   useEffect(() => {
-    initialBoard(boardData.id);
+    initialBoard();
 
     window.electron.ipcRenderer.on('updateBoardBody', async () => {
-      initialBoard(boardData.id);
+      initialBoard();
       const query = {
         table: 'folder',
         conditions: {
@@ -149,7 +152,7 @@ export default function BoardSpace({
   }, [titleRef?.current]);
 
   const addText = async () => {
-    const query = {
+    const query: InsertRecordQuery<'page'> = {
       table: 'page',
       columns: {
         title: '無題',
@@ -157,19 +160,19 @@ export default function BoardSpace({
         project_id: project.id,
       },
     };
-    const page_id = await window.electron.ipcRenderer.invoke(
+    const pageId: number = await window.electron.ipcRenderer.invoke(
       'insertRecord',
       query
     );
-    const storeQuery = {
+    const storeQuery: InsertRecordQuery<'store'> = {
       table: 'store',
       columns: {
-        page_id,
+        page_id: pageId,
         folder_id: boardData.id,
         position: -1,
       },
     };
-    window.electron.ipcRenderer.invoke('insertRecord', storeQuery);
+    await window.electron.ipcRenderer.invoke('insertRecord', storeQuery);
     await initialBoard();
   };
 
