@@ -40,6 +40,7 @@ interface PageElement {
   project_id: number;
   position: number;
   is_deleted: boolean;
+  setting: string;
   updated_at: string;
   created_at: string;
 }

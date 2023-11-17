@@ -934,7 +934,6 @@ ipcMain.handle('fetchAllPagesInFolder', (event, idArray: number[]) => {
                WHERE s.folder_id IN (${placeholders})
                AND p.is_deleted = 0
                ORDER BY s.position ASC`;
-
   return new Promise((resolve, reject) => {
     db.all(sql, idArray, (error, rows) => {
       if (error) {

@@ -84,7 +84,6 @@ export default function BoardSpace({
 
     const pagesData = [...parentPageData, ...childPagesData];
 
-    console.log(pagesData);
     return pagesData;
   }
 
@@ -98,7 +97,6 @@ export default function BoardSpace({
 
     // ボードのIDを並列にする
     const boardIds = boards.map((item) => item.id);
-    console.log(boardIds);
 
     // ボード内とフォルダ内のページを取得
     const pagesData = await flattenPages(boardIds);

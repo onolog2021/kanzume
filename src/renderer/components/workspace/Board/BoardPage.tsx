@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Paper, TextField } from '@mui/material';
 import { Resizable } from 're-resizable';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
@@ -35,14 +35,7 @@ function Boardpage({
   const theme = useTheme();
 
   useEffect(() => {
-    if (paperSize) {
-      const newSize = { ...paperSize };
-      newSize.width = paperWidth;
-      setPaperSize(newSize);
-    }
-  }, [paperWidth]);
-
-  useEffect(() => {
+    // セッティングにサイズデータはあるか？
     if (pageData.setting) {
       const data = JSON.parse(pageData.setting);
       if (data.width) {
@@ -54,12 +47,20 @@ function Boardpage({
       }
     } else {
       const initialSize = {
-        width: paperWidth,
+        width: paperWidth || 120,
         height: 300,
       };
       setPaperSize(initialSize);
     }
   }, []);
+
+  // useEffect(() => {
+  //   if (paperSize) {
+  //     const newSize = { ...paperSize };
+  //     newSize.width = paperWidth;
+  //     setPaperSize(newSize);
+  //   }
+  // }, [paperWidth]);
 
   const dndData = {
     area: 'boardBody',
