@@ -231,6 +231,10 @@ export default function BoardSpace({
     });
   }
 
+  if (board!) {
+    <p>loading</p>;
+  }
+
   return (
     <>
       {board && (
@@ -243,11 +247,11 @@ export default function BoardSpace({
         />
       )}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <ColumnsCountSelector
+        {/* <ColumnsCountSelector
           changeColumnsCount={changeColumnsCount}
           pages={pages}
           fullwidth={fullWidth}
-        />
+        /> */}
         <Tooltip title="テキストの追加" placement="top">
           <IconButton onClick={addText}>
             <AddButton fill="gray" width={30} />
@@ -266,7 +270,7 @@ export default function BoardSpace({
           board={board}
           columnsCount={columnsCount}
           pages={pages}
-          fullWidth={fullWidth}
+          // fullWidth={fullWidth}
         />
       )}
     </>

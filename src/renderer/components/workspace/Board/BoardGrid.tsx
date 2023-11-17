@@ -9,12 +9,12 @@ function BoardGrid({
   board,
   columnsCount,
   pages,
-  fullWidth,
-}: {
+}: // fullWidth,
+{
   board: FolderElement;
   columnsCount: number;
   pages: PageElement[];
-  fullWidth: number;
+  // fullWidth: number;
 }) {
   const [orderArray, setOrderArray] = useState<string[]>([]);
   const [itemWidth, setItemWidth] = useState<string>();
@@ -33,13 +33,13 @@ function BoardGrid({
     getPages();
   }, [pages]);
 
-  useEffect(() => {
-    if (columnsCount) {
-      const width = (fullWidth - 16 * (columnsCount + 1)) / columnsCount;
-      const percent = `${(width / fullWidth) * 100}%`;
-      setItemWidth(percent);
-    }
-  }, [columnsCount, fullWidth]);
+  // useEffect(() => {
+  //   if (columnsCount) {
+  //     const width = (fullWidth - 16 * (columnsCount + 1)) / columnsCount;
+  //     const percent = `${(width / fullWidth) * 100}%`;
+  //     setItemWidth(percent);
+  //   }
+  // }, [columnsCount, fullWidth]);
 
   return (
     <Box ref={setNodeRef}>
@@ -50,7 +50,6 @@ function BoardGrid({
           flexShrink: 0,
           flexWrap: 'wrap',
           p: 2,
-          minHeight: 800,
         }}
       >
         {orderArray && (
