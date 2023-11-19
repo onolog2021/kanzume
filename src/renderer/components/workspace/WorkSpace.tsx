@@ -1,10 +1,11 @@
-import { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { TabListContext, CurrentPageContext, TabListElement } from '../Context';
 import EditorBody from './Editor/EditorBody';
 import BoardSpace from './Board/BoardSpace';
 import TrashBox from './Trash/TrashBox';
 import TabList from './TabList';
 import NoSpace from './NoSpace';
+import BoardProvider from './Board/BoardProvider';
 
 function WorkSpace() {
   const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
@@ -36,7 +37,7 @@ function WorkSpace() {
       case 'board':
         content = (
           <div style={isCurrent(tab)} key={`board-${tab.id}`} className="panel">
-            <BoardSpace boardData={tab} />
+            <BoardProvider tab={tab} />
           </div>
         );
         break;

@@ -1,6 +1,6 @@
 // src/contexts/CountContexts.jsx
 
-import { useState, createContext, useCallback } from 'react';
+import React, { useState, createContext, useCallback } from 'react';
 import { TabListElement } from '../../types/renderElement';
 
 export const ProjectContext = createContext(null);
@@ -54,3 +54,11 @@ export function TabListProvider({ children }) {
     </TabListContext.Provider>
   );
 }
+
+export type ColumnsStateElement = {
+  fullWidth: number;
+  columns: number;
+};
+
+const initialColumnsState = { fullWidth: 0, columns: 1 };
+export const ColumnsContext = createContext(initialColumnsState);

@@ -39,7 +39,8 @@ export type Channels =
   | 'eventReply'
   | 'fetchRecords'
   | 'gitCheckOut'
-  | 'fetchAllPagesInFolder';
+  | 'fetchAllPagesInFolder'
+  | 'updateBoardBody';
 
 const electronHandler = {
   ipcRenderer: {

@@ -9,12 +9,12 @@ function BoardGrid({
   board,
   columnsCount,
   pages,
-}: // fullWidth,
-{
+  fullWidth,
+}: {
   board: FolderElement;
   columnsCount: number;
   pages: PageElement[];
-  // fullWidth: number;
+  fullWidth: number;
 }) {
   const [orderArray, setOrderArray] = useState<string[]>([]);
   const [itemWidth, setItemWidth] = useState<string>();

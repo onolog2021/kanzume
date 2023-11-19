@@ -27,7 +27,9 @@ function Boardpage({
   paperWidth: string | undefined;
   index: number;
 }) {
-  const [paperSize, setPaperSize] = useState<PaperSize | undefined>();
+  const basicSize: PaperSize = { width: 300, height: 300 };
+
+  const [paperSize, setPaperSize] = useState<PaperSize>(basicSize);
   const titleRef = useRef();
   const resizeRef = useRef(null);
   const dndId = `bp-${pageData.id}`;
@@ -45,12 +47,6 @@ function Boardpage({
         };
         setPaperSize(initialSize);
       }
-    } else {
-      const initialSize = {
-        width: paperWidth || 120,
-        height: 300,
-      };
-      setPaperSize(initialSize);
     }
   }, []);
 
@@ -136,6 +132,7 @@ function Boardpage({
       onResizeStop={(event, data, node, size) => updateSize(size)}
       size={paperSize}
       ref={resizeRef}
+      maxWidth="98%"
       style={{
         margin: '16px 8px',
         opacity: isDragging ? 0.4 : 1,

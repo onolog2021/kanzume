@@ -1,7 +1,9 @@
-import { Box, Rating, Typography } from '@mui/material';
-import { useState } from 'react';
+import React, { Box, Rating, Typography } from '@mui/material';
+import { useContext } from 'react';
 import { ReactComponent as Rectangle } from '../../../../../assets/rectangle.svg';
 import { PageElement } from '../../../../types/sqlElement';
+import { UpdateRecordQuery } from '../../../../types/renderElement';
+import { ColumnsContext } from '../../Context';
 
 function ColumnsCountSelector({
   changeColumnsCount,
@@ -9,38 +11,38 @@ function ColumnsCountSelector({
   fullwidth,
 }: {
   changeColumnsCount: void | any;
-  pages: PageElement[] | undefined;
-  fullwidth: string | undefined;
+  pages: PageElement[];
+  fullwidth: number;
 }) {
-  const [count, setCount] = useState();
-
+  const [columnsState, setColumnsState] = useContext(ColumnsContext);
   const runChangeColumnsCount = async (event, newValue) => {
-    const width = (fullwidth - 16 * (newValue + 1)) / newValue;
-    const percent = `${(width / fullwidth) * 100}%`;
-    const queryArray = [];
-    pages.forEach((page) => {
-      const oldSetting = JSON.parse(page.setting);
-      const newSetting = {
-        ...oldSetting,
-        width: percent,
-      };
-      if (!newSetting.height) {
-        newSetting.height = 300;
-      }
-      const query = {
-        table: 'page',
-        columns: {
-          setting: JSON.stringify(newSetting),
-        },
-        conditions: {
-          id: page.id,
-        },
-      };
-      queryArray.push(query);
-    });
-    await window.electron.ipcRenderer.invoke('updateRecords', queryArray);
-    setCount(newValue);
-    changeColumnsCount(newValue);
+    console.log(columnsState);
+    // // ひとつあたりの大きさ
+    // const marginWidth = 16;
+    // const sumMarginWidth = marginWidth * newValue;
+    // const itemWidth = (fullwidth - sumMarginWidth) / newValue - 16;
+    // const queryArray: UpdateRecordQuery<'page'>[] = [];
+    // pages.forEach((page) => {
+    //   const oldSetting = JSON.parse(page.setting);
+    //   const newSetting = {
+    //     ...oldSetting,
+    //     width: itemWidth,
+    //   };
+    //   if (!newSetting.height) {
+    //     newSetting.height = 300;
+    //   }
+    //   const query: UpdateRecordQuery<'page'> = {
+    //     table: 'page',
+    //     columns: {
+    //       setting: JSON.stringify(newSetting),
+    //     },
+    //     conditions: {
+    //       id: page.id,
+    //     },
+    //   };
+    //   queryArray.push(query);
+    // });
+    // await window.electron.ipcRenderer.invoke('updateRecords', queryArray);
   };
 
   return (

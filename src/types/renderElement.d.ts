@@ -56,3 +56,15 @@ export interface InsertRecordQuery<T extends TableName> {
   table: T;
   columns: ColumnValueTypeByTable[T];
 }
+
+export interface UpdateRecordQuery<T extends TableName> {
+  table: T;
+  columns: ColumnValueTypeByTable[T];
+  conditions: ColumnValueTypeByTable[T];
+}
+
+export interface FetchRecordQuery<T extends TableName> {
+  table: T;
+  columns: ColumnValueTypeByTable[T];
+  conditions: ColumnValueTypeByTable[T];
+}

@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Board from 'renderer/Classes/Board';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import { ProjectContext } from 'renderer/components/Context';
+import {
+  ProjectContext,
+  ColumnsContext,
+  ColumnsStateElement,
+} from 'renderer/components/Context';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useTheme } from '@mui/material/styles';
 import BoardGrid from './BoardGrid';
@@ -24,7 +28,7 @@ export default function BoardSpace({
   const [pages, setPages] = useState<PageElement[]>();
   const [columnsCount, setColumnsCount] = useState<number>(3);
   const [bookmark, setBookmark] = useState<Boolean>(false);
-  const [fullWidth, setFullWidth] = useState();
+  const [fullWidth, setFullWidth] = useState(0);
   const titleRef = useRef();
   const theme = useTheme();
 
@@ -147,9 +151,11 @@ export default function BoardSpace({
   useEffect(() => {
     if (titleRef.current) {
       const width = titleRef.current.offsetWidth;
-      setFullWidth(width);
+      const newWidth = { fullWidth: width };
+      const newState = { ...columnsState };
+      setColumnsState(newState);
     }
-  }, [titleRef?.current]);
+  }, [titleRef?.current, fullWidth]);
 
   const addText = async () => {
     const query: InsertRecordQuery<'page'> = {
@@ -247,11 +253,11 @@ export default function BoardSpace({
         />
       )}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        {/* <ColumnsCountSelector
+        <ColumnsCountSelector
           changeColumnsCount={changeColumnsCount}
           pages={pages}
           fullwidth={fullWidth}
-        /> */}
+        />
         <Tooltip title="テキストの追加" placement="top">
           <IconButton onClick={addText}>
             <AddButton fill="gray" width={30} />
@@ -270,7 +276,7 @@ export default function BoardSpace({
           board={board}
           columnsCount={columnsCount}
           pages={pages}
-          // fullWidth={fullWidth}
+          fullWidth={fullWidth}
         />
       )}
     </>
