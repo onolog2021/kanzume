@@ -4,15 +4,11 @@ import {
   FetchRecordQuery,
   TabListElement,
 } from '../../../../types/renderElement';
-import { ColumnsContext, ColumnsStateElement } from '../../Context';
+import { ColumnsStateProvider } from '../../Context';
 import { FolderElement } from '../../../../types/sqlElement';
 
 export default function BoardProvider({ tab }: { tab: TabListElement }) {
   const [board, setBoard] = useState<FolderElement>();
-  const [columnsState, setColumnsState] = useState<ColumnsStateElement>({
-    fullWidth: 0,
-    columns: 1,
-  });
 
   // 初期設定
   useEffect(() => {
@@ -34,9 +30,13 @@ export default function BoardProvider({ tab }: { tab: TabListElement }) {
     fetchBoardData();
   }, [tab]);
 
+  if (board === undefined) {
+    return <p>load</p>;
+  }
+
   return (
-    <ColumnsContext.Provider value={[columnsState, setColumnsState]}>
-      <BoardSpace boardData={tab} />
-    </ColumnsContext.Provider>
+    <ColumnsStateProvider>
+      <BoardSpace boardData={board} />
+    </ColumnsStateProvider>
   );
 }

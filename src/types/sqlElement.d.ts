@@ -24,13 +24,13 @@ interface ProjectElement {
 // Folder interface
 interface FolderElement {
   id: number;
-  title: string;
-  position: number;
-  project_id: number;
-  type: 'folder' | 'board';
-  is_deleted: number;
-  updated_at: string;
-  created_at: string;
+  title?: string;
+  position?: number;
+  project_id?: number;
+  type?: 'folder' | 'board';
+  is_deleted?: number;
+  updated_at?: string;
+  created_at?: string;
 }
 
 // Page interface

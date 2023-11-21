@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Box, Paper, TextField } from '@mui/material';
 import { Resizable } from 're-resizable';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
@@ -8,6 +8,7 @@ import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
 import { PageElement } from '../../../../types/sqlElement';
+import { ColumnsContext, calcItemWidth } from '../../Context';
 
 interface PaperSize {
   width: number;
@@ -18,13 +19,11 @@ function Boardpage({
   pageData,
   orderArray,
   boardId,
-  paperWidth,
   index,
 }: {
   pageData: PageElement;
   orderArray: string[];
   boardId: number;
-  paperWidth: string | undefined;
   index: number;
 }) {
   const basicSize: PaperSize = { width: 300, height: 300 };
@@ -35,6 +34,7 @@ function Boardpage({
   const dndId = `bp-${pageData.id}`;
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
+  const { columnsState } = useContext(ColumnsContext);
 
   useEffect(() => {
     // セッティングにサイズデータはあるか？
@@ -50,13 +50,15 @@ function Boardpage({
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (paperSize) {
-  //     const newSize = { ...paperSize };
-  //     newSize.width = paperWidth;
-  //     setPaperSize(newSize);
-  //   }
-  // }, [paperWidth]);
+  useEffect(() => {
+    if (columnsState.columns !== 0) {
+      const newWidth = calcItemWidth(columnsState);
+      setPaperSize((prevSize) => ({
+        width: newWidth,
+        height: prevSize.height,
+      }));
+    }
+  }, [columnsState]);
 
   const dndData = {
     area: 'boardBody',
@@ -133,6 +135,7 @@ function Boardpage({
       size={paperSize}
       ref={resizeRef}
       maxWidth="98%"
+      minWidth={120}
       style={{
         margin: '16px 8px',
         opacity: isDragging ? 0.4 : 1,

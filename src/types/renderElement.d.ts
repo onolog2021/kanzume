@@ -45,8 +45,8 @@ type ColumnValueTypeByTable = {
   };
   bookmark?: {
     id?: number;
-    target?: string;
-    target_id?: number;
+    target: 'page' | 'folder';
+    target_id: number;
     position?: number;
     project_id?: number;
   };
@@ -65,6 +65,6 @@ export interface UpdateRecordQuery<T extends TableName> {
 
 export interface FetchRecordQuery<T extends TableName> {
   table: T;
-  columns: ColumnValueTypeByTable[T];
+  columns?: ColumnValueTypeByTable[T];
   conditions: ColumnValueTypeByTable[T];
 }

@@ -7,17 +7,12 @@ import { FolderElement, PageElement } from '../../../../types/sqlElement';
 
 function BoardGrid({
   board,
-  columnsCount,
   pages,
-  fullWidth,
 }: {
   board: FolderElement;
-  columnsCount: number;
   pages: PageElement[];
-  fullWidth: number;
 }) {
   const [orderArray, setOrderArray] = useState<string[]>([]);
-  const [itemWidth, setItemWidth] = useState<string>();
   const sizeRef = useRef();
 
   const { setNodeRef } = useSortable({
@@ -32,14 +27,6 @@ function BoardGrid({
     };
     getPages();
   }, [pages]);
-
-  // useEffect(() => {
-  //   if (columnsCount) {
-  //     const width = (fullWidth - 16 * (columnsCount + 1)) / columnsCount;
-  //     const percent = `${(width / fullWidth) * 100}%`;
-  //     setItemWidth(percent);
-  //   }
-  // }, [columnsCount, fullWidth]);
 
   return (
     <Box ref={setNodeRef}>
@@ -60,7 +47,6 @@ function BoardGrid({
                   key={`page-${page.id}`}
                   boardId={board.id}
                   pageData={page}
-                  paperWidth={itemWidth}
                   orderArray={orderArray}
                   index={index}
                 />
