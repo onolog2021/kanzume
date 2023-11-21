@@ -129,6 +129,8 @@ const createWindow = async () => {
 
   const store = new Store();
   const beforeSize = store.get('windowSize');
+  const isMaximized = store.get('isMaximized');
+  console.log(isMaximized);
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -151,7 +153,6 @@ const createWindow = async () => {
 
   // appバージョンの保存
   const version = app.getVersion();
-  console.log(version);
   store.set('version', version);
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
@@ -160,6 +161,11 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
+    if (isMaximized) {
+      mainWindow.maximize();
+    }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -172,7 +178,9 @@ const createWindow = async () => {
 
   mainWindow.on('close', () => {
     const windowSize = mainWindow?.getBounds();
+    const isMaximized = mainWindow?.isMaximized();
     store.set('windowSize', windowSize);
+    store.set('isMaximized', isMaximized);
   });
 
   mainWindow.on('closed', () => {
