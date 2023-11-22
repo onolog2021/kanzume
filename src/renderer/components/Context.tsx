@@ -23,14 +23,16 @@ export function ProjectProvider({ children }) {
 
 export const CurrentPageContext = createContext([]);
 
-export type CurrentPageData = {
+export type CurrentPageElement = {
   id: number;
-  type: string;
+  type: 'board' | 'editor' | 'trash';
   parentId: number | null;
 };
 
 export function CurrentPageProvider({ children }) {
-  const [currentPage, setCurrentPage] = useState<CurrentPageData | null>(null);
+  const [currentPage, setCurrentPage] = useState<CurrentPageElement | null>(
+    null
+  );
 
   return (
     <CurrentPageContext.Provider value={[currentPage, setCurrentPage]}>

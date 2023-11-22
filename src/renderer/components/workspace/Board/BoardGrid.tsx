@@ -13,6 +13,7 @@ function BoardGrid({
   pages: PageElement[];
 }) {
   const [orderArray, setOrderArray] = useState<string[]>([]);
+  const [activeId, setActiveId] = useState<number>(0);
   const sizeRef = useRef();
 
   const { setNodeRef } = useSortable({
@@ -27,6 +28,10 @@ function BoardGrid({
     };
     getPages();
   }, [pages]);
+
+  const changeActiveId = (id: number) => {
+    setActiveId(id);
+  };
 
   return (
     <Box ref={setNodeRef}>
@@ -49,6 +54,7 @@ function BoardGrid({
                   pageData={page}
                   orderArray={orderArray}
                   index={index}
+                  changeActiveId={changeActiveId}
                 />
               ))}
             {pages && (
@@ -56,6 +62,7 @@ function BoardGrid({
                 boardId={board.id}
                 index={pages.length}
                 orderArray={orderArray}
+                activeId={activeId}
               />
             )}
           </SortableContext>

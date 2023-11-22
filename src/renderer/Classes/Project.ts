@@ -1,3 +1,4 @@
+import { FetchRecordQuery } from '../../types/renderElement';
 import Node from './Node';
 
 interface ProjectData {
@@ -53,7 +54,7 @@ export default class Project {
   }
 
   async boards() {
-    const query = {
+    const query: FetchRecordQuery<'folder'> = {
       table: 'folder',
       columns: ['id', 'title', 'position', 'parent_id'],
       conditions: {
@@ -62,7 +63,11 @@ export default class Project {
       },
       order: ['position', 'ASC'],
     };
-    return await window.electron.ipcRenderer.invoke('fetchRecords', query);
+    const result = await window.electron.ipcRenderer.invoke(
+      'fetchRecords',
+      query
+    );
+    return result;
   }
 
   async createTree() {

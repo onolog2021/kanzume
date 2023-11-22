@@ -1,7 +1,17 @@
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { TextField } from '@mui/material';
 
-export default function CreateForm({ createFunc, setStatus, initialValue, label }) {
+export default function CreateForm({
+  createFunc,
+  setStatus,
+  initialValue,
+  label,
+}: {
+  createFunc: any;
+  setStatus: any;
+  initialValue: any;
+  label: any;
+}) {
   const titleRef = useRef();
 
   useEffect(() => {

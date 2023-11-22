@@ -190,7 +190,7 @@ ipcMain.handle('getStores', (_e, projectId) => {
 
 ipcMain.handle('boardChildren', (_e, folderId) => {
   const sql =
-    'SELECT p.id, p.title, p.content, p.setting FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? AND p.is_deleted = 0 ORDER BY s.position ASC';
+    'SELECT p.id, p.title, p.content, p.setting, p.created_at FROM page p JOIN store s ON s.page_id = p.id JOIN folder f ON f.id = s.folder_id WHERE f.id = ? AND p.is_deleted = 0 ORDER BY s.position ASC';
   return executeDbAll(sql, folderId);
 });
 
@@ -933,7 +933,7 @@ ipcMain.handle('fetchAllPagesInFolder', (event, idArray: number[]) => {
                JOIN store AS s ON p.id = s.page_id
                WHERE s.folder_id IN (${placeholders})
                AND p.is_deleted = 0
-               ORDER BY s.position ASC`;
+               ORDER BY s.position ASC, p.created_at DESC`;
   return new Promise((resolve, reject) => {
     db.all(sql, idArray, (error, rows) => {
       if (error) {

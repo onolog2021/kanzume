@@ -1,5 +1,5 @@
 import { Button, List, IconButton, Box, Tooltip } from '@mui/material';
-import { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import Folder from 'renderer/Classes/Folder';
@@ -14,6 +14,10 @@ import CreateForm from '../PageList/CreateForm';
 import CategoryTitle from '../CategoryTitle';
 import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 import { ReactComponent as AddBoardButton } from '../../../../../assets/grid-plus.svg';
+import {
+  InsertRecordQuery,
+  TabListElement,
+} from '../../../../types/renderElement';
 
 function BoardList({ boards }) {
   const [project] = useContext(ProjectContext);
@@ -38,17 +42,24 @@ function BoardList({ boards }) {
   }, [boards]);
 
   const createNewBoard = async (title: string) => {
-    const newBoard = new Folder({
-      title,
-      project_id: project.id,
-      type: 'board',
-    });
-    const newId = await newBoard.create();
-    await window.electron.ipcRenderer.sendMessage(
-      'updateBoardList',
-      project.id
+    const { length } = boards;
+    // 新しいボードの作成
+    const query: InsertRecordQuery<'folder'> = {
+      table: 'folder',
+      columns: {
+        title,
+        position: length ? length * -1 : -1,
+        type: 'board',
+        project_id: project.id,
+      },
+    };
+    const newId = await window.electron.ipcRenderer.invoke(
+      'insertRecord',
+      query
     );
-    const value = {
+
+    window.electron.ipcRenderer.sendMessage('updateBoardList', project.id);
+    const value: TabListElement = {
       id: newId,
       tabId: `tab-board-${newId}`,
       title,
@@ -72,7 +83,7 @@ function BoardList({ boards }) {
         <CategoryTitle svg={svg} categoryName="ボード" />
         <Tooltip title="ボード作成" placement="top">
           <IconButton onClick={() => switchFormDisplay('board')}>
-            <AddBoardButton style={{width: 16, height: 16}}/>
+            <AddBoardButton style={{ width: 16, height: 16 }} />
           </IconButton>
         </Tooltip>
       </div>

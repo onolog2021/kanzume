@@ -21,10 +21,10 @@ type ColumnValueTypeByTable = {
   };
   folder?: {
     id?: number;
-    title?: string;
+    title: string;
     position?: number;
     project_id?: number;
-    type?: string;
+    type: string;
     parent_id?: number | null;
     is_deleted?: number;
     updated_at?: string | null;
@@ -52,6 +52,8 @@ type ColumnValueTypeByTable = {
   };
 };
 
+type ColumnsKeys<T extends TableName> = keyof ColumnValueTypeByTable[T];
+
 export interface InsertRecordQuery<T extends TableName> {
   table: T;
   columns: ColumnValueTypeByTable[T];
@@ -65,6 +67,6 @@ export interface UpdateRecordQuery<T extends TableName> {
 
 export interface FetchRecordQuery<T extends TableName> {
   table: T;
-  columns?: ColumnValueTypeByTable[T];
+  columns?: ColumnsKeys<T>[];
   conditions: ColumnValueTypeByTable[T];
 }

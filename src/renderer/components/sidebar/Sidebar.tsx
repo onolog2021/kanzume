@@ -1,11 +1,9 @@
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Drawer,
   Box,
   Typography,
   Tooltip,
-  useTheme,
-  IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
@@ -30,9 +28,9 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
     setOpenSetting(boolean);
   };
 
-  const changeTitlte = (title:string) => {
-    setProjectTitle(title)
-  }
+  const changeTitlte = (title: string) => {
+    setProjectTitle(title);
+  };
 
   useEffect(() => {
     if (project) {

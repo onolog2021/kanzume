@@ -43,6 +43,13 @@ class AppUpdater {
         });
     });
 
+    //  アプデの進行状況
+    autoUpdater.on('download-progress', (progress) => {
+      // 進行状況のログを表示
+      log.info(`ダウンロード進行状況: ${progress.percent}%`);
+      // 必要に応じてユーザーインターフェースに進行状況を表示
+    });
+
     // アップデートのダウンロードが完了した場合
     autoUpdater.on('update-downloaded', () => {
       dialog

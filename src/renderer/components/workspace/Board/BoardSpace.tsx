@@ -28,8 +28,8 @@ export default function BoardSpace({
   const { columnsState, setColumnsState } = useContext(ColumnsContext);
 
   // ボードの初期設定
-  async function initialBoard() {
-    const boardinstance = new Board(boardData);
+  async function initialBoard(paramsData: FolderElement) {
+    const boardinstance = new Board(paramsData);
     setBoard(boardinstance);
     const pagesData = await boardinstance.flattenPages();
     setPages(pagesData);
@@ -38,7 +38,7 @@ export default function BoardSpace({
   }
 
   useEffect(() => {
-    initialBoard();
+    initialBoard(boardData);
 
     window.electron.ipcRenderer.on('updateBoardBody', async () => {
       const query = {
@@ -51,8 +51,8 @@ export default function BoardSpace({
         'fetchRecord',
         query
       );
-      const newBoard = new Board(newData);
-      setBoard(newBoard);
+
+      initialBoard(newData);
     });
   }, []);
 
@@ -77,16 +77,17 @@ export default function BoardSpace({
       'insertRecord',
       query
     );
+    const length = pages ? pages.length * -1 : -1;
     const storeQuery: InsertRecordQuery<'store'> = {
       table: 'store',
       columns: {
         page_id: pageId,
         folder_id: boardData.id,
-        position: -1,
+        position: length,
       },
     };
     await window.electron.ipcRenderer.invoke('insertRecord', storeQuery);
-    await initialBoard();
+    await initialBoard(boardData);
   };
 
   const changeBoardTitle = () => {
