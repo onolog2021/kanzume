@@ -1,4 +1,4 @@
-import { FetchRecordQuery } from '../../types/renderElement';
+import { ColumnsKeys, FetchRecordQuery } from '../../types/renderElement';
 import Node from './Node';
 
 interface ProjectData {

@@ -7,6 +7,7 @@ import TreeBranch from './TreeBranch';
 import { ReactComponent as Expand } from '../../../../../assets/expand.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from './CreateForm';
+import { DndTagElement } from '../../../../types/renderElement';
 
 function ListItemFolder({ folderData, orderArray, parentId }) {
   const { children } = folderData;
@@ -25,7 +26,7 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
     />
   );
 
-  const dndTag = {
+  const dndTag: DndTagElement = {
     id: `f-${folderData.id}`,
     data: {
       area: parentId ? 'folder' : 'pageList',

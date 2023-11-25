@@ -17,26 +17,15 @@ import handleDataDroppedInQuickAccessArea from './DragAndDrop/handleDataDroppedI
 import handleDataDroppedInFolder from './DragAndDrop/handleDataDroppedInFolder';
 import handleDataDroppedInBoardBody from './DragAndDrop/handleDataDroppedInBoardBody';
 import softDeleteByDrop from './DragAndDrop/softDeleteByDrop';
-
-interface itemData {
-  dndId: string;
-  type: string;
-  id: number;
-  area: string;
-  parentId: number;
-  orderArray: string[];
-  position: number;
-  itemType: 'border' | 'item';
-  bookmark: Boolean;
-  content: string;
-}
+import { DndTagDataElement } from '../types/renderElement';
+import Node from './Classes/Node';
 
 function DragAndDrop() {
   const projectId = useLocation().state?.project_id;
   const [project, setProject] = useContext(ProjectContext);
-  const [activeItem, setActiveItem] = useState<itemData>();
-  const [overItem, setOverItem] = useState<itemData>();
-  const [pageRoot, setPageRoot] = useState();
+  const [activeItem, setActiveItem] = useState<DndTagDataElement>();
+  const [overItem, setOverItem] = useState<DndTagDataElement>();
+  const [pageRoot, setPageRoot] = useState<Node | undefined>();
   const [boards, setBoards] = useState([]);
   const [droppable, setDroppable] = useState<Boolean>(true);
   const timeId = useRef(null);
@@ -51,7 +40,6 @@ function DragAndDrop() {
   const quickAccessArea = <QuickAccessArea />;
   const boardList = <BoardList boards={boards} />;
   const pageList = <PageList root={pageRoot} />;
-  // const tabs = <TabList  />;
 
   useEffect(() => {
     async function fetchData() {

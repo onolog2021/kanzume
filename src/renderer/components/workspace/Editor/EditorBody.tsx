@@ -26,7 +26,7 @@ function EditorBody({ targetId, page_id, title }) {
   const [contentWidth, setContentWidth] = useState<number | undefined>();
   const [lineHeight, setLineHeight] = useState<number | undefined>();
   const [editorSetting, setEditorSetting] = useState<PageSetting>();
-  const [currentPage] = useContext(CurrentPageContext);
+  const { currentPage } = useContext(CurrentPageContext);
   const [loading, setLoading] = useState(false);
   const [defaultSetting, setDefaultSetting] = useState<PageSetting>();
 

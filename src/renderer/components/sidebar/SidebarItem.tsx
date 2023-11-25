@@ -1,42 +1,60 @@
-import { IconButton, ListItemButton, Typography, Box } from '@mui/material';
+import React, { ListItemButton, Typography, Box } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, ReactElement } from 'react';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
+import { useTheme } from '@mui/material/styles';
 import { ReactComponent as MenuIcon } from '../../../../assets/dots.svg';
 import ContextMenu from '../ContextMenu';
-import { CurrentPageContext } from '../Context';
+import {
+  CurrentPageContext,
+  SelectedItemElement,
+  SidebarSelectedContext,
+} from '../Context';
 import SortableBorder from './SortableBorder';
-import { useTheme } from '@mui/material/styles';
+import { DndTagElement } from '../../../types/renderElement';
 
 interface contextMenu {
   mouseX: number;
   mouseY: number;
 }
 
-function SidebarItem({ icon, text, functions, dndTag, collapse }) {
-  const [selected, setSelected] = useState<Boolean>(false);
+function SidebarItem({
+  icon,
+  text,
+  functions,
+  dndTag,
+  collapse,
+}: {
+  icon: ReactElement;
+  text: string;
+  functions: any;
+  dndTag: DndTagElement;
+  collapse: any;
+}) {
+  const [isSelected, setIsSelected] = useState<boolean>(false);
+  const { selectedSidebarItem, setSelectedSidebarItem } = useContext(
+    SidebarSelectedContext
+  );
   const { click, contextMenu } = functions;
   const [contextMenuStatus, setContextMenuStatus] =
     useState<contextMenu | null>(null);
-  const [currentPage] = useContext(CurrentPageContext);
   // dnd
   const { attributes, listeners, setNodeRef, isOver, index, over, isDragging } =
     useSortable(dndTag);
   const theme = useTheme();
+  const { data } = dndTag;
 
   useEffect(() => {
-    if (!currentPage) {
-      setSelected(false);
+    // typeとidが同じか
+    if (
+      data.type === selectedSidebarItem.type &&
+      data.id === selectedSidebarItem.id
+    ) {
+      setIsSelected(true);
       return;
     }
-
-    const isSameId = currentPage.id === dndTag.data.id;
-    const isMatchingType =
-      (currentPage.type === 'editor' && dndTag.data.type === 'page') ||
-      currentPage.type === dndTag.data.type;
-
-    setSelected(isSameId && isMatchingType);
-  }, [currentPage]);
+    setIsSelected(false);
+  }, [selectedSidebarItem]);
 
   const style = {
     transition: 'none',
@@ -52,10 +70,11 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     }
   };
 
-  const overColor = theme.palette.mode === 'dark' ? theme.palette.secondary.dark : '#F2FDFF';
+  const overColor =
+    theme.palette.mode === 'dark' ? theme.palette.secondary.dark : '#F2FDFF';
   const overStyle = {
     transition: 'none',
-    background: isFolder() ?  overColor : 'none',
+    background: isFolder() ? overColor : 'none',
   };
 
   const contextMenuOpen = (event) => {
@@ -74,11 +93,26 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
     setContextMenuStatus(null);
   };
 
+  function overrideClick(originalClick: any) {
+    return () => {
+      originalClick();
+
+      if (data.type !== 'paper' && data.itemType !== 'border' && data.id) {
+        const selectedData: SelectedItemElement = {
+          type: data.type,
+          id: data.id,
+          parentId: data.parentId ? data.parentId : null,
+        };
+        setSelectedSidebarItem(selectedData);
+      }
+    };
+  }
+
   return (
     <Box>
       {index === 0 ? <SortableBorder tag={borderDndData} index={0} /> : null}
       <ListItemButton
-        onClick={click}
+        onClick={overrideClick(click)}
         sx={{
           px: 1,
           display: 'grid',
@@ -106,7 +140,7 @@ function SidebarItem({ icon, text, functions, dndTag, collapse }) {
         <Typography
           sx={{
             fontSize: 14,
-            fontWeight: selected ? 'bolder' : 'normal',
+            fontWeight: isSelected ? 'bolder' : 'normal',
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 1,

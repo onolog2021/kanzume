@@ -9,6 +9,10 @@ import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
 import { PageElement } from '../../../../types/sqlElement';
 import { ColumnsContext, calcItemWidth } from '../../Context';
+import {
+  DndTagDataElement,
+  DndTagElement,
+} from '../../../../types/renderElement';
 
 interface PaperSize {
   width: number;
@@ -60,7 +64,7 @@ function Boardpage({
     }
   }, [columnsState]);
 
-  const dndData = {
+  const dndData: DndTagDataElement = {
     area: 'boardBody',
     type: 'paper',
     content: pageData.title,

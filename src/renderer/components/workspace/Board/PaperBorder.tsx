@@ -1,11 +1,11 @@
 import { Box } from '@mui/material';
 import { useDroppable } from '@dnd-kit/core';
 import { useTheme } from '@mui/material/styles';
-
+import { DndTagElement } from '../../../../types/renderElement';
 
 export default function PaperBorder({ boardId, index, orderArray }) {
   const theme = useTheme();
-  const { setNodeRef, over, isOver, active } = useDroppable({
+  const dndTag: DndTagElement = {
     id: `border-${boardId}-${index}`,
     data: {
       itemType: 'border',
@@ -15,12 +15,13 @@ export default function PaperBorder({ boardId, index, orderArray }) {
       position: index,
       orderArray,
     },
-  });
+  };
+  const { setNodeRef, over, isOver, active } = useDroppable(dndTag);
 
   const style = {
     width: 20,
     height: 20,
-    background: 'transparent'
+    background: 'transparent',
   };
 
   const overedStyle = {

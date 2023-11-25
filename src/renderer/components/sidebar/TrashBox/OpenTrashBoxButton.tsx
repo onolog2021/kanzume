@@ -11,7 +11,7 @@ import { ReactComponent as TraxhBoxIcon } from '../../../../../assets/trash.svg'
 function OpenTrashBoxButton() {
   const theme = useTheme();
   const [tabList, setTabList] = useContext(TabListContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { setCurrentPage } = useContext(CurrentPageContext);
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'sidebar-trashbox',

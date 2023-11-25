@@ -22,7 +22,7 @@ import {
 function BoardList({ boards }) {
   const [project] = useContext(ProjectContext);
   const [tabList, setTabList] = useContext(TabListContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { setCurrentPage } = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
   const [orderArray, setOrderArray] = useState();
   const svg = <BoardIcon style={{ fill: '#999' }} />;

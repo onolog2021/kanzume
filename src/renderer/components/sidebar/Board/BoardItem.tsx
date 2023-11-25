@@ -6,13 +6,14 @@ import {
 import { ReactComponent as BoardIcon } from '../../../../../assets/board.svg';
 import SidebarItem from '../SidebarItem';
 import CreateForm from '../PageList/CreateForm';
+import { DndTagElement } from '../../../../types/renderElement';
 
 function BoadItem({ board, orderArray, bookmark }) {
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { setCurrentPage } = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [isShowInput, setIsShowInput] = useState(false);
 
-  let dndTag;
+  let dndTag: DndTagElement;
   if (bookmark) {
     dndTag = {
       id: `qb-${board.id}`,

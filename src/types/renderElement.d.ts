@@ -21,10 +21,10 @@ type ColumnValueTypeByTable = {
   };
   folder?: {
     id?: number;
-    title: string;
+    title?: string;
     position?: number;
     project_id?: number;
-    type: string;
+    type?: string;
     parent_id?: number | null;
     is_deleted?: number;
     updated_at?: string | null;
@@ -70,3 +70,21 @@ export interface FetchRecordQuery<T extends TableName> {
   columns?: ColumnsKeys<T>[];
   conditions: ColumnValueTypeByTable[T];
 }
+
+// ドラッグアンドドロップ
+export interface DndTagDataElement {
+  area: 'quickAccess' | 'boardList' | 'folder' | 'pageList' | 'boardBody';
+  type: 'page' | 'board' | 'folder' | 'paper';
+  id?: number;
+  position?: number;
+  orderArray: string[];
+  itemType: 'item' | 'border';
+  bookmark?: boolean;
+  content?: string;
+  parentId?: number;
+}
+
+export type DndTagElement = {
+  id: string;
+  data: DndTagDataElement;
+};

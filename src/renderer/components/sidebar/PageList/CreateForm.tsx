@@ -9,8 +9,8 @@ export default function CreateForm({
 }: {
   createFunc: any;
   setStatus: any;
-  initialValue: any;
-  label: any;
+  initialValue?: string | undefined;
+  label: string;
 }) {
   const titleRef = useRef();
 

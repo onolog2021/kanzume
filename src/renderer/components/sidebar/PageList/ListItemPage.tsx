@@ -3,15 +3,16 @@ import SidebarItem from '../SidebarItem';
 import { CurrentPageContext, TabListContext } from '../../Context';
 import CreateForm from './CreateForm';
 import { ReactComponent as PageIcon } from '../../../../../assets/paper.svg';
+import { DndTagElement } from '../../../../types/renderElement';
 
 function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
   const [isShowInput, setIsShowInput] = useState(false);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { setCurrentPage } = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
 
   const icon = <PageIcon />;
 
-  let dndTag;
+  let dndTag: DndTagElement;
   if (bookmark) {
     dndTag = {
       id: `qp-${pageData.id}`,

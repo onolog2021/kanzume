@@ -2,25 +2,15 @@ import { useDroppable } from '@dnd-kit/core';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-
-interface itemData {
-  dndId: string;
-  type: string;
-  id: number;
-  area: string;
-  parentId: number;
-  orderArray: string[];
-  position: number;
-  itemType: 'border' | 'item';
-}
+import { DndTagDataElement } from '../../../types/renderElement';
 
 export default function SortableBorder({ tag, index }) {
   const [itemId, setItemId] = useState<string>('');
-  const [itemData, setItemData] = useState<itemData>();
+  const [itemData, setItemData] = useState<DndTagDataElement>();
   const theme = useTheme();
 
   useEffect(() => {
-    const modifiedData = {
+    const modifiedData: DndTagDataElement = {
       ...tag.data,
       position: index,
       itemType: 'border',

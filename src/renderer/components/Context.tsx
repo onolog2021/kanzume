@@ -21,21 +21,40 @@ export function ProjectProvider({ children }) {
   );
 }
 
-export const CurrentPageContext = createContext([]);
-
 export type CurrentPageElement = {
   id: number;
-  type: 'board' | 'editor' | 'trash';
+  type: 'board' | 'editor' | 'trash' | null;
   parentId: number | null;
 };
 
+const initialCurrentPage: CurrentPageElement = {
+  id: 0,
+  type: null,
+  parentId: null,
+};
+
+export const CurrentPageContext = createContext<{
+  currentPage: CurrentPageElement;
+  setCurrentPage: React.Dispatch<React.SetStateAction<CurrentPageElement>>;
+}>({
+  currentPage: initialCurrentPage,
+  setCurrentPage: () => {},
+});
+
 export function CurrentPageProvider({ children }) {
-  const [currentPage, setCurrentPage] = useState<CurrentPageElement | null>(
-    null
+  const [currentPage, setCurrentPage] =
+    useState<CurrentPageElement>(initialCurrentPage);
+
+  const contextValue = useMemo(
+    () => ({
+      currentPage,
+      setCurrentPage,
+    }),
+    [currentPage, setCurrentPage]
   );
 
   return (
-    <CurrentPageContext.Provider value={[currentPage, setCurrentPage]}>
+    <CurrentPageContext.Provider value={contextValue}>
       {children}
     </CurrentPageContext.Provider>
   );
@@ -105,4 +124,86 @@ export function calcItemWidth(params: ColumnsStateElement): number {
   const margin = 16;
   const itemWidth: number = (fullWidth - 32 - (columns + 1) * margin) / columns;
   return itemWidth;
+}
+
+// サイドバーの選択アイテム用
+export type SelectedItemElement = {
+  type: 'board' | 'folder' | 'page';
+  id: number;
+  parentId: number | null;
+};
+
+const initialSelectedItem: SelectedItemElement = {
+  type: 'page',
+  id: 0,
+  parentId: null,
+};
+
+export const SidebarSelectedContext = createContext<{
+  selectedSidebarItem: SelectedItemElement | undefined;
+  setSelectedSidebarItem: React.Dispatch<
+    React.SetStateAction<SelectedItemElement>
+  >;
+}>({
+  selectedSidebarItem: initialSelectedItem,
+  setSelectedSidebarItem: () => {},
+});
+
+export function SelectedSidebarProvider({ children }: { children: ReactNode }) {
+  const [selectedSidebarItem, setSelectedSidebarItem] =
+    useState<SelectedItemElement>(initialSelectedItem);
+
+  const contextValue = useMemo(
+    () => ({
+      selectedSidebarItem,
+      setSelectedSidebarItem,
+    }),
+    [selectedSidebarItem, setSelectedSidebarItem]
+  );
+
+  return (
+    <SidebarSelectedContext.Provider value={contextValue}>
+      {children}
+    </SidebarSelectedContext.Provider>
+  );
+}
+
+// サイドバーのクリエイト用
+export type CreateFormSelectorElement = {
+  type: 'folder' | 'page';
+  parentId: number | null;
+};
+
+export const CreateFormSelectorContext = createContext<{
+  createFormSelector: CreateFormSelectorElement | undefined;
+  setCreateFormSelector: React.Dispatch<
+    React.SetStateAction<CreateFormSelectorElement | undefined>
+  >;
+}>({
+  createFormSelector: undefined,
+  setCreateFormSelector: () => {},
+});
+
+export function CreateFormSelectorProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [createFormSelector, setCreateFormSelector] = useState<
+    CreateFormSelectorElement | undefined
+  >(undefined);
+
+  const contextValue = useMemo(
+    () => ({
+      createFormSelector,
+      setCreateFormSelector,
+    }),
+    [createFormSelector, setCreateFormSelector]
+  );
+
+  return (
+    <CreateFormSelectorContext.Provider value={contextValue}>
+      {children}
+    </CreateFormSelectorContext.Provider>
+  );
 }

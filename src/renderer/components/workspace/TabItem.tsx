@@ -20,7 +20,7 @@ import { ReactComponent as TrashIcon } from '../../../../assets/trash.svg';
 
 function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { currentPage, setCurrentPage } = useContext(CurrentPageContext);
   const [tabList, setTabList] = useContext(TabListContext);
   const [isActive, setIsActive] = useState<Boolean>(false);
   const theme = useTheme();

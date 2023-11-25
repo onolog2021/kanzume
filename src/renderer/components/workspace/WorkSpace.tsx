@@ -9,7 +9,7 @@ import BoardProvider from './Board/BoardProvider';
 
 function WorkSpace() {
   const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
-  const [currentPage, setCurrentPage] = useContext(CurrentPageContext);
+  const { currentPage } = useContext(CurrentPageContext);
 
   const isCurrent = (tab) => {
     if (currentPage === null) {
