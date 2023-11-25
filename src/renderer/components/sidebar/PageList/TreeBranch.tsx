@@ -25,7 +25,7 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
   const [tabList, setTabList] = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const [items, setItems] = useState([]);
-  const [parentId, setParentId] = useState<number>();
+  const [parentId, setParentId] = useState<number | null>(null);
   const [isForm, setIsForm] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,17 +42,13 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
 
   useEffect(() => {
     if (createFormSelector) {
-      const isMatchId = createFormSelector.parentId === parentId;
-      setIsForm(isMatchId);
-    }
+      const isMatch = createFormSelector.parentId === parentId;
+      setIsForm(isMatch);
 
-    // if (createFormSelector?.parentId) {
-    //   const isMatch = createFormSelector.parentId === parentId;
-    //   setIsForm(isMatch);
-    // } else if (createFormSelector?.type === 'folder') {
-    //   const isMatch = createFormSelector.id === parentId;
-    //   setIsForm(isMatch);
-    // }
+      if (createFormSelector.parentId === null && parentNode.parent === null) {
+        setIsForm(true);
+      }
+    }
   }, [createFormSelector]);
 
   const createNewPage = async (title: string) => {
@@ -105,11 +101,23 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
   };
 
   const createNewFolder = async (title: string) => {
-    const newFolder = new Folder({
-      title,
-      project_id: project.id,
-    });
-    await newFolder.create();
+    const hasParent = selectedSidebarItem?.parentId;
+    const query: InsertRecordQuery<'folder'> = {
+      table: 'folder',
+      columns: {
+        title,
+        type: 'folder',
+        position: -1,
+        project_id: project.id,
+      },
+    };
+
+    if (hasParent && query && query.columns) {
+      query.columns.parent_id = createFormSelector?.parentId;
+    }
+
+    await window.electron.ipcRenderer.invoke('insertRecord', query);
+
     window.electron.ipcRenderer.sendMessage('updatePageList', project.id);
   };
 

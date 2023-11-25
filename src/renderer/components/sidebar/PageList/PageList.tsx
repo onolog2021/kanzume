@@ -35,19 +35,21 @@ function PageList({ root }: { root: Node }) {
     data: { area: 'pageList', type: 'area' },
   });
 
-  // 選択中のフォルダIDの取得
-  let currentParentId: number | null;
-  if (selectedSidebarItem) {
-    if (selectedSidebarItem.parentId) {
-      currentParentId = selectedSidebarItem.parentId;
-    } else if (selectedSidebarItem.type === 'folder') {
-      currentParentId = selectedSidebarItem.id;
-    }
-  } else {
-    currentParentId = null;
-  }
-
   const switchNewForm = (status: 'page' | 'folder') => {
+    let currentParentId: number | null = null;
+    if (selectedSidebarItem) {
+      // ページの場合
+      if (selectedSidebarItem.type === 'page') {
+        currentParentId = selectedSidebarItem.parentId
+          ? selectedSidebarItem.parentId
+          : null;
+      }
+      // フォルダの場合
+      if (selectedSidebarItem.type === 'folder') {
+        currentParentId = selectedSidebarItem.id;
+      }
+    }
+
     // setNewForm(status);
     const value: CreateFormSelectorElement = {
       type: status,

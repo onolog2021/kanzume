@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Collapse } from '@mui/material';
 import Folder from 'renderer/Classes/Folder';
 import Confirmation from 'renderer/GlobalComponent/Confirmation';
@@ -41,9 +41,7 @@ function ListItemFolder({ folderData, orderArray, parentId }) {
 
   const collapse = (
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
-      {children && children.length > 0 && (
-        <TreeBranch parentNode={folderData} />
-      )}
+      {children && <TreeBranch parentNode={folderData} />}
     </Collapse>
   );
 
