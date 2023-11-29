@@ -90,7 +90,7 @@ export default class Board implements FolderElement {
     return pagesData;
   }
 
-  async isBookmarked(): Promise<void> {
+  async isBookmarked() {
     const query: FetchRecordQuery<'bookmark'> = {
       table: 'bookmark',
       conditions: {
@@ -103,11 +103,12 @@ export default class Board implements FolderElement {
       query
     );
 
-    if (result!) {
+    if (result === undefined) {
       this.bookmarked = false;
+      return false;
     }
-
     this.bookmarked = true;
+    return true;
   }
 
   async toggleBookmark() {

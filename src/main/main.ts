@@ -32,7 +32,8 @@ class AppUpdater {
         .showMessageBox({
           type: 'info',
           title: 'アップデートが利用可能です',
-          message: '新しいバージョンが利用可能です。アップデートしますか？',
+          message:
+            '新しいバージョンが利用可能です。ダウンロードしますか？\n（ダウンロードはバックグラウンドで行われます）',
           buttons: ['はい', 'いいえ'],
         })
         .then((result) => {
@@ -44,11 +45,10 @@ class AppUpdater {
     });
 
     //  アプデの進行状況
-    autoUpdater.on('download-progress', (progress) => {
-      // 進行状況のログを表示
-      log.info(`ダウンロード進行状況: ${progress.percent}%`);
-      // 必要に応じてユーザーインターフェースに進行状況を表示
-    });
+    // autoUpdater.on('download-progress', (progress) => {
+    //   // 進行状況のログを表示
+    //   log.info(`ダウンロード進行状況: ${progress.percent}%`);
+    // });
 
     // アップデートのダウンロードが完了した場合
     autoUpdater.on('update-downloaded', () => {
@@ -57,7 +57,7 @@ class AppUpdater {
           type: 'info',
           title: 'アップデートのダウンロードが完了しました',
           message:
-            'アップデートをインストールしてアプリケーションを再起動しますか？',
+            'アップデートのダウンロードが完了しました。アップデートをインストールしてアプリケーションを再起動しますか？',
           buttons: ['再起動', '後で'],
         })
         .then((result) => {
@@ -137,7 +137,6 @@ const createWindow = async () => {
   const store = new Store();
   const beforeSize = store.get('windowSize');
   const isMaximized = store.get('isMaximized');
-  console.log(isMaximized);
 
   mainWindow = new BrowserWindow({
     show: false,

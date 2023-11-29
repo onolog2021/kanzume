@@ -670,8 +670,6 @@ ipcMain.on('exportText', async (event, pageId) => {
       cancelId: -1, // キャンセルボタンの場合のID
     });
 
-    console.log(formatChoice);
-
     // ユーザーがキャンセルした場合
     if (formatChoice === -1) return;
 

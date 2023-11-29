@@ -33,7 +33,7 @@ export default function BoardSpace({
     setBoard(boardinstance);
     const pagesData = await boardinstance.flattenPages();
     setPages(pagesData);
-    const isBookmarked = boardinstance.bookmarked;
+    const isBookmarked = await boardinstance.isBookmarked();
     setBookmark(isBookmarked);
   }
 
