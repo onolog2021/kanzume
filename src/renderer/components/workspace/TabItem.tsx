@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import {
   CurrentPageContext,
@@ -17,6 +17,7 @@ import { ReactComponent as CloseButton } from '../../../../assets/times.svg';
 import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../assets/board.svg';
 import { ReactComponent as TrashIcon } from '../../../../assets/trash.svg';
+import { ReactComponent as PreviewIcon } from '../../../../assets/preview.svg';
 
 function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
@@ -30,6 +31,8 @@ function TabItem({ tab, orderArray }) {
     svg = <PageIcon />;
   } else if (tab.type === 'board') {
     svg = <BoardIcon />;
+  } else if (tab.type === 'preview') {
+    svg = <PreviewIcon />;
   } else {
     svg = <TrashIcon />;
   }

@@ -23,7 +23,7 @@ export function ProjectProvider({ children }) {
 
 export type CurrentPageElement = {
   id: number;
-  type: 'board' | 'editor' | 'trash' | null;
+  type: 'board' | 'editor' | 'trash' | 'preview' | null;
   parentId: number | null;
 };
 

@@ -1,16 +1,33 @@
-import { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, Tooltip } from '@mui/material';
 import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import { useTheme } from '@mui/material/styles';
 import BookmarkButton from './BookmarkButton';
-import TextSetting from './TextSetting';
 import { ReactComponent as HistoryIcon } from '../../../../../assets/history.svg';
 import { ReactComponent as MarkerIcon } from '../../../../../assets/marker.svg';
+import { ReactComponent as PreviewIcon } from '../../../../../assets/preview.svg';
+import { PageElement } from '../../../../types/sqlElement';
+import { TabListElement } from '../../../../types/renderElement';
+import {
+  CurrentPageContext,
+  CurrentPageElement,
+  TabListContext,
+} from '../../Context';
 
-export default function EditorTools({ page, toggleStatus, textSetting }) {
+export default function EditorTools({
+  page,
+  toggleStatus,
+  textSetting,
+}: {
+  page: PageElement;
+  toggleStatus: any;
+  textSetting: any;
+}) {
   const [loading, setLoading] = useState(false);
   const [hasGit, setHasGit] = useState(false);
+  const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
+  const { setCurrentPage } = useContext(CurrentPageContext);
   const theme = useTheme();
 
   useEffect(() => {
@@ -50,6 +67,27 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
     </>
   ) : null;
 
+  function displayPreview() {
+    const tabData: TabListElement = {
+      title: `${page.title}(プレビュー)`,
+      id: page.id,
+      type: 'preview',
+      tabId: `tab-preview-${page.id}`,
+    };
+    if (
+      tabList.length === 0 ||
+      !tabList.some((item) => item.tabId === tabData.tabId)
+    ) {
+      setTabList((prevTabs) => [...prevTabs, tabData]);
+    }
+    const currentQuery: CurrentPageElement = {
+      id: page.id,
+      type: 'preview',
+      parentId: null,
+    };
+    setCurrentPage(currentQuery);
+  }
+
   return (
     <Box
       className="editorTools"
@@ -65,6 +103,11 @@ export default function EditorTools({ page, toggleStatus, textSetting }) {
         </PlaneIconButton>
       </Tooltip>
       {textSetting}
+      <Tooltip title="プレビュー表示" placement="left">
+        <PlaneIconButton onClick={() => displayPreview()}>
+          <PreviewIcon />
+        </PlaneIconButton>
+      </Tooltip>
       {loading ? LoadingComponent : GitComponents}
     </Box>
   );

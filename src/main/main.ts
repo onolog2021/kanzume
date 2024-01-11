@@ -84,15 +84,37 @@ class AppUpdater {
 
 function checkGit() {
   return new Promise((resolve, reject) => {
+    // Gitがインストールされているかチェック
+    console.log('checking git');
     exec('git --version', (error, stdout, stderr) => {
       if (error) {
         reject(false);
+        return;
       }
-      resolve(true);
+
+      // Gitユーザー名とメールアドレスをチェック
+      exec('git config user.name', (errorName, stdoutName, stderrName) => {
+        if (errorName || !stdoutName.trim()) {
+          reject(false);
+          return;
+        }
+
+        exec(
+          'git config user.email',
+          (errorEmail, stdoutEmail, stderrEmail) => {
+            if (errorEmail || !stdoutEmail.trim()) {
+              reject(false);
+              return;
+            }
+
+            // すべてのチェックが完了
+            resolve(true);
+          }
+        );
+      });
     });
   });
 }
-
 let mainWindow: BrowserWindow | null = null;
 Menu.setApplicationMenu(null);
 if (process.env.NODE_ENV === 'production') {

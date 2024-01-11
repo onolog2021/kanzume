@@ -6,6 +6,7 @@ import TrashBox from './Trash/TrashBox';
 import TabList from './TabList';
 import NoSpace from './NoSpace';
 import BoardProvider from './Board/BoardProvider';
+import PreviewTab from './Preview/PreviewTab';
 
 function WorkSpace() {
   const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
@@ -45,6 +46,17 @@ function WorkSpace() {
         content = (
           <div style={isCurrent(tab)} key="trash-box" className="panel">
             <TrashBox />
+          </div>
+        );
+        break;
+      case 'preview':
+        content = (
+          <div
+            style={isCurrent(tab)}
+            key={`preview-${tab.id}`}
+            className="panel"
+          >
+            <PreviewTab tab={tab} />
           </div>
         );
         break;

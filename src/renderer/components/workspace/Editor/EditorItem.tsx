@@ -124,6 +124,7 @@ function MyEditor({ page, isCount }) {
           countText();
         },
         onBlur: () => {
+          countText();
           saveContent();
         },
       };
@@ -224,14 +225,14 @@ function MyEditor({ page, isCount }) {
 
     const transaction = editor.current.state.tr.insertText(clipboardText);
     editor.current.view.dispatch(transaction);
-    contextMenuClose()
+    contextMenuClose();
   };
 
   const cutText = () => {
-    copyText()
+    copyText();
     const transaction = editor.current.state.tr.deleteSelection();
     editor.current.view.dispatch(transaction);
-  }
+  };
 
   const menues = [
     {
@@ -274,7 +275,7 @@ function MyEditor({ page, isCount }) {
           <EditorContent
             editor={editor.current}
             onContextMenu={(e) => {
-              contextMenuOpen(e)
+              contextMenuOpen(e);
             }}
           />
           <BubbleMenu editor={editor.current}>
