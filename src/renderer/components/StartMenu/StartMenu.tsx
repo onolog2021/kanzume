@@ -80,7 +80,7 @@ function StartMenu() {
   };
 
   return (
-    <Box className="startMenuWrapper">
+    <Box className="startMenuWrapper" sx={{ minHeight: window.innerHeight }}>
       <ListItemButton
         sx={{
           position: 'absolute',

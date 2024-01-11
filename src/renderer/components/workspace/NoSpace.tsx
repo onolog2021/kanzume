@@ -12,13 +12,18 @@ function NoSpace() {
   };
 
   return (
-    <Box sx={{ height: '100vh' }}>
+    <Box sx={{ height: window.innerHeight }}>
       <Box sx={style}>
         <img
           src={LogoImage}
           alt="logo"
           className="logo"
-          style={{ margin: '0 auto', display: 'block', opacity: 0.7, width:120 }}
+          style={{
+            margin: '0 auto',
+            display: 'block',
+            opacity: 0.7,
+            width: 120,
+          }}
         />
         {/* <Typography
           sx={{

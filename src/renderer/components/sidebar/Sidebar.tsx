@@ -50,7 +50,11 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
         sx={{
           width: 240,
           position: 'relative',
-          '& .MuiDrawer-paper': { width: 240, px: 1, minHeight: '100vh' },
+          '& .MuiDrawer-paper': {
+            width: 240,
+            px: 1,
+            minHeight: window.innerHeight,
+          },
           '& ::-webkit-scrollbar': {
             width: '2px',
           },

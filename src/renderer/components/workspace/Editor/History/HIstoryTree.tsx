@@ -46,7 +46,9 @@ export default function HistoryTree({ pageId, selectFunc, selected }) {
   }
 
   return (
-    <StyledScrollbarBox sx={{ maxHeight: 'calc(100vh - 200px)' }}>
+    <StyledScrollbarBox
+      sx={{ maxHeight: `calc(${window.innerHeight}px - 200px)` }}
+    >
       {loading && loading ? (
         <ReactLoading
           type="spin"

@@ -104,7 +104,7 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
     <>
       <StyledScrollbarBox
         sx={{
-          height: 'calc(100vh - 160px)',
+          height: `calc(${window.innerHeight}px - 160px)`,
           borderLeft: '1px solid #999',
           p: 4,
           px: 8,

@@ -71,7 +71,7 @@ function TrashBox() {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         gap: 1,
-        minHeight: 'calc(100vh - 80px)',
+        minHeight: `calc(${window.innerHeight}px - 80px)`,
       }}
     >
       {trashedItems && trashedItems.length > 0 ? (

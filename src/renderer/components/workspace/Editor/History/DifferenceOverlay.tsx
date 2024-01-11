@@ -62,7 +62,7 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: window.innerHeight,
         width: '100vw',
         background: '#80808096',
         zIndex: 1201,
@@ -79,7 +79,7 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
                 ? theme.palette.primary.dark
                 : 'white',
             width: '80vw',
-            height: '100vh',
+            height: window.innerHeight,
             m: 'auto',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',

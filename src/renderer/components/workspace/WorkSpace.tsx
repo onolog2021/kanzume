@@ -17,7 +17,7 @@ function WorkSpace() {
       return;
     }
     return tab.id === currentPage.id && tab.type === currentPage.type
-      ? { display: 'block' }
+      ? { display: 'block', minHeight: window.innerHeight, paddingTop: 80 }
       : { display: 'none' };
   };
 
@@ -70,7 +70,7 @@ function WorkSpace() {
   }
 
   return (
-    <div className="workSpace">
+    <div className="workSpace" style={{ minHeight: window.innerHeight }}>
       <TabList />
       {tabList && tabList.map((tab) => panelRender(tab))}
     </div>

@@ -5,6 +5,7 @@ import {
   TabListElement,
 } from '../../../../types/renderElement';
 import { PageElement } from '../../../../types/sqlElement';
+import { editorTextToPlaneText } from '../../GlobalMethods';
 
 export default function PreviewTab({ tab }: { tab: TabListElement }) {
   const [page, setPage] = useState<PageElement | null>(null);
@@ -29,8 +30,34 @@ export default function PreviewTab({ tab }: { tab: TabListElement }) {
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        whiteSpace: 'pre-wrap',
+        writingMode: 'vertical-rl',
+        textOrientation: 'upright',
+        maxHeight: `calc(${window.innerHeight}px - 80px)`,
+        overflowX: 'auto',
+        width: '100%',
+        '&::-webkit-scrollbar': {
+          width: '4px',
+          height: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'transparent',
+        },
+        '&:hover::-webkit-scrollbar-thumb': {
+          backgroundColor: '#999',
+        },
+      }}
+    >
       <p>{tab.title}</p>
+      <Box
+        sx={{
+          overflowWrap: 'break-word',
+        }}
+      >
+        {editorTextToPlaneText(JSON.parse(page.content))}
+      </Box>
     </Box>
   );
 }

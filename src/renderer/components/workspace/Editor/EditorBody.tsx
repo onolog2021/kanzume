@@ -159,7 +159,10 @@ function EditorBody({ targetId, page_id, title }) {
   };
 
   return (
-    <div className={`editorBody tiptap-${page_id}`}>
+    <div
+      className={`editorBody tiptap-${page_id}`}
+      style={{ minHeight: `calc(${window.innerHeight}px - 80px)` }}
+    >
       <Box display="grid" gridTemplateColumns="1fr 40px" position="relative">
         {page && (
           <Box

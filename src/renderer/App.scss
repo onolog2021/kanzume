@@ -8,7 +8,6 @@ $dark-base-color-secondary: #5b5b66;
 
 $tab-list-height: 48px;
 $editor-title-height: 48px;
-$editor-body-height: calc(100vh - #{$tab-list-height + $editor-title-height});
 
 $editor-height: (
   'tab-list': $tab-list-height,
@@ -62,7 +61,6 @@ body {
 
 // StartMenu
 .startMenuWrapper {
-  min-height: 100vh;
   min-width: 100vw;
   padding: 24px;
   .logo {
@@ -109,7 +107,6 @@ body {
 }
 
 .advancedSearchProjectWindow {
-  height: 100vh;
   width: 100vw;
   z-index: 100;
   background-color: #80808096;
@@ -137,12 +134,6 @@ body {
   }
 }
 
-// workSpace
-.panel {
-  padding-top: 80px;
-  min-height: 100vh;
-}
-
 // Editor
 .editorPage {
   width: 100%;
@@ -156,10 +147,6 @@ body {
   }
 }
 
-.editorBody {
-  min-height: calc(100vh - 48px);
-}
-
 .editorJS {
   font-size: 1.6rem;
   min-height: map-get($map: $editor-height, $key: editor-body);
@@ -170,7 +157,6 @@ body {
 .workSpace {
   padding: 0 16px;
   width: calc(100vw - 240px);
-  min-height: 100vh;
 }
 
 .editorTools {
@@ -191,7 +177,6 @@ body {
   padding: 16px 16px 60px;
   border-right: 0.5px solid grey;
   width: 240px;
-  height: 100vh;
   overflow-y: auto;
   h1 {
     font-size: 1.2rem;
@@ -326,7 +311,7 @@ $workspace-width: calc(100vw - 240px);
 
 .editorBody {
   .tiptap {
-    min-height: calc(100vh - 80px);
+    min-height: 100%;
     padding-left: var(--editor-padding);
     padding-right: var(--editor-padding);
     .ruby {

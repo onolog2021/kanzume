@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledScrollbarBox = styled(Box)<BoxProps>(({ theme }) => ({
   overflow: 'auto',
-  '&.MuiDrawer-paper': { width: 240, px: 1, minHeight: '100vh' },
+  '&.MuiDrawer-paper': { width: 240, px: 1, minHeight: window.innerHeight },
   '&::-webkit-scrollbar': {
     width: '4px',
   },
