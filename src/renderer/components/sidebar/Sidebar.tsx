@@ -19,7 +19,10 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [openSetting, setOpenSetting] = useState<Boolean>(false);
   const navigate = useNavigate();
 
-  function returnHome() {
+  async function returnHome() {
+    await window.electron.ipcRenderer.invoke('storeRemove', 'project');
+    await window.electron.ipcRenderer.invoke('storeRemove', 'currentPage');
+    await window.electron.ipcRenderer.invoke('storeRemove', 'tabList');
     navigate('/');
   }
 

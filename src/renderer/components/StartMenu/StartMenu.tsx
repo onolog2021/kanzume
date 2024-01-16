@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import CurrentProjects from './CurrentProject';
 import CreateProjectForm from './CreateProjectForm';
 import LogoImage from '../../../../assets/logo.png';
@@ -25,8 +24,20 @@ function StartMenu() {
   const openProject = (id: number) => {
     navigate('/editor', { state: { project_id: id } });
   };
-
   useEffect(() => {
+    async function storedId() {
+      const project = await window.electron.ipcRenderer.invoke(
+        'storeGet',
+        'project'
+      );
+
+      if (project) {
+        navigate('/editor', { state: { project_id: project.id } });
+      }
+    }
+
+    storedId();
+
     async function checkGit(): Promise<void> {
       const result = await window.electron.ipcRenderer.invoke('hasGit?');
       setSnackOpen(!result);

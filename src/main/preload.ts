@@ -40,7 +40,8 @@ export type Channels =
   | 'fetchRecords'
   | 'gitCheckOut'
   | 'fetchAllPagesInFolder'
-  | 'updateBoardBody';
+  | 'updateBoardBody'
+  | 'storeRemove';
 
 const electronHandler = {
   ipcRenderer: {

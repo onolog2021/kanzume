@@ -2,6 +2,13 @@
   "rules": {
     "no-console": "off",
     "global-require": "off",
-    "unused-imports/no-unused-imports": "error"
-  }
+    "unused-imports/no-unused-imports": "error",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended"
+  ]
 }

@@ -1,4 +1,8 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+} from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import StartMenu from './components/StartMenu/StartMenu';
 import Editor from './Editor';

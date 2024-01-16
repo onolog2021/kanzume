@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo,
   ReactNode,
+  useEffect,
 } from 'react';
 import { TabListElement } from '../../types/renderElement';
 
@@ -14,6 +15,35 @@ export const ProjectContext = createContext(null);
 export function ProjectProvider({ children }) {
   const [project, setProject] = useState(null);
 
+  useEffect(() => {
+    async function fetchStoreProject() {
+      try {
+        const storedProject = await window.electron.ipcRenderer.invoke(
+          'storeGet',
+          'project'
+        );
+        if (storedProject) {
+          setProject(project);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stored project:', error);
+      }
+    }
+
+    fetchStoreProject();
+  }, []);
+
+  useEffect(() => {
+    function setProjectId() {
+      const query = { key: 'project', value: project };
+      window.electron.ipcRenderer.sendMessage('storeSet', query);
+    }
+
+    if (project) {
+      setProjectId();
+    }
+  }, [project]);
+
   return (
     <ProjectContext.Provider value={[project, setProject]}>
       {children}
@@ -21,13 +51,18 @@ export function ProjectProvider({ children }) {
   );
 }
 
+// 現在のページ
 export type CurrentPageElement = {
   id: number;
   type: 'board' | 'editor' | 'trash' | 'preview' | null;
   parentId: number | null;
 };
 
-const initialCurrentPage: CurrentPageElement = {
+const exPage = await window.electron.ipcRenderer.invoke(
+  'storeGet',
+  'currentPage'
+);
+const initialCurrentPage: CurrentPageElement = exPage || {
   id: 0,
   type: null,
   parentId: null,
@@ -45,6 +80,17 @@ export function CurrentPageProvider({ children }) {
   const [currentPage, setCurrentPage] =
     useState<CurrentPageElement>(initialCurrentPage);
 
+  useEffect(() => {
+    function setStoreCurrentPage() {
+      const query = { key: 'currentPage', value: currentPage };
+      window.electron.ipcRenderer.sendMessage('storeSet', query);
+    }
+
+    if (currentPage) {
+      setStoreCurrentPage();
+    }
+  }, [currentPage]);
+
   const contextValue = useMemo(
     () => ({
       currentPage,
@@ -60,20 +106,39 @@ export function CurrentPageProvider({ children }) {
   );
 }
 
+// タブリスト
 export const TabListContext = createContext([]);
-
 export function TabListProvider({ children }) {
   const [tabList, setTabList] = useState<TabListElement[]>([]);
 
-  const addTab = useCallback(
-    (newTab: TabListElement) => {
-      // Check for duplication based on tabId
-      if (!tabList.some((tab) => tab.tabId === newTab.tabId)) {
-        setTabList((prevTabs) => [...prevTabs, newTab]);
+  useEffect(() => {
+    async function fetchStoredTabList() {
+      try {
+        const storedTabList = await window.electron.ipcRenderer.invoke(
+          'storeGet',
+          'tabList'
+        );
+        if (storedTabList) {
+          setTabList(storedTabList);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stored tabList:', error);
       }
-    },
-    [tabList]
-  );
+    }
+
+    fetchStoredTabList();
+  }, []);
+
+  useEffect(() => {
+    function storeTabList() {
+      const query = { key: 'tabList', value: tabList };
+      window.electron.ipcRenderer.sendMessage('storeSet', query);
+    }
+
+    if (tabList) {
+      storeTabList();
+    }
+  }, [tabList]);
 
   return (
     <TabListContext.Provider value={[tabList, setTabList]}>

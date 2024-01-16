@@ -69,7 +69,7 @@ export default function EditorTools({
 
   function displayPreview() {
     const tabData: TabListElement = {
-      title: `${page.title}(プレビュー)`,
+      title: `${page.title}【 プレビュー 】`,
       id: page.id,
       type: 'preview',
       tabId: `tab-preview-${page.id}`,
