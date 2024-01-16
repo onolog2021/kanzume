@@ -14,7 +14,7 @@ import { ReactComponent as SettingIcon } from '../../../../assets/gear.svg';
 import ProjectSettingWindow from './ProjectSettingWindow';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
-  const [project, setProject] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [projectTitle, setProjectTitle] = useState();
   const [openSetting, setOpenSetting] = useState<Boolean>(false);
   const navigate = useNavigate();

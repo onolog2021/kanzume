@@ -1,7 +1,7 @@
 export interface TabListElement {
   id: number;
   title: string;
-  type: 'editor' | 'board' | 'trash' | 'preview';
+  type: 'editor' | 'board' | 'trash' | 'preview' | 'history';
   tabId: string;
 }
 

@@ -7,7 +7,7 @@ import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import HistoryItem from './HistoryItem';
 
 export default function HistoryTree({ pageId, selectFunc, selected }) {
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([]);
   const theme = useTheme();

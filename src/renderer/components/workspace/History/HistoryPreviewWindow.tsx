@@ -15,11 +15,11 @@ import { useTheme } from '@mui/material/styles';
 import Confirmation from 'renderer/GlobalComponent/Confirmation';
 import DifferenceOverlay from './DifferenceOverlay';
 import PreviewText from './PreviewText';
-import { ReactComponent as RollbackButton } from '../../../../../../assets/rollback.svg';
-import { ReactComponent as CompareButton } from '../../../../../../assets/compare.svg';
+import { ReactComponent as RollbackButton } from '../../../../../assets/rollback.svg';
+import { ReactComponent as CompareButton } from '../../../../../assets/compare.svg';
 
-export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
-  const [project] = useContext(ProjectContext);
+export default function HistoryPreviewWindow({ pageId, log }) {
+  const { project } = useContext(ProjectContext);
   const [diffText, setDiffText] = useState<[number, string]>([]);
   const [loading, setLoading] = useState(false);
   const [overlayOn, setOverlayOn] = useState(false);
@@ -79,7 +79,11 @@ export default function HistoryPreviewWindow({ pageId, log, toggleStatus }) {
     };
     await window.electron.ipcRenderer.invoke('importText', importQuery);
     setLoading(false);
-    toggleStatus('editor');
+
+    // 確認画面を消す
+    setIsConfirm(false);
+
+    // エディタの更新
   };
 
   const switchOverlayOn = (boolean: Boolean) => {

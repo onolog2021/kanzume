@@ -20,9 +20,9 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
     CreateFormSelectorContext
   );
   const { children } = parentNode;
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const { selectedSidebarItem } = useContext(SidebarSelectedContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const [items, setItems] = useState([]);
   const [parentId, setParentId] = useState<number | null>(null);

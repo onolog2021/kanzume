@@ -8,7 +8,7 @@ import { DndTagElement } from '../../../../types/renderElement';
 function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
   const [isShowInput, setIsShowInput] = useState(false);
   const { setCurrentPage } = useContext(CurrentPageContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
 
   const icon = <PageIcon />;
 

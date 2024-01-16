@@ -12,7 +12,7 @@ import { DndTagElement } from '../../../../types/renderElement';
 function ListItemFolder({ folderData, orderArray, parentId }) {
   const { children } = folderData;
   const folder = new Folder(folderData);
-  const [project, setProject] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [open, setOpen] = useState(false);
   const [hasPage, setHasPage] = useState([]);
   const [isShowInput, setIsShowInput] = useState(false);

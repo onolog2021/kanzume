@@ -10,7 +10,7 @@ interface TrashItem {
 }
 
 function TrashBox() {
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [selectedItem, setSelectedItem] = useState<TrashItem | null>(null);
   const [trashedItems, setTrashedItems] = useState([]);
 
@@ -50,7 +50,9 @@ function TrashBox() {
       setTrashedItems(combinedItems);
     }
 
-    fetchTrashedData();
+    if (project) {
+      fetchTrashedData();
+    }
 
     window.electron.ipcRenderer.on(
       'updateTrashIndex',
@@ -58,7 +60,7 @@ function TrashBox() {
         fetchTrashedData();
       }
     );
-  }, []);
+  }, [project]);
 
   const changeSelectedItem = (item) => {
     setSelectedItem(item);

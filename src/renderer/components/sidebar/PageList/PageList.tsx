@@ -22,11 +22,11 @@ import Node from '../../../Classes/Node';
 type FormStatus = 'page' | 'folder' | null;
 
 function PageList({ root }: { root: Node }) {
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const { selectedSidebarItem } = useContext(SidebarSelectedContext);
   const { setCreateFormSelector } = useContext(CreateFormSelectorContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
   const [newForm, setNewForm] = useState<FormStatus>(null);
   const svg = <PageIcon style={{ fill: '#999' }} />;
 

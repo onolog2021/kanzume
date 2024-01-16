@@ -7,9 +7,10 @@ import TabList from './TabList';
 import NoSpace from './NoSpace';
 import BoardProvider from './Board/BoardProvider';
 import PreviewTab from './Preview/PreviewTab';
+import HistorySpace from './History/HistorySpace';
 
 function WorkSpace() {
-  const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
+  const { tabList, setTabList } = useContext<TabListElement>(TabListContext);
   const { currentPage } = useContext(CurrentPageContext);
 
   const isCurrent = (tab) => {
@@ -57,6 +58,17 @@ function WorkSpace() {
             className="panel"
           >
             <PreviewTab tab={tab} />
+          </div>
+        );
+        break;
+      case 'history':
+        content = (
+          <div
+            style={isCurrent(tab)}
+            key={`history-${tab.id}`}
+            className="panel"
+          >
+            <HistorySpace pageId={tab.id} />
           </div>
         );
         break;

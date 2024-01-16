@@ -8,7 +8,7 @@ import { ReactComponent as QuickLogo } from '../../../../../assets/bookmark.svg'
 import CategoryTitle from '../CategoryTitle';
 
 function QuickAccessArea() {
-  const [project, setProject] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [bookmarks, setBookmarks] = useState([]);
   const [items, setItems] = useState([]);
   const svg = <QuickLogo style={{ fill: '#999' }} />;

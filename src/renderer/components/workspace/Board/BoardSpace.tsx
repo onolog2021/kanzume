@@ -19,7 +19,7 @@ export default function BoardSpace({
 }: {
   boardData: FolderElement;
 }) {
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [board, setBoard] = useState<Board>(boardData);
   const [pages, setPages] = useState<PageElement[]>();
   const [bookmark, setBookmark] = useState<Boolean>(false);

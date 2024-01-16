@@ -22,14 +22,14 @@ import Node from './Classes/Node';
 
 function DragAndDrop() {
   const projectId = useLocation().state?.project_id;
-  const [project, setProject] = useContext(ProjectContext);
+  const { project, setProject } = useContext(ProjectContext);
   const [activeItem, setActiveItem] = useState<DndTagDataElement>();
   const [overItem, setOverItem] = useState<DndTagDataElement>();
   const [pageRoot, setPageRoot] = useState<Node | undefined>();
   const [boards, setBoards] = useState([]);
   const [droppable, setDroppable] = useState<Boolean>(true);
   const timeId = useRef(null);
-  const [tabList, setTablist] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -227,7 +227,7 @@ function DragAndDrop() {
         const matchTab = tabList.find((tab) => tab.tabId === element);
         tmpArray.push(matchTab);
       });
-      setTablist(tmpArray);
+      setTabList(tmpArray);
     }
 
     if (
@@ -318,7 +318,7 @@ function DragAndDrop() {
           )
       ),
     ];
-    setTablist(newTabList);
+    setTabList(newTabList);
   }
 
   return (

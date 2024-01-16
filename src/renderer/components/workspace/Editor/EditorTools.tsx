@@ -17,16 +17,14 @@ import {
 
 export default function EditorTools({
   page,
-  toggleStatus,
   textSetting,
 }: {
   page: PageElement;
-  toggleStatus: any;
   textSetting: any;
 }) {
   const [loading, setLoading] = useState(false);
   const [hasGit, setHasGit] = useState(false);
-  const [tabList, setTabList] = useContext<TabListElement>(TabListContext);
+  const { tabList, addTab } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const theme = useTheme();
 
@@ -46,7 +44,19 @@ export default function EditorTools({
   };
 
   const togglePageStatus = () => {
-    toggleStatus('history');
+    const historyTab: TabListElement = {
+      id: page.id,
+      title: `${page.title}【履歴】`,
+      type: 'history',
+      tabId: `history-${page.id}`,
+    };
+    addTab(historyTab);
+    const pageData: CurrentPageElement = {
+      id: page.id,
+      type: 'history',
+      parentId: null,
+    };
+    setCurrentPage(pageData);
   };
 
   const LoadingComponent = <NowLoading loading={loading} />;
@@ -78,7 +88,7 @@ export default function EditorTools({
       tabList.length === 0 ||
       !tabList.some((item) => item.tabId === tabData.tabId)
     ) {
-      setTabList((prevTabs) => [...prevTabs, tabData]);
+      addTab(tabData);
     }
     const currentQuery: CurrentPageElement = {
       id: page.id,

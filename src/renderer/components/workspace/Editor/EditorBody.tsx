@@ -4,7 +4,6 @@ import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { styled } from '@mui/system';
 import NowLoading from 'renderer/GlobalComponent/NowLoading';
 import { CurrentPageContext, ProjectContext } from '../../Context';
-import HistorySpace from './History/HistorySpace';
 import EditorItem from './EditorItem';
 import EditorTools from './EditorTools';
 import TextSetting from './TextSetting';
@@ -17,9 +16,8 @@ type PageSetting = {
 };
 
 function EditorBody({ targetId, page_id, title }) {
-  const [project, setProject] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
   const [page, setPage] = useState();
-  const [pageStatus, setPageStatus] = useState<'editor' | 'history'>('editor');
   const titleRef = useRef();
   const [fontSize, setFontSize] = useState<number | undefined>();
   const [fontFamily, setFontFamily] = useState<string | undefined>();
@@ -77,7 +75,7 @@ function EditorBody({ targetId, page_id, title }) {
     }
 
     setPageData();
-  }, [pageStatus, defaultSetting]);
+  }, [defaultSetting]);
 
   useEffect(() => {
     if (
@@ -93,10 +91,6 @@ function EditorBody({ targetId, page_id, title }) {
       );
     }
   }, [currentPage, contentWidth]);
-
-  const toggleStatus = (status) => {
-    setPageStatus(status);
-  };
 
   const saveTitle = async () => {
     const title = titleRef.current.value;
@@ -116,10 +110,6 @@ function EditorBody({ targetId, page_id, title }) {
 
   if (!project) {
     return <NowLoading loading={loading} />;
-  }
-
-  if (pageStatus === 'history') {
-    return <HistorySpace pageId={page.id} toggleStatus={toggleStatus} />;
   }
 
   const changeFontSize = (size: number) => {
@@ -190,11 +180,7 @@ function EditorBody({ targetId, page_id, title }) {
             <EditorItem page={page} isCount />
           </Box>
         )}
-        <EditorTools
-          page={page}
-          toggleStatus={toggleStatus}
-          textSetting={textSetting}
-        />
+        <EditorTools page={page} textSetting={textSetting} />
       </Box>
     </div>
   );

@@ -18,11 +18,12 @@ import { ReactComponent as PageIcon } from '../../../../assets/paper.svg';
 import { ReactComponent as BoardIcon } from '../../../../assets/board.svg';
 import { ReactComponent as TrashIcon } from '../../../../assets/trash.svg';
 import { ReactComponent as PreviewIcon } from '../../../../assets/preview.svg';
+import { ReactComponent as HistoryIcon } from '../../../../assets/history.svg';
 
 function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
   const { currentPage, setCurrentPage } = useContext(CurrentPageContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
   const [isActive, setIsActive] = useState<Boolean>(false);
   const theme = useTheme();
 
@@ -33,6 +34,8 @@ function TabItem({ tab, orderArray }) {
     svg = <BoardIcon />;
   } else if (tab.type === 'preview') {
     svg = <PreviewIcon />;
+  } else if (tab.type === 'history') {
+    svg = <HistoryIcon />;
   } else {
     svg = <TrashIcon />;
   }

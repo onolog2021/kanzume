@@ -3,14 +3,22 @@
 import React, {
   useState,
   createContext,
-  useCallback,
   useMemo,
   ReactNode,
   useEffect,
+  useCallback,
 } from 'react';
 import { TabListElement } from '../../types/renderElement';
+import { ProjectElement } from '../../types/sqlElement';
 
-export const ProjectContext = createContext(null);
+// プロジェクト
+export const ProjectContext = createContext<{
+  project: ProjectElement | undefined;
+  setProject: React.Dispatch<React.SetStateAction<ProjectElement>>;
+}>({
+  project: undefined,
+  setProject: () => {},
+});
 
 export function ProjectProvider({ children }) {
   const [project, setProject] = useState(null);
@@ -23,7 +31,7 @@ export function ProjectProvider({ children }) {
           'project'
         );
         if (storedProject) {
-          setProject(project);
+          setProject(storedProject);
         }
       } catch (error) {
         console.error('Failed to fetch stored project:', error);
@@ -44,8 +52,16 @@ export function ProjectProvider({ children }) {
     }
   }, [project]);
 
+  const contextValue = useMemo(
+    () => ({
+      project,
+      setProject,
+    }),
+    [project, setProject]
+  );
+
   return (
-    <ProjectContext.Provider value={[project, setProject]}>
+    <ProjectContext.Provider value={contextValue}>
       {children}
     </ProjectContext.Provider>
   );
@@ -54,7 +70,7 @@ export function ProjectProvider({ children }) {
 // 現在のページ
 export type CurrentPageElement = {
   id: number;
-  type: 'board' | 'editor' | 'trash' | 'preview' | null;
+  type: 'board' | 'editor' | 'trash' | 'preview' | 'history' | null;
   parentId: number | null;
 };
 
@@ -107,7 +123,14 @@ export function CurrentPageProvider({ children }) {
 }
 
 // タブリスト
-export const TabListContext = createContext([]);
+export const TabListContext = createContext<{
+  tabList: TabListElement[];
+  setTabList: React.Dispatch<React.SetStateAction<TabListElement[]>>;
+}>({
+  tabList: [],
+  setTabList: () => {},
+});
+
 export function TabListProvider({ children }) {
   const [tabList, setTabList] = useState<TabListElement[]>([]);
 
@@ -140,13 +163,39 @@ export function TabListProvider({ children }) {
     }
   }, [tabList]);
 
+  const addTab = useCallback((newTab: TabListElement) => {
+    if (
+      tabList.length === 0 ||
+      !tabList.some((item) => item.tabId === newTab.tabId)
+    ) {
+      setTabList((prevTabList) => [...prevTabList, newTab]);
+    }
+  }, []);
+
+  const removeTab = useCallback((tabToRemove: TabListElement) => {
+    setTabList((prevTabList) =>
+      prevTabList.filter((tab) => tab.tabId !== tabToRemove.tabId)
+    );
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      tabList,
+      setTabList,
+      addTab,
+      removeTab,
+    }),
+    [tabList, setTabList, addTab, removeTab]
+  );
+
   return (
-    <TabListContext.Provider value={[tabList, setTabList]}>
+    <TabListContext.Provider value={contextValue}>
       {children}
     </TabListContext.Provider>
   );
 }
 
+// カラムの大きさ
 export type ColumnsStateElement = {
   fullWidth: number;
   columns: number;

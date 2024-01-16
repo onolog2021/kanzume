@@ -10,7 +10,7 @@ import { DndTagElement } from '../../../../types/renderElement';
 
 function BoadItem({ board, orderArray, bookmark }) {
   const { setCurrentPage } = useContext(CurrentPageContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { tabList, setTabList } = useContext(TabListContext);
   const [isShowInput, setIsShowInput] = useState(false);
 
   let dndTag: DndTagElement;

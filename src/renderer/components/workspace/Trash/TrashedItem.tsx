@@ -18,7 +18,7 @@ import { ReactComponent as TrashButton } from '../../../../../assets/trash.svg';
 
 function TrashedItem({ item, setSelectedItem }) {
   const { id, title } = item;
-  const [project] = useContext(ProjectContext);
+  const { project } = useContext(ProjectContext);
 
   let icon;
   if (item.type) {

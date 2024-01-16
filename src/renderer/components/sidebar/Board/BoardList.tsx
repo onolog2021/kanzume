@@ -20,8 +20,8 @@ import {
 } from '../../../../types/renderElement';
 
 function BoardList({ boards }) {
-  const [project] = useContext(ProjectContext);
-  const [tabList, setTabList] = useContext(TabListContext);
+  const { project } = useContext(ProjectContext);
+  const { setTabList } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
   const [orderArray, setOrderArray] = useState();
