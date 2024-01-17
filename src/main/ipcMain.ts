@@ -910,7 +910,6 @@ ipcMain.handle('getFonts', async () => {
 
 ipcMain.on('storeSet', (event, storePare) => {
   const { key, value } = storePare;
-  console.log(storePare);
   store.set(key, value);
 });
 
@@ -946,7 +945,6 @@ ipcMain.handle('fetchAllPagesInFolder', (event, idArray: number[]) => {
 
 ipcMain.handle('storeRemove', (event, key: string) => {
   if (store.has(key)) {
-    console.log(key);
     store.delete(key);
   }
   return true;

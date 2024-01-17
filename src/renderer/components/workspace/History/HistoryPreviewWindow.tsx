@@ -1,7 +1,7 @@
 import { Button, Box, Tooltip, Typography } from '@mui/material';
 import { profile } from 'console';
 import { useContext, useEffect, useState } from 'react';
-import { ProjectContext } from 'renderer/components/Context';
+import { ProjectContext, TabListContext } from 'renderer/components/Context';
 import {
   editorTextToPlaneText,
   gitDiffParse,
@@ -17,9 +17,11 @@ import DifferenceOverlay from './DifferenceOverlay';
 import PreviewText from './PreviewText';
 import { ReactComponent as RollbackButton } from '../../../../../assets/rollback.svg';
 import { ReactComponent as CompareButton } from '../../../../../assets/compare.svg';
+import { TabListElement } from '../../../../types/renderElement';
 
 export default function HistoryPreviewWindow({ pageId, log }) {
   const { project } = useContext(ProjectContext);
+  const { addTab, removeTab } = useContext(TabListContext);
   const [diffText, setDiffText] = useState<[number, string]>([]);
   const [loading, setLoading] = useState(false);
   const [overlayOn, setOverlayOn] = useState(false);
@@ -82,8 +84,6 @@ export default function HistoryPreviewWindow({ pageId, log }) {
 
     // 確認画面を消す
     setIsConfirm(false);
-
-    // エディタの更新
   };
 
   const switchOverlayOn = (boolean: Boolean) => {

@@ -10,7 +10,7 @@ import PreviewTab from './Preview/PreviewTab';
 import HistorySpace from './History/HistorySpace';
 
 function WorkSpace() {
-  const { tabList, setTabList } = useContext<TabListElement>(TabListContext);
+  const { tabList } = useContext<TabListElement>(TabListContext);
   const { currentPage } = useContext(CurrentPageContext);
 
   const isCurrent = (tab) => {

@@ -3,6 +3,7 @@ import { Drawer, Box, Typography, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PlaneIconButton from 'renderer/GlobalComponent/PlaneIconButton';
 import NowLoading from 'renderer/GlobalComponent/NowLoading';
+import { useTheme } from '@emotion/react';
 import {
   CreateFormSelectorProvider,
   ProjectContext,
@@ -11,6 +12,7 @@ import {
 import OpenTrashBoxButton from './TrashBox/OpenTrashBoxButton';
 import LogoImage from '../../../../assets/logo.png';
 import { ReactComponent as SettingIcon } from '../../../../assets/gear.svg';
+import { ReactComponent as HomeIcon } from '../../../../assets/home.svg';
 import ProjectSettingWindow from './ProjectSettingWindow';
 
 function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
@@ -18,6 +20,7 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
   const [projectTitle, setProjectTitle] = useState();
   const [openSetting, setOpenSetting] = useState<Boolean>(false);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   async function returnHome() {
     await window.electron.ipcRenderer.invoke('storeRemove', 'project');
@@ -70,19 +73,10 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
         }}
       >
         <Box sx={{ mb: '40px' }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Tooltip title="スタートメニュー" placement="bottom">
               <PlaneIconButton onClick={() => returnHome()} sx={{ p: 0 }}>
-                <img
-                  src={LogoImage}
-                  alt="logo"
-                  className="logo"
-                  style={{
-                    margin: '0 auto',
-                    display: 'block',
-                    width: 24,
-                  }}
-                />
+                <HomeIcon width={18} fill={theme.palette.primary.main} />
               </PlaneIconButton>
             </Tooltip>
             <Typography
