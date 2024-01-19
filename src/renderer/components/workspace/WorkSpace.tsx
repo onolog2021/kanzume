@@ -1,7 +1,6 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { TabListContext, CurrentPageContext, TabListElement } from '../Context';
 import EditorBody from './Editor/EditorBody';
-import BoardSpace from './Board/BoardSpace';
 import TrashBox from './Trash/TrashBox';
 import TabList from './TabList';
 import NoSpace from './NoSpace';
@@ -12,22 +11,36 @@ import HistorySpace from './History/HistorySpace';
 function WorkSpace() {
   const { tabList } = useContext<TabListElement>(TabListContext);
   const { currentPage } = useContext(CurrentPageContext);
+  const [panel, setPanel] = useState();
+  const noSpace = <NoSpace />;
 
-  const isCurrent = (tab) => {
-    if (currentPage === null) {
+  // 現在表示中のタブ
+  useEffect(() => {
+    if (!currentPage) {
+      setPanel(noSpace);
       return;
     }
-    return tab.id === currentPage.id && tab.type === currentPage.type
-      ? { display: 'block', minHeight: window.innerHeight, paddingTop: 80 }
-      : { display: 'none' };
+    const nowTab = tabList.find(
+      (item) => item.id === currentPage.id && item.type === currentPage.type
+    );
+    if (nowTab) {
+      const tmp = panelRender(nowTab);
+      setPanel(tmp);
+    }
+  }, [currentPage, tabList]);
+
+  const panelStyle = {
+    display: 'block',
+    minHeight: window.innerHeight,
+    paddingTop: 80,
   };
 
-  const panelRender = (tab) => {
+  function panelRender(tab) {
     let content;
     switch (tab.type) {
       case 'editor':
         content = (
-          <div style={isCurrent(tab)} key={`page-${tab.id}`} className="panel">
+          <div style={panelStyle} key={`page-${tab.id}`} className="panel">
             <EditorBody
               targetId={tab.tabId}
               page_id={tab.id}
@@ -38,36 +51,28 @@ function WorkSpace() {
         break;
       case 'board':
         content = (
-          <div style={isCurrent(tab)} key={`board-${tab.id}`} className="panel">
+          <div style={panelStyle} key={`board-${tab.id}`} className="panel">
             <BoardProvider tab={tab} />
           </div>
         );
         break;
       case 'trash':
         content = (
-          <div style={isCurrent(tab)} key="trash-box" className="panel">
+          <div style={panelStyle} key="trash-box" className="panel">
             <TrashBox />
           </div>
         );
         break;
       case 'preview':
         content = (
-          <div
-            style={isCurrent(tab)}
-            key={`preview-${tab.id}`}
-            className="panel"
-          >
+          <div style={panelStyle} key={`preview-${tab.id}`} className="panel">
             <PreviewTab tab={tab} />
           </div>
         );
         break;
       case 'history':
         content = (
-          <div
-            style={isCurrent(tab)}
-            key={`history-${tab.id}`}
-            className="panel"
-          >
+          <div style={panelStyle} key={`history-${tab.id}`} className="panel">
             <HistorySpace pageId={tab.id} />
           </div>
         );
@@ -75,16 +80,17 @@ function WorkSpace() {
       default:
     }
     return content;
-  };
+  }
 
   if (tabList && tabList.length === 0) {
-    return <NoSpace />;
+    return <>{noSpace}</>;
   }
 
   return (
     <div className="workSpace" style={{ minHeight: window.innerHeight }}>
       <TabList />
-      {tabList && tabList.map((tab) => panelRender(tab))}
+      {panel && panel}
+      {/* {tabList && tabList.map((tab) => panelRender(tab))} */}
     </div>
   );
 }
