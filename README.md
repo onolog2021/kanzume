@@ -18,14 +18,14 @@
 
 # 利用方法
 
-1.最新リリースから Kanzume-setup.exe ファイルをダウンロードして実行してください。<br>
-[▶ 最新リリース](https://github.com/onolog2021/kanzume/releases/latest)<br>
+1. 最新リリースから Kanzume-setup.exe ファイルをダウンロードして実行してください。<br>
+   [▶ 最新リリース](https://github.com/onolog2021/kanzume/releases/latest)<br>
 
-2.ダウンロードファイルを実行  
-※ 機能を全て使うためには Git という機能が必要です。(無料)<br>
-[▶ Git の導入方法](https://note.com/onolog_review/n/ne20e938d8a3b)
+2. ダウンロードファイルを実行  
+   ※ 機能を全て使うためには Git という機能が必要です。(無料)<br>
+   [▶ Git の導入方法](https://note.com/onolog_review/n/ne20e938d8a3b)
 
-# ライセンス
+## ライセンス
 
 MIT です。再配布・改造など自由にしていただいて構いません。<br>
 
