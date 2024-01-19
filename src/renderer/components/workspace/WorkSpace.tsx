@@ -90,7 +90,6 @@ function WorkSpace() {
     <div className="workSpace" style={{ minHeight: window.innerHeight }}>
       <TabList />
       {panel && panel}
-      {/* {tabList && tabList.map((tab) => panelRender(tab))} */}
     </div>
   );
 }
