@@ -1,4 +1,4 @@
-![イメージ](Videotogif.gif)
+![イメージ](image.jpg)
 
 # KANZUME エディタとは
 
