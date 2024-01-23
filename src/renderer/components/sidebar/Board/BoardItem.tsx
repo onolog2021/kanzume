@@ -10,7 +10,7 @@ import { DndTagElement } from '../../../../types/renderElement';
 
 function BoadItem({ board, orderArray, bookmark }) {
   const { setCurrentPage } = useContext(CurrentPageContext);
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { addTab } = useContext(TabListContext);
   const [isShowInput, setIsShowInput] = useState(false);
 
   let dndTag: DndTagElement;
@@ -50,12 +50,7 @@ function BoadItem({ board, orderArray, bookmark }) {
       tabId: `tab-board-${board.id}`,
       parentId: board.id,
     };
-    if (
-      tabList.length === 0 ||
-      !tabList.some((item) => item.tabId === value.tabId)
-    ) {
-      await setTabList((prevTabs) => [...prevTabs, value]);
-    }
+    addTab(value);
   }
 
   const showInput = () => {

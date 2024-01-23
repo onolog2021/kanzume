@@ -23,6 +23,7 @@ import Node from './Classes/Node';
 function DragAndDrop() {
   const projectId = useLocation().state?.project_id;
   const { project, setProject } = useContext(ProjectContext);
+  const [projectInstance, setProjectInstance] = useState();
   const [activeItem, setActiveItem] = useState<DndTagDataElement>();
   const [overItem, setOverItem] = useState<DndTagDataElement>();
   const [pageRoot, setPageRoot] = useState<Node | undefined>();
@@ -53,13 +54,13 @@ function DragAndDrop() {
   // 他コンポーネントからの更新要請の処理。
   useEffect(() => {
     window.electron.ipcRenderer.on('updatePageList', () => {
-      if (project) {
-        updatePageList(project);
+      if (projectInstance) {
+        updatePageList(projectInstance);
       }
     });
     window.electron.ipcRenderer.on('updateBoardList', () => {
-      if (project) {
-        updateBoardList(project);
+      if (projectInstance) {
+        updateBoardList(projectInstance);
       }
     });
   }, [project]);
@@ -76,6 +77,7 @@ function DragAndDrop() {
         query
       );
       const currentProject = new Project(projectData);
+      setProjectInstance(currentProject);
       setProject(currentProject);
       const currentTime = getCurrentTime();
       query.columns = {

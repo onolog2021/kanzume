@@ -8,7 +8,7 @@ import { DndTagElement } from '../../../../types/renderElement';
 function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
   const [isShowInput, setIsShowInput] = useState(false);
   const { setCurrentPage } = useContext(CurrentPageContext);
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { tabList, addTab, removeTab } = useContext(TabListContext);
 
   const icon = <PageIcon />;
 
@@ -48,11 +48,7 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
       type: 'editor',
       tabId: `tab-editor-${pageData.id}`,
     };
-    if (
-      !tabList.some((item) => item.id === value.id && item.type === 'editor')
-    ) {
-      setTabList((prevTabs) => [...prevTabs, value]);
-    }
+    addTab(value);
     setCurrentPage({
       id: pageData.id,
       type: 'editor',
@@ -71,15 +67,12 @@ function ListItemPage({ pageData, orderArray, bookmark, parentId }) {
     window.electron.ipcRenderer.sendMessage('eventReply', 'updatePageList');
     window.electron.ipcRenderer.sendMessage('eventReply', 'updateQuickArea');
 
-    if (
-      tabList.some((item) => item.id === pageData.id && item.type === 'editor')
-    ) {
-      console.log('hi');
-      setTabList((prevTabs) =>
-        prevTabs.filter(
-          (tab) => !(tab.id === pageData.id && tab.type === 'editor')
-        )
-      );
+    const deleteTab = tabList.find(
+      (item) => item.id === pageData.id && item.type === 'editor'
+    );
+    if (deleteTab) {
+      console.log(deleteTab);
+      removeTab(deleteTab);
     }
   };
 

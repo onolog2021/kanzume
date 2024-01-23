@@ -183,6 +183,10 @@ const createWindow = async () => {
   const version = app.getVersion();
   store.set('version', version);
 
+  // Gitの確認
+  const hasGit = await checkGit();
+  store.set('Git', hasGit);
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', async () => {
@@ -199,9 +203,6 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
-
-    const hasGit = await checkGit();
-    store.set('Git', hasGit);
   });
 
   mainWindow.on('close', () => {

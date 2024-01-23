@@ -62,7 +62,7 @@ function StartMenu() {
   const toGit = () => {
     window.electron.ipcRenderer.sendMessage(
       'openURL',
-      'https://git-scm.com/downloads'
+      'https://note.com/onolog_review/n/ne20e938d8a3b'
     );
   };
 
@@ -91,7 +91,7 @@ function StartMenu() {
   };
 
   return (
-    <Box className="startMenuWrapper" sx={{ minHeight: window.innerHeight }}>
+    <Box className="startMenuWrapper" sx={{ minHeight: '100vh' }}>
       <ListItemButton
         sx={{
           position: 'absolute',

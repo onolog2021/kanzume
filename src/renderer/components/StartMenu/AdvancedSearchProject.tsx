@@ -36,10 +36,7 @@ function AdvancedSearchProject({ projects, handleClick }) {
         一覧表示
       </Button>
       {visible ? (
-        <div
-          className="advancedSearchProjectWindow"
-          style={{ height: window.innerHeight }}
-        >
+        <div className="advancedSearchProjectWindow" style={{ height: '100%' }}>
           <ClickAwayListener onClickAway={switchVisible}>
             <div className="windowContent">
               <h1>プロジェクト一覧</h1>

@@ -59,7 +59,6 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
           '& .MuiDrawer-paper': {
             width: 240,
             px: 1,
-            minHeight: window.innerHeight,
           },
           '& ::-webkit-scrollbar': {
             width: '2px',

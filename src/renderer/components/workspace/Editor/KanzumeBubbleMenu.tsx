@@ -18,6 +18,12 @@ export default function KanzumeBubbleMenu({ editor }) {
     border: '.2px solid gray',
   };
 
+  const buttonContentStyle = {
+    width: 16,
+    height: 16,
+    fill: theme.palette.mode === 'dark' ? 'white' : '#333',
+  };
+
   const menuMap = {
     ruby: <RubyForm editor={editor} closeMenu={closeMenu} />,
   };
@@ -56,10 +62,10 @@ export default function KanzumeBubbleMenu({ editor }) {
           style={buttonStyle}
           onClick={() => editor.chain().toggleBold().focus().run()}
         >
-          <BoldIcon style={{ width: 16, height: 16 }} />
+          <BoldIcon style={buttonContentStyle} />
         </IconButton>
         <IconButton style={buttonStyle} onClick={() => menuToggle('ruby')}>
-          <RubyIcon style={{ width: 16, height: 16 }} />
+          <RubyIcon style={buttonContentStyle} />
         </IconButton>
       </Box>
     </Box>

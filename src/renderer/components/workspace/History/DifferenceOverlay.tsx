@@ -79,7 +79,7 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
                 ? theme.palette.primary.dark
                 : 'white',
             width: '80vw',
-            height: window.innerHeight,
+            height: '100vh',
             m: 'auto',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',

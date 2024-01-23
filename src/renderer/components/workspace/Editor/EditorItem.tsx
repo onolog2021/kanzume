@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Editor, markPasteRule } from '@tiptap/core';
 import { EditorContent, BubbleMenu } from '@tiptap/react';
 import Bold from '@tiptap/extension-bold';
-import Strike from '@tiptap/extension-strike';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';

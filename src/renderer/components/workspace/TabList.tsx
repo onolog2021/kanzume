@@ -12,7 +12,7 @@ import { ReactComponent as TrackButton } from '../../../../assets/expand.svg';
 
 function TabList() {
   const [orderArray, setOrderArray] = useState();
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { tabList } = useContext(TabListContext);
   const tabListRef = useRef(null);
   const theme = useTheme();
 

@@ -22,7 +22,7 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
   const { children } = parentNode;
   const { project } = useContext(ProjectContext);
   const { selectedSidebarItem } = useContext(SidebarSelectedContext);
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { addTab } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const [items, setItems] = useState([]);
   const [parentId, setParentId] = useState<number | null>(null);
@@ -93,10 +93,7 @@ export default function TreeBranch({ parentNode }: { parentNode: Node }) {
       type: 'editor',
       tabId: `tab-editor-${newId}`,
     };
-    setTabList((prevList) => {
-      prevList.push(newTab);
-      return prevList;
-    });
+    addTab(newTab);
     setCurrentPage({ id: newId, type: 'editor' });
   };
 

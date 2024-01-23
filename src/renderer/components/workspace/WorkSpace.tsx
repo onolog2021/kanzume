@@ -41,11 +41,7 @@ function WorkSpace() {
       case 'editor':
         content = (
           <div style={panelStyle} key={`page-${tab.id}`} className="panel">
-            <EditorBody
-              targetId={tab.tabId}
-              page_id={tab.id}
-              title={tab.title}
-            />
+            <EditorBody page_id={tab.id} />
           </div>
         );
         break;

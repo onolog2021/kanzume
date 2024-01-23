@@ -21,7 +21,7 @@ import {
 
 function BoardList({ boards }) {
   const { project } = useContext(ProjectContext);
-  const { setTabList } = useContext(TabListContext);
+  const { addTab } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
   const [formDisplay, setFormDisplay] = useState(null);
   const [orderArray, setOrderArray] = useState();
@@ -59,16 +59,13 @@ function BoardList({ boards }) {
     );
 
     window.electron.ipcRenderer.sendMessage('updateBoardList', project.id);
-    const value: TabListElement = {
+    const newTab: TabListElement = {
       id: newId,
       tabId: `tab-board-${newId}`,
       title,
       type: 'board',
     };
-    setTabList((prevTab) => {
-      prevTab.push(value);
-      return prevTab;
-    });
+    addTab(newTab);
     const current = { id: newId, type: 'board', parentId: null };
     setCurrentPage(current);
   };

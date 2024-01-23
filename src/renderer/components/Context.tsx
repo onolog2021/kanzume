@@ -7,6 +7,7 @@ import React, {
   ReactNode,
   useEffect,
   useCallback,
+  useContext,
 } from 'react';
 import { TabListElement } from '../../types/renderElement';
 import { ProjectElement } from '../../types/sqlElement';
@@ -163,20 +164,27 @@ export function TabListProvider({ children }) {
     }
   }, [tabList]);
 
-  const addTab = useCallback((newTab: TabListElement) => {
-    if (
-      tabList.length === 0 ||
-      !tabList.some((item) => item.tabId === newTab.tabId)
-    ) {
-      setTabList((prevTabList) => [...prevTabList, newTab]);
-    }
-  }, []);
+  const addTab = useCallback(
+    (newTab: TabListElement) => {
+      if (
+        tabList.length === 0 ||
+        !tabList.some((item) => item.tabId === newTab.tabId)
+      ) {
+        console.log(tabList);
+        setTabList((prevTabList) => [...prevTabList, newTab]);
+      }
+    },
+    [tabList]
+  );
 
-  const removeTab = useCallback((tabToRemove: TabListElement) => {
-    setTabList((prevTabList) =>
-      prevTabList.filter((tab) => tab.tabId !== tabToRemove.tabId)
-    );
-  }, []);
+  const removeTab = useCallback(
+    (tabToRemove: TabListElement) => {
+      setTabList((prevTabList) =>
+        prevTabList.filter((tab) => tab.tabId !== tabToRemove.tabId)
+      );
+    },
+    [tabList]
+  );
 
   const contextValue = useMemo(
     () => ({

@@ -23,7 +23,7 @@ import { ReactComponent as HistoryIcon } from '../../../../assets/history.svg';
 function TabItem({ tab, orderArray }) {
   const { id, tabId } = tab;
   const { currentPage, setCurrentPage } = useContext(CurrentPageContext);
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { tabList, removeTab } = useContext(TabListContext);
   const [isActive, setIsActive] = useState<Boolean>(false);
   const theme = useTheme();
 
@@ -70,12 +70,8 @@ function TabItem({ tab, orderArray }) {
 
   const closeTab = (event) => {
     event.stopPropagation();
-    const closedTabIndex = tabList.findIndex(
-      (item) => item.tabId === tab.tabId
-    );
-    const newTabList = [...tabList];
-    newTabList.splice(closedTabIndex, 1);
-    setTabList(newTabList);
+    const targetTab = tabList.find((item) => item.tabId === tabId);
+    removeTab(targetTab);
     if (isActive) {
       setCurrentPage(null);
     }

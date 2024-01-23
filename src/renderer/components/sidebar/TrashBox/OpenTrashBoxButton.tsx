@@ -10,7 +10,7 @@ import { ReactComponent as TraxhBoxIcon } from '../../../../../assets/trash.svg'
 
 function OpenTrashBoxButton() {
   const theme = useTheme();
-  const { tabList, setTabList } = useContext(TabListContext);
+  const { tabList, addTab } = useContext(TabListContext);
   const { setCurrentPage } = useContext(CurrentPageContext);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -19,14 +19,14 @@ function OpenTrashBoxButton() {
   });
 
   const addTabList = () => {
-    const value = {
+    const newTab = {
       id: 0,
       title: '',
       type: 'trash',
       tabId: 'tab-trash',
     };
     if (!tabList.some((item) => item.type === 'trash')) {
-      setTabList((prevTabs) => [...prevTabs, value]);
+      addTab(newTab);
     }
     setCurrentPage({ id: 0, type: 'trash' });
   };

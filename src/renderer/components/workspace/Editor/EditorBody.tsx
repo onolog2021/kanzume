@@ -15,7 +15,7 @@ type PageSetting = {
   lineHeight: number;
 };
 
-function EditorBody({ targetId, page_id, title }) {
+function EditorBody({ page_id }) {
   const { project } = useContext(ProjectContext);
   const [page, setPage] = useState();
   const titleRef = useRef();
@@ -160,6 +160,7 @@ function EditorBody({ targetId, page_id, title }) {
               fontSize,
               fontFamily,
               lineHeight,
+              pb: 8,
             }}
           >
             <PlaneTextField
