@@ -105,6 +105,7 @@ function SideBar({ project_id, pageList, boardList, quickAccessArea }) {
               title={projectTitle}
               changeTitlte={changeTitlte}
               project={project}
+              returnHomeFunc={() => returnHome()}
             />
           )}
 

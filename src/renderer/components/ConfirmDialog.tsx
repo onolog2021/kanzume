@@ -8,11 +8,21 @@ import {
   DialogActions,
 } from '@mui/material';
 
-export default function ConfirmDialog({open, agreeAction}) {
+export default function ConfirmDialog({ open, agreeAction, title, content }): {
+  open: boolean;
+  agreeAction: void;
+  title: string;
+  content: string;
+} {
   const [isOpen, setIsOpen] = useState(open);
 
   const handleClose = () => {
-    setIsOpen(false)
+    setIsOpen(false);
+  };
+
+  function execAgreeAction() {
+    handleClose();
+    agreeAction();
   }
 
   return (
@@ -22,20 +32,17 @@ export default function ConfirmDialog({open, agreeAction}) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
-        Use Google's location service?
-      </DialogTitle>
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Let Google help apps determine location. This means sending anonymous
-          location data to Google, even when no apps are running.
+          {content}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Disagree</Button>
-        <Button onClick={handleClose} autoFocus>
-          Agree
+        <Button onClick={() => execAgreeAction()} autoFocus>
+          はい
         </Button>
+        <Button onClick={handleClose}>いいえ</Button>
       </DialogActions>
     </Dialog>
   );
