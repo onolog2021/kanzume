@@ -89,6 +89,11 @@ function EditorBody({ page_id }) {
         '--editor-padding',
         paddingWidth
       );
+      // const bottomHeight = window.innerHeight - 300;
+      // document.documentElement.style.setProperty(
+      //   '--editor-bottom',
+      //   `${bottomHeight}px`
+      // );
     }
   }, [currentPage, contentWidth]);
 

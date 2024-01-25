@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Board from 'renderer/Classes/Board';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  IconButton,
+  Switch,
+  Tooltip,
+} from '@mui/material';
 import { ProjectContext, ColumnsContext } from 'renderer/components/Context';
 import PlaneTextField from 'renderer/GlobalComponent/PlaneTextField';
 import { useTheme } from '@mui/material/styles';
@@ -54,6 +60,17 @@ export default function BoardSpace({
 
       initialBoard(newData);
     });
+
+    // リサイズ処理
+    const handleResize = () => {
+      const width = titleRef.current.offsetWidth;
+      const tmpState = { ...columnsState, fullWidth: width };
+      setColumnsState(tmpState);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -65,6 +82,7 @@ export default function BoardSpace({
   }, [titleRef?.current]);
 
   const addText = async () => {
+    // ページデータ作成
     const query: InsertRecordQuery<'page'> = {
       table: 'page',
       columns: {
@@ -77,7 +95,9 @@ export default function BoardSpace({
       'insertRecord',
       query
     );
-    const length = pages ? pages.length * -1 : -1;
+
+    // 紐づけデータ作成
+    const length = pages ? pages.length : -1;
     const storeQuery: InsertRecordQuery<'store'> = {
       table: 'store',
       columns: {
@@ -87,6 +107,8 @@ export default function BoardSpace({
       },
     };
     await window.electron.ipcRenderer.invoke('insertRecord', storeQuery);
+
+    // 更新
     await initialBoard(boardData);
   };
 

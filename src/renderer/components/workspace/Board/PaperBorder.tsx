@@ -30,6 +30,19 @@ export default function PaperBorder({ boardId, index, orderArray }) {
     background: isOver ? theme.palette.primary.main : 'transparent',
   };
 
+  if (orderArray && orderArray.length < 1) {
+    return (
+      <Box
+        ref={setNodeRef}
+        sx={{
+          width: '100%',
+          minHeight: '300px',
+          background: isOver ? theme.palette.primary.main : 'transparent',
+        }}
+      />
+    );
+  }
+
   return (
     <Box
       ref={setNodeRef}

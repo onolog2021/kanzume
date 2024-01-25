@@ -170,7 +170,6 @@ export function TabListProvider({ children }) {
         tabList.length === 0 ||
         !tabList.some((item) => item.tabId === newTab.tabId)
       ) {
-        console.log(tabList);
         setTabList((prevTabList) => [...prevTabList, newTab]);
       }
     },
@@ -207,11 +206,13 @@ export function TabListProvider({ children }) {
 export type ColumnsStateElement = {
   fullWidth: number;
   columns: number;
+  newHeight: number;
 };
 
 const initialColumnsState: ColumnsStateElement = {
   fullWidth: 0,
   columns: 0,
+  newHeight: 0,
 };
 
 export const ColumnsContext = createContext<{

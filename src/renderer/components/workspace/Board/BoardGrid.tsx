@@ -1,5 +1,5 @@
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Box } from '@mui/material';
 import Boardpage from './BoardPage';
 import PaperBorder from './PaperBorder';
@@ -36,8 +36,10 @@ function BoardGrid({
   return (
     <Box ref={setNodeRef}>
       <Box
+        className="test"
         ref={sizeRef}
         sx={{
+          width: '100%',
           display: 'flex',
           flexShrink: 0,
           flexWrap: 'wrap',
@@ -62,7 +64,6 @@ function BoardGrid({
                 boardId={board.id}
                 index={pages.length}
                 orderArray={orderArray}
-                activeId={activeId}
               />
             )}
           </SortableContext>

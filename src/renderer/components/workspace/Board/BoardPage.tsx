@@ -7,12 +7,14 @@ import { useTheme } from '@mui/material/styles';
 import StyledScrollbarBox from 'renderer/GlobalComponent/StyledScrollbarBox';
 import EditorItem from '../Editor/EditorItem';
 import { ReactComponent as HandleIcon } from '../../../../../assets/handle-dot.svg';
+import { ReactComponent as DeleteIcon } from '../../../../../assets/times.svg';
 import { PageElement } from '../../../../types/sqlElement';
 import { ColumnsContext, calcItemWidth } from '../../Context';
 import {
   DndTagDataElement,
   DndTagElement,
 } from '../../../../types/renderElement';
+import PlaneIconButton from '../../../GlobalComponent/PlaneIconButton';
 
 interface PaperSize {
   width: number;
@@ -34,35 +36,14 @@ function Boardpage({
 
   const [paperSize, setPaperSize] = useState<PaperSize>(basicSize);
   const titleRef = useRef();
+  const clickRef = useRef();
   const resizeRef = useRef(null);
   const dndId = `bp-${pageData.id}`;
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
   const { columnsState } = useContext(ColumnsContext);
-
-  useEffect(() => {
-    // セッティングにサイズデータはあるか？
-    if (pageData.setting) {
-      const data = JSON.parse(pageData.setting);
-      if (data.width) {
-        const initialSize = {
-          width: data.width,
-          height: data.height,
-        };
-        setPaperSize(initialSize);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (columnsState.columns !== 0) {
-      const newWidth = calcItemWidth(columnsState);
-      setPaperSize((prevSize) => ({
-        width: newWidth,
-        height: prevSize.height,
-      }));
-    }
-  }, [columnsState]);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const dndData: DndTagDataElement = {
     area: 'boardBody',
@@ -80,6 +61,47 @@ function Boardpage({
       id: dndId,
       data: dndData,
     });
+
+  useEffect(() => {
+    // セッティングにサイズデータはあるか？
+    if (pageData.setting) {
+      const data = JSON.parse(pageData.setting);
+      if (data.width) {
+        const initialSize = {
+          width: data.width,
+          height: data.height,
+        };
+        setPaperSize(initialSize);
+      }
+    }
+
+    // フォーカス処理
+    // クリックイベントを処理する関数
+    const handleClickOutside = (event) => {
+      if (clickRef.current && !clickRef.current.contains(event.target)) {
+        setIsFocused(false);
+      }
+    };
+
+    // ドキュメントにイベントリスナーを追加
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // クリーンアップ関数
+    return () => {
+      // コンポーネントがアンマウントされる時にイベントリスナーを削除
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (columnsState.columns !== 0) {
+      const newWidth = calcItemWidth(columnsState);
+      setPaperSize((prevSize) => ({
+        width: newWidth,
+        height: prevSize.height,
+      }));
+    }
+  }, [columnsState]);
 
   function updateSize(size: PaperSize) {
     setIsResizing(false);
@@ -130,6 +152,25 @@ function Boardpage({
     }
   }
 
+  async function softDeleteBoard() {
+    // 削除
+    const deleteQuery = {
+      table: 'page',
+      conditions: {
+        id: pageData.id,
+      },
+    };
+
+    window.electron.ipcRenderer.sendMessage('softDelete', deleteQuery);
+
+    // アプデ
+    window.electron.ipcRenderer.sendMessage('eventReply', 'updateBoardBody');
+  }
+
+  function handleFocus(param: boolean) {
+    setIsFocused(param);
+  }
+
   const borderColer = theme.palette.primary.main;
 
   return (
@@ -157,11 +198,19 @@ function Boardpage({
     >
       <Paper
         className="boardPaper"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => handleFocus(true)}
         elevation={1}
-        ref={setNodeRef}
+        ref={(node) => {
+          setNodeRef(node);
+          clickRef.current = node;
+        }}
         sx={{
           position: 'relative',
-          border: '0.5px solid #999',
+          border: isFocused
+            ? `1.5px solid ${theme.palette.primary.main}`
+            : '0.5px solid #999',
           width: '100%',
           height: '100%',
         }}
@@ -178,6 +227,17 @@ function Boardpage({
             top: 4,
           }}
         />
+        <PlaneIconButton
+          onClick={() => softDeleteBoard()}
+          sx={{
+            position: 'absolute',
+            right: 4,
+            top: 4,
+            display: isHovered ? 'block' : 'none', // ここで制御
+          }}
+        >
+          <DeleteIcon width={16} height={16} />
+        </PlaneIconButton>
         <PlaneTextField
           defaultValue={pageData.title}
           inputRef={titleRef}
@@ -193,6 +253,13 @@ function Boardpage({
               p: 0,
               fontSize: 11,
               fontWeight: 500,
+              ':focus': {
+                backgroundColor:
+                  theme.palette.mode === 'light' ? 'white' : 'gray',
+                border: '0.5px solid gray',
+                p: 0.5,
+                opacity: 1,
+              },
             },
           }}
         />

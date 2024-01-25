@@ -81,7 +81,6 @@ export default function ProjectSettingWindow({
               <PlaneIconButton onClick={() => setIsConfirm(true)}>
                 <TrashIcon />
               </PlaneIconButton>
-              <br />
               {isConfirm && (
                 <ConfirmDialog
                   open={isConfirm}

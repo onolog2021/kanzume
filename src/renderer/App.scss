@@ -314,6 +314,7 @@ $workspace-width: calc(100vw - 240px);
     min-height: 100%;
     padding-left: var(--editor-padding);
     padding-right: var(--editor-padding);
+    padding-bottom: var(--editor-bottom, 80px);
     .ruby {
       position: relative;
       &:hover {

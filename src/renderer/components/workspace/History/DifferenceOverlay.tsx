@@ -37,7 +37,13 @@ export default function DifferenceOverlay({ diffText, switchDisplsy }) {
     }
     if (text[0] === -1) {
       return (
-        <span key={index} style={{ color: 'blue', fontWeight: 700 }}>
+        <span
+          key={index}
+          style={{
+            color: theme.palette.mode === 'dark' ? 'gray' : '#9bbdfb',
+            fontWeight: 700,
+          }}
+        >
           {text[1]}
         </span>
       );
