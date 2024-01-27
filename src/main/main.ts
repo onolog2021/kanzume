@@ -15,7 +15,8 @@ import log from 'electron-log';
 import fs from 'fs';
 import { error } from 'console';
 import Store from 'electron-store';
-import { exec } from 'child_process';
+import { exec as execCallback } from 'child_process';
+import { promisify } from 'util';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import './ipcMain';
@@ -82,39 +83,29 @@ class AppUpdater {
   }
 }
 
-function checkGit() {
-  return new Promise((resolve, reject) => {
-    // Gitがインストールされているかチェック
-    console.log('checking git');
-    exec('git --version', (error, stdout, stderr) => {
-      if (error) {
-        reject(false);
-        return;
-      }
+const exec = promisify(execCallback);
 
-      // Gitユーザー名とメールアドレスをチェック
-      exec('git config user.name', (errorName, stdoutName, stderrName) => {
-        if (errorName || !stdoutName.trim()) {
-          reject(false);
-          return;
-        }
+async function checkGit() {
+  console.log('checking Git');
+  try {
+    const { stdout: gitVersion } = await exec('git --version');
+    const { stdout: userName } = await exec('git config user.name');
+    if (!userName.trim()) {
+      throw new Error('Git user.name is not set');
+    }
 
-        exec(
-          'git config user.email',
-          (errorEmail, stdoutEmail, stderrEmail) => {
-            if (errorEmail || !stdoutEmail.trim()) {
-              reject(false);
-              return;
-            }
+    const { stdout: userEmail } = await exec('git config user.email');
+    if (!userEmail.trim()) {
+      throw new Error('Git user.email is not set');
+    }
 
-            // すべてのチェックが完了
-            resolve(true);
-          }
-        );
-      });
-    });
-  });
+    return true;
+  } catch (error) {
+    console.error('Error checking Git:', error);
+    return false;
+  }
 }
+
 let mainWindow: BrowserWindow | null = null;
 Menu.setApplicationMenu(null);
 if (process.env.NODE_ENV === 'production') {
